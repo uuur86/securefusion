@@ -1,0 +1,602 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: securefusion\n"
+"POT-Creation-Date: 2024-01-19 06:40+0300\n"
+"PO-Revision-Date: 2024-01-19 07:36+0300\n"
+"Last-Translator: \n"
+"Language-Team: contact@codeplus.dev\n"
+"Language: es_ES\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.4.2\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-Flags-xgettext: --add-comments=translators:\n"
+"X-Poedit-WPHeader: securefusion.php\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
+"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;"
+"_nx_noop:3c,1,2;__ngettext_noop:1,2;X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: *.min.js\n"
+"X-Poedit-SearchPathExcluded-1: vendor\n"
+
+#: securefusion.php:24
+msgid "Forbidden!"
+msgstr "¡Prohibido!"
+
+#: src/Lib/Admin.php:48 src/Lib/Admin.php:81 src/Lib/Admin.php:263
+msgid "Settings"
+msgstr "Ajustes"
+
+#. Plugin Name of the plugin/theme
+#: src/Lib/Admin.php:61 src/Lib/Admin.php:62
+msgid "SecureFusion"
+msgstr "SecureFusion"
+
+#: src/Lib/Admin.php:71 src/Lib/Admin.php:145
+msgid "SecureFusion Dashboard"
+msgstr "Panel de control de SecureFusion"
+
+#: src/Lib/Admin.php:72
+msgid "Dashboard"
+msgstr "Escritorio"
+
+#: src/Lib/Admin.php:80
+msgid "SecureFusion Settings"
+msgstr "Configuración de SecureFusion"
+
+#: src/Lib/Admin.php:148
+msgid "You could monitoring your WordPress security settings."
+msgstr "Podría controlar la configuración de seguridad de su WordPress."
+
+#: src/Lib/Admin.php:154
+msgid "Security Status"
+msgstr "Estado de seguridad"
+
+#: src/Lib/Admin.php:156
+msgid "WordPress Version:"
+msgstr "Versión de WordPress:"
+
+#: src/Lib/Admin.php:162
+msgid "Your WordPress version has security vulnurabilities."
+msgstr "Su versión de WordPress tiene vulnerabilidades de seguridad."
+
+#: src/Lib/Admin.php:165
+msgid "PHP Version:"
+msgstr "Versión PHP:"
+
+#: src/Lib/Admin.php:171
+msgid "Your PHP version has security vulnurabilities."
+msgstr "Su versión de PHP tiene vulnerabilidades de seguridad."
+
+#: src/Lib/Admin.php:174
+msgid "Failed login attempts:"
+msgstr "Intentos de inicio de sesión fallidos:"
+
+#: src/Lib/Admin.php:175
+msgid "IPs of Failed Attempts:"
+msgstr "IPs de intentos fallidos:"
+
+#: src/Lib/Admin.php:178
+msgid "Everything is running smoothly. No security issues have been detected."
+msgstr ""
+"Todo funciona correctamente. No se ha detectado ningún problema de seguridad."
+
+#: src/Lib/Admin.php:191
+msgid "XML-RPC FULL PROTECTION"
+msgstr "XML-RPC PROTECCIÓN TOTAL"
+
+#: src/Lib/Admin.php:193
+msgid ""
+"Blocks all remote requests. Most commonly used to prevent all types of "
+"remote attacks."
+msgstr ""
+"Bloquea todas las peticiones remotas. Más comúnmente utilizado para prevenir "
+"todo tipo de ataques remotos."
+
+#: src/Lib/Admin.php:197
+msgid "XML-RPC LOGIN PROTECTION"
+msgstr "PROTECCIÓN DE INICIO DE SESIÓN XML-RPC"
+
+#: src/Lib/Admin.php:199
+msgid ""
+"Blocks remote login requests. Most commonly used to prevent brute force "
+"login attempts."
+msgstr ""
+"Bloquea las solicitudes de inicio de sesión remotas. Más comúnmente "
+"utilizado para evitar intentos de inicio de sesión por fuerza bruta."
+
+#: src/Lib/Admin.php:203
+msgid "XML-RPC PINGBACK PROTECTION"
+msgstr "XML-RPC PROTECCIÓN PINGBACK"
+
+#: src/Lib/Admin.php:205
+msgid ""
+"Blocks remote pingback requests. Most commonly used to prevent DDoS attacks."
+msgstr ""
+"Bloquea las solicitudes de pingback remotas. Más comúnmente utilizado para "
+"prevenir ataques DDoS."
+
+#: src/Lib/Admin.php:209
+msgid "SELF PINGBACK PROTECTION"
+msgstr "AUTOPROTECCIÓN PINGBACK"
+
+#: src/Lib/Admin.php:211
+msgid ""
+"Blocks remote self-pingback requests. Most commonly used to prevent DDoS "
+"attacks."
+msgstr ""
+"Bloquea las peticiones remotas de auto-retorno. Más comúnmente utilizado "
+"para prevenir ataques DDoS."
+
+#: src/Lib/Admin.php:215
+msgid "New Custom Login URL"
+msgstr "Nueva URL de inicio de sesión personalizada"
+
+#: src/Lib/Admin.php:217
+msgid "Hides login url from the attackers."
+msgstr "Oculta la url de acceso a los atacantes."
+
+#: src/Lib/Admin.php:221
+msgid "Enable HTTPS / SSL"
+msgstr "Habilitar HTTPS / SSL"
+
+#: src/Lib/Admin.php:223
+msgid "SSL automatically encrypts your privileged information data."
+msgstr "SSL encripta automáticamente sus datos de información privilegiada."
+
+#: src/Lib/Admin.php:227
+msgid "Force HTTPS Login"
+msgstr "Forzar inicio de sesión HTTPS"
+
+#: src/Lib/Admin.php:229
+msgid "Redirect login page protocol HTTP to HTTPS"
+msgstr "Redirigir el protocolo de la página de inicio de sesión HTTP a HTTPS"
+
+#: src/Lib/Admin.php:232
+msgid "Change Login Error"
+msgstr "Cambiar error de inicio de sesión"
+
+#: src/Lib/Admin.php:234
+msgid ""
+"Disable default login errors and provide attackers with less than what they "
+"need."
+msgstr ""
+"Desactive los errores de inicio de sesión por defecto y proporcione a los "
+"atacantes menos de lo que necesitan."
+
+#: src/Lib/Admin.php:237
+msgid "Change Admin ID"
+msgstr "Cambiar ID de administrador"
+
+#: src/Lib/Admin.php:239
+msgid ""
+"It's not difficult to predict your Admin ID if it's set to `1`. Secure your "
+"site against simple SQL vulnerabilities."
+msgstr ""
+"No es difícil predecir su ID de administrador si está configurado como `1`. "
+"Asegure su sitio contra vulnerabilidades SQL simples."
+
+#: src/Lib/Admin.php:242
+msgid "Forge HTTPS Admin"
+msgstr "Forjar HTTPS Admin"
+
+#: src/Lib/Admin.php:244
+msgid "Redirects the admin page protocol from HTTP to HTTPS"
+msgstr "Redirige el protocolo de la página de administración de HTTP a HTTPS"
+
+#: src/Lib/Admin.php:247
+msgid "Force HTTPS Front Page"
+msgstr "Forzar página de inicio HTTPS"
+
+#: src/Lib/Admin.php:249
+msgid "Redirects the front page protocol from HTTP to HTTPS."
+msgstr "Redirige el protocolo de la página principal de HTTP a HTTPS."
+
+#: src/Lib/Admin.php:252 src/Lib/Admin.php:524
+msgid "Filter Bad Requests"
+msgstr "Filtrar solicitudes erróneas"
+
+#: src/Lib/Admin.php:254
+msgid ""
+"Helps secure your site against attacks like XSS, CSRF, and Code Injections."
+msgstr ""
+"Ayuda a proteger su sitio contra ataques como XSS, CSRF e inyecciones de "
+"código."
+
+#: src/Lib/Admin.php:257
+msgid "Disable Rest API"
+msgstr "Desactivar API Rest"
+
+#: src/Lib/Admin.php:259
+msgid ""
+"Conceals sensitive information from attackers, such as Admin user IDs, user "
+"lists, and their IDs."
+msgstr ""
+"Oculta información sensible a los atacantes, como los ID de los usuarios "
+"administradores, las listas de usuarios y sus ID."
+
+#: src/Lib/Admin.php:265
+msgid "Manage your security features"
+msgstr "Gestione sus elementos de seguridad"
+
+#: src/Lib/Admin.php:267
+msgid "Go to settings"
+msgstr "Ir a los ajustes"
+
+#: src/Lib/Admin.php:282
+msgid ""
+"Only use this if you have an SSL certificate; otherwise, it cannot be "
+"enabled."
+msgstr ""
+"Utilícelo únicamente si dispone de un certificado SSL; de lo contrario, no "
+"podrá habilitarlo."
+
+#: src/Lib/Admin.php:286
+msgid "ERROR! You don’t have any valid SSL certificate. "
+msgstr "¡ERROR! No tiene ningún certificado SSL válido."
+
+#: src/Lib/Admin.php:289
+msgid "Free SSL certificate providers"
+msgstr "Proveedores de certificados SSL gratuitos"
+
+#: src/Lib/Admin.php:291
+msgid "Let’s Encrypt"
+msgstr "Cifremos"
+
+#: src/Lib/Admin.php:295
+msgid "Cloudflare"
+msgstr "Cloudflare"
+
+#: src/Lib/Admin.php:300
+msgid "Comodo / Sectigo"
+msgstr "Comodo / Sectigo"
+
+#: src/Lib/Admin.php:303
+msgid "Digicert"
+msgstr "Digicert"
+
+#: src/Lib/Admin.php:313
+msgid "SecureFusion Security Settings"
+msgstr "Configuración de seguridad de SecureFusion"
+
+#: src/Lib/Admin.php:315
+#, php-format
+msgid "Version %s - Check out"
+msgstr "Versión %s - Comprobar"
+
+#: src/Lib/Admin.php:317
+msgid "What's New"
+msgstr "Qué hay de nuevo"
+
+#: src/Lib/Admin.php:323
+msgid "Additional Plugins"
+msgstr "Plugins adicionales"
+
+#: src/Lib/Admin.php:328
+msgid "You could manage your WordPress security settings."
+msgstr "Puede gestionar la configuración de seguridad de WordPress."
+
+#: src/Lib/Admin.php:337
+msgid "XMLRPC"
+msgstr "XMLRPC"
+
+#: src/Lib/Admin.php:341
+#, fuzzy
+msgid "Login"
+msgstr "Iniciar sesión"
+
+#: src/Lib/Admin.php:345
+msgid "SSL"
+msgstr "SSL"
+
+#: src/Lib/Admin.php:349
+msgid "Firewall"
+msgstr "Cortafuegos"
+
+#: src/Lib/Admin.php:353
+msgid "Advanced"
+msgstr "Avanzado"
+
+#: src/Lib/Admin.php:376
+msgid ""
+"If you don't have experience in cybersecurity or regular expressions, do not "
+"modify these areas."
+msgstr ""
+"Si no tiene experiencia en ciberseguridad o expresiones regulares, no "
+"modifique estas áreas."
+
+#: src/Lib/Admin.php:405
+msgid "Welcome to SecureFusion"
+msgstr "Bienvenido a SecureFusion"
+
+#: src/Lib/Admin.php:411
+#, php-format
+msgid ""
+"Thank you for installing SecureFusion! Check out <a href=\"%s\">the Plugin "
+"Settings</a>"
+msgstr ""
+"¡Gracias por instalar SecureFusion! Compruebe <a href=\"%s\">la "
+"configuración del plugin</a>"
+
+#: src/Lib/Admin.php:422
+msgid "Get started"
+msgstr "Comenzar"
+
+#: src/Lib/Admin.php:444
+msgid "XML-RPC SETTINGS"
+msgstr "CONFIGURACIÓN XML-RPC"
+
+#: src/Lib/Admin.php:445
+msgid "You can prevent to xmlrpc attacks."
+msgstr "Puede prevenir los ataques xmlrpc."
+
+#: src/Lib/Admin.php:451
+msgid "Disable All XML-RPC Services"
+msgstr "Desactivar todos los servicios XML-RPC"
+
+#: src/Lib/Admin.php:455 src/Lib/Admin.php:471 src/Lib/Admin.php:487
+#: src/Lib/Admin.php:503 src/Lib/Admin.php:528 src/Lib/Admin.php:543
+#: src/Lib/Admin.php:558 src/Lib/Admin.php:573 src/Lib/Admin.php:588
+msgid "No"
+msgstr "No"
+
+#: src/Lib/Admin.php:459 src/Lib/Admin.php:475 src/Lib/Admin.php:491
+#: src/Lib/Admin.php:507 src/Lib/Admin.php:532 src/Lib/Admin.php:547
+#: src/Lib/Admin.php:562 src/Lib/Admin.php:577 src/Lib/Admin.php:592
+msgid "Yes"
+msgstr "Sí"
+
+#: src/Lib/Admin.php:462
+msgid ""
+"Enabling this option will completely disable XML-RPC functionality, which "
+"can prevent certain types of attacks but may affect integrations with other "
+"systems and applications."
+msgstr ""
+"Si activa esta opción, desactivará por completo la funcionalidad XML-RPC, lo "
+"que puede evitar ciertos tipos de ataques pero puede afectar a las "
+"integraciones con otros sistemas y aplicaciones."
+
+#: src/Lib/Admin.php:467
+msgid "Disable XML-RPC Login Service"
+msgstr "Desactivar el servicio de inicio de sesión XML-RPC"
+
+#: src/Lib/Admin.php:478
+msgid ""
+"If checked, this will disable login capability through XML-RPC. This helps "
+"prevent brute force attacks but may affect some legitimate XML-RPC uses."
+msgstr ""
+"Si se marca, se deshabilitará la capacidad de inicio de sesión a través de "
+"XML-RPC. Esto ayuda a prevenir ataques de fuerza bruta pero puede afectar a "
+"algunos usos legítimos de XML-RPC."
+
+#: src/Lib/Admin.php:483
+msgid "Disable XML-RPC Pingback Service"
+msgstr "Desactivar el servicio de Pingback XML-RPC"
+
+#: src/Lib/Admin.php:494
+msgid ""
+"Pingbacks can be abused for DDoS attacks. Disabling this will prevent "
+"pingbacks, improving security."
+msgstr ""
+"Se puede abusar de los pingbacks para realizar ataques DDoS. Deshabilitar "
+"esto evitará los pingbacks, mejorando la seguridad."
+
+#: src/Lib/Admin.php:499
+msgid "Disable Self Pingback Service"
+msgstr "Desactivar el servicio Self Pingback"
+
+#: src/Lib/Admin.php:510
+msgid ""
+"WordPress generates pingbacks to its own posts by default. This option "
+"disables such self-pingbacks."
+msgstr ""
+"WordPress genera pingbacks a sus propias entradas por defecto. Esta opción "
+"desactiva dichos pingbacks propios."
+
+#: src/Lib/Admin.php:517
+msgid "FIREWALL SETTINGS"
+msgstr "CONFIGURACIÓN DEL CORTAFUEGOS"
+
+#: src/Lib/Admin.php:518
+msgid "Firewall security settings. (Beta)"
+msgstr "Configuración de seguridad del cortafuegos. (Beta)"
+
+#: src/Lib/Admin.php:539
+msgid "Disable Rest API for Visitors"
+msgstr "Desactivar la API Rest para visitantes"
+
+#: src/Lib/Admin.php:554
+msgid "Hide apache and PHP version"
+msgstr "Ocultar versión de apache y PHP"
+
+#: src/Lib/Admin.php:569
+msgid "Block bad bots"
+msgstr "Bloquear bots malos"
+
+#: src/Lib/Admin.php:584
+msgid "Add HTTP Headers for Browser Security"
+msgstr "Añadir cabeceras HTTP para la seguridad del navegador"
+
+#: src/Lib/Admin.php:601
+msgid "LOGIN SETTINGS - BE CAREFUL!"
+msgstr "AJUSTES DE INICIO DE SESIÓN - ¡TENGA CUIDADO!"
+
+#: src/Lib/Admin.php:602
+msgid ""
+"You can hide or secure your login page against the attackers. Please save "
+"your new login url before you change it."
+msgstr ""
+"Puede ocultar o proteger su página de inicio de sesión contra los atacantes. "
+"Por favor, guarde su nueva url de inicio de sesión antes de cambiarla."
+
+#: src/Lib/Admin.php:608
+msgid "Min. Wait Time"
+msgstr "Min. Tiempo de espera"
+
+#: src/Lib/Admin.php:610
+msgid " hour(s)"
+msgstr " hora(s)"
+
+#: src/Lib/Admin.php:610
+msgid "Minimum Wait Time After Failed Attempt"
+msgstr "Tiempo mínimo de espera tras un intento fallido"
+
+#: src/Lib/Admin.php:615
+msgid "Max. Attempt Limit"
+msgstr "Max. Límite de intentos"
+
+#: src/Lib/Admin.php:617
+msgid " time(s)"
+msgstr " tiempo(s)"
+
+#: src/Lib/Admin.php:617
+msgid "Maksimum Failed Login Attempt Limit"
+msgstr "Maksimum Límite de intentos de inicio de sesión fallidos"
+
+#: src/Lib/Admin.php:622
+msgid "Custom Login Path"
+msgstr "Mensaje personalizado a mostrar a los usuarios bloqueados"
+
+#: src/Lib/Admin.php:629
+msgid "Custom Login Error Message"
+msgstr "Mensaje de error de inicio de sesión personalizado"
+
+#: src/Lib/Admin.php:634
+msgid "Your Admin ID"
+msgstr "Su ID de administrador"
+
+#: src/Lib/Admin.php:646
+msgid "SSL SETTINGS"
+msgstr "CONFIGURACIÓN DE SSL"
+
+#: src/Lib/Admin.php:647
+msgid "HTTPS/SSL security settings."
+msgstr "Configuración de seguridad HTTPS/SSL."
+
+#: src/Lib/Admin.php:654
+msgid "HTTPS Support"
+msgstr "Soporte HTTPS"
+
+#: src/Lib/Admin.php:657 src/Lib/Admin.php:673 src/Lib/Admin.php:689
+#: src/Lib/Admin.php:705 src/Lib/Admin.php:721
+msgid "Disabled"
+msgstr "Desactivado"
+
+#: src/Lib/Admin.php:661 src/Lib/Admin.php:677 src/Lib/Admin.php:693
+#: src/Lib/Admin.php:709 src/Lib/Admin.php:725
+msgid "Enabled"
+msgstr "Habilitado"
+
+#: src/Lib/Admin.php:670
+msgid "Force HTTPS on login page"
+msgstr "Forzar HTTPS en la página de inicio de sesión"
+
+#: src/Lib/Admin.php:686
+msgid "Force HTTPS on admin page"
+msgstr "Forzar HTTPS en la página de administración"
+
+#: src/Lib/Admin.php:702
+msgid "Force HTTPS on front page"
+msgstr "Forzar HTTPS en la página principal"
+
+#: src/Lib/Admin.php:718
+msgid "Force HTTPS site-wide"
+msgstr "Forzar HTTPS en todo el sitio"
+
+#: src/Lib/Admin.php:735
+msgid "ADVANCED SETTINGS"
+msgstr "AJUSTES AVANZADOS"
+
+#: src/Lib/Admin.php:736
+msgid ""
+"Advanced security settings. `Filter Bad Requests` must be active for it to "
+"work. Separated by lines. For example: [a-z0-9]+/#[a-z]*"
+msgstr ""
+"Configuración de seguridad avanzada. el `Filtro de malas solicitudes` debe "
+"estar activo para que funcione. Separado por líneas. Por ejemplo: [a-z0-9]+/"
+"#[a-z]*"
+
+#: src/Lib/Admin.php:742
+msgid "Cookie Regex Patterns"
+msgstr "Patrones Regex de cookies"
+
+#: src/Lib/Admin.php:748
+msgid "Get/Post Request Regex Patterns"
+msgstr "Patrones Regex de solicitud Get/Post"
+
+#: src/Lib/Admin.php:803
+msgid "enabled"
+msgstr "habilitado"
+
+#: src/Lib/Admin.php:803
+msgid "disabled"
+msgstr "deshabilitado"
+
+#: src/Lib/Middleware.php:156
+msgid "SecureFusion Firewall has been denied this cookie request."
+msgstr "Se ha denegado esta solicitud de cookie a SecureFusion Firewall."
+
+#: src/Lib/Middleware.php:157
+msgid "Cookie Failure"
+msgstr "Fallo de la galleta"
+
+#: src/Lib/Middleware.php:207
+msgid "SecureFusion Firewall has been denied this comment submission."
+msgstr "Se ha denegado el envío de este comentario a SecureFusion Firewall."
+
+#: src/Lib/Middleware.php:208
+msgid "Comment Submission Failure"
+msgstr "Fallo al Enviar Comentario"
+
+#: src/Lib/Middleware.php:216
+msgid "SecureFusion Firewall has been denied this request."
+msgstr "Se ha denegado esta solicitud a SecureFusion Firewall."
+
+#: src/Lib/Middleware.php:217
+msgid "Request Failure"
+msgstr "Solicitud de fracaso"
+
+#: src/Lib/Middleware.php:230
+msgid "SecureFusion Firewall has been denied this WP Queries."
+msgstr "El Firewall SecureFusion ha denegado esta consulta WP."
+
+#: src/Lib/Middleware.php:231
+msgid "WP Query Failure"
+msgstr "Fallo en la consulta de WP"
+
+#: src/Lib/Middleware.php:361
+msgid "<strong>ERROR</strong>: You have reached the login attempts limit."
+msgstr ""
+"<strong>ERROR</strong>: Ha alcanzado el límite de intentos de inicio de "
+"sesión."
+
+#: src/Lib/Middleware.php:362
+msgid "Too many failed login attempts"
+msgstr "Demasiados intentos de inicio de sesión fallidos"
+
+#: xmlrpc_server.php:47
+msgid "XMLRPC login disabled"
+msgstr "Inicio de sesión XMLRPC desactivado"
+
+#: xmlrpc_server.php:64
+msgid "XMLRPC pingback disabled"
+msgstr "XMLRPC pingback desactivado"
+
+#. Plugin URI of the plugin/theme
+msgid "https://codeplus.dev/securefusion"
+msgstr "https://codeplus.dev/securefusion"
+
+#. Description of the plugin/theme
+msgid "SecureFusion is a lightweight, robust security plugin for WordPress."
+msgstr ""
+"SecureFusion es un plugin de seguridad ligero y robusto para WordPress."
+
+#. Author of the plugin/theme
+msgid "codeplusdev <contact@codeplus.dev>"
+msgstr "codeplusdev <contact@codeplus.dev>"
+
+#. Author URI of the plugin/theme
+msgid "https://profiles.wordpress.org/codeplusdev/"
+msgstr "https://profiles.wordpress.org/codeplusdev/"

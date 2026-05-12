@@ -1,0 +1,598 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: securefusion\n"
+"POT-Creation-Date: 2024-01-19 06:40+0300\n"
+"PO-Revision-Date: 2024-01-19 07:27+0300\n"
+"Last-Translator: \n"
+"Language-Team: contact@codeplus.dev\n"
+"Language: tr_TR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.4.2\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-Flags-xgettext: --add-comments=translators:\n"
+"X-Poedit-WPHeader: securefusion.php\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
+"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;"
+"_nx_noop:3c,1,2;__ngettext_noop:1,2;X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: *.min.js\n"
+"X-Poedit-SearchPathExcluded-1: vendor\n"
+
+#: securefusion.php:24
+msgid "Forbidden!"
+msgstr "Yasak!"
+
+#: src/Lib/Admin.php:48 src/Lib/Admin.php:81 src/Lib/Admin.php:263
+msgid "Settings"
+msgstr "Ayarlar"
+
+#. Plugin Name of the plugin/theme
+#: src/Lib/Admin.php:61 src/Lib/Admin.php:62
+msgid "SecureFusion"
+msgstr "SecureFusion"
+
+#: src/Lib/Admin.php:71 src/Lib/Admin.php:145
+msgid "SecureFusion Dashboard"
+msgstr "SecureFusion Güvenlik Durumu"
+
+#: src/Lib/Admin.php:72
+msgid "Dashboard"
+msgstr "Kontrol Paneli"
+
+#: src/Lib/Admin.php:80
+msgid "SecureFusion Settings"
+msgstr "SecureFusion Ayarları"
+
+#: src/Lib/Admin.php:148
+msgid "You could monitoring your WordPress security settings."
+msgstr "WordPress güvenlik ayarlarınızı izleyebilirsiniz."
+
+#: src/Lib/Admin.php:154
+msgid "Security Status"
+msgstr "Güvenlik Durumu"
+
+#: src/Lib/Admin.php:156
+msgid "WordPress Version:"
+msgstr "Versiyon:"
+
+#: src/Lib/Admin.php:162
+msgid "Your WordPress version has security vulnurabilities."
+msgstr "WordPress sürümünüzde güvenlik açıkları var."
+
+#: src/Lib/Admin.php:165
+msgid "PHP Version:"
+msgstr "PHP Sürümü:"
+
+#: src/Lib/Admin.php:171
+msgid "Your PHP version has security vulnurabilities."
+msgstr "PHP sürümünüzde güvenlik açıkları var."
+
+#: src/Lib/Admin.php:174
+msgid "Failed login attempts:"
+msgstr "Başarısız oturum açma denemeleri:"
+
+#: src/Lib/Admin.php:175
+msgid "IPs of Failed Attempts:"
+msgstr "Başarısız Girişimlerin IP'leri:"
+
+#: src/Lib/Admin.php:178
+msgid "Everything is running smoothly. No security issues have been detected."
+msgstr ""
+"Her şey sorunsuz çalışıyor. Herhangi bir güvenlik sorunu tespit edilmedi."
+
+#: src/Lib/Admin.php:191
+msgid "XML-RPC FULL PROTECTION"
+msgstr "XML-RPC TAM KORUMA"
+
+#: src/Lib/Admin.php:193
+msgid ""
+"Blocks all remote requests. Most commonly used to prevent all types of "
+"remote attacks."
+msgstr ""
+"Tüm uzak istekleri engeller. En yaygın olarak her türlü uzaktan saldırıyı "
+"önlemek için kullanılır."
+
+#: src/Lib/Admin.php:197
+msgid "XML-RPC LOGIN PROTECTION"
+msgstr "XML-RPC OTURUM AÇMA KORUMASI"
+
+#: src/Lib/Admin.php:199
+msgid ""
+"Blocks remote login requests. Most commonly used to prevent brute force "
+"login attempts."
+msgstr ""
+"Uzaktan oturum açma isteklerini engeller. En yaygın olarak kaba kuvvet "
+"oturum açma girişimlerini önlemek için kullanılır."
+
+#: src/Lib/Admin.php:203
+msgid "XML-RPC PINGBACK PROTECTION"
+msgstr "XML-RPC PINGBACK KORUMASI"
+
+#: src/Lib/Admin.php:205
+msgid ""
+"Blocks remote pingback requests. Most commonly used to prevent DDoS attacks."
+msgstr ""
+"Uzak pingback isteklerini engeller. En yaygın olarak DDoS saldırılarını "
+"önlemek için kullanılır."
+
+#: src/Lib/Admin.php:209
+msgid "SELF PINGBACK PROTECTION"
+msgstr "KENDI KENDINE PINGBACK KORUMASI"
+
+#: src/Lib/Admin.php:211
+msgid ""
+"Blocks remote self-pingback requests. Most commonly used to prevent DDoS "
+"attacks."
+msgstr ""
+"Uzaktan kendi kendine geri dönüş isteklerini engeller. En yaygın olarak DDoS "
+"saldırılarını önlemek için kullanılır."
+
+#: src/Lib/Admin.php:215
+msgid "New Custom Login URL"
+msgstr "Yeni Özel Giriş URL'si"
+
+#: src/Lib/Admin.php:217
+msgid "Hides login url from the attackers."
+msgstr "Saldırganlardan giriş URL'sini gizler."
+
+#: src/Lib/Admin.php:221
+msgid "Enable HTTPS / SSL"
+msgstr "HTTPS / SSL'yi Etkinleştir"
+
+#: src/Lib/Admin.php:223
+msgid "SSL automatically encrypts your privileged information data."
+msgstr "SSL, ayrıcalıklı bilgi verilerinizi otomatik olarak şifreler."
+
+#: src/Lib/Admin.php:227
+msgid "Force HTTPS Login"
+msgstr "HTTPS Girişini Zorla"
+
+#: src/Lib/Admin.php:229
+msgid "Redirect login page protocol HTTP to HTTPS"
+msgstr "Oturum açma sayfası protokolü HTTP'yi HTTPS'ye yeniden yönlendirme"
+
+#: src/Lib/Admin.php:232
+msgid "Change Login Error"
+msgstr "Giriş Hatasını Değiştir"
+
+#: src/Lib/Admin.php:234
+msgid ""
+"Disable default login errors and provide attackers with less than what they "
+"need."
+msgstr ""
+"Varsayılan oturum açma hatalarını devre dışı bırakın ve saldırganlara "
+"ihtiyaç duyduklarından daha azını sağlayın."
+
+#: src/Lib/Admin.php:237
+msgid "Change Admin ID"
+msgstr "Yönetici Kimliğini Değiştir"
+
+#: src/Lib/Admin.php:239
+msgid ""
+"It's not difficult to predict your Admin ID if it's set to `1`. Secure your "
+"site against simple SQL vulnerabilities."
+msgstr ""
+"Yönetici kimliğiniz `1` olarak ayarlanmışsa bunu tahmin etmek zor değildir. "
+"Sitenizi basit SQL güvenlik açıklarına karşı koruyun."
+
+#: src/Lib/Admin.php:242
+msgid "Forge HTTPS Admin"
+msgstr "Forge HTTPS Yöneticisi"
+
+#: src/Lib/Admin.php:244
+msgid "Redirects the admin page protocol from HTTP to HTTPS"
+msgstr "Yönetici sayfası protokolünü HTTP'den HTTPS'ye yönlendirir"
+
+#: src/Lib/Admin.php:247
+msgid "Force HTTPS Front Page"
+msgstr "HTTPS Ön Sayfasını Zorla"
+
+#: src/Lib/Admin.php:249
+msgid "Redirects the front page protocol from HTTP to HTTPS."
+msgstr "Ön sayfa protokolünü HTTP'den HTTPS'ye yönlendirir."
+
+#: src/Lib/Admin.php:252 src/Lib/Admin.php:524
+msgid "Filter Bad Requests"
+msgstr "Kötü İstekleri Filtreleme"
+
+#: src/Lib/Admin.php:254
+msgid ""
+"Helps secure your site against attacks like XSS, CSRF, and Code Injections."
+msgstr ""
+"Sitenizi XSS, CSRF ve Kod Enjeksiyonları gibi saldırılara karşı korumaya "
+"yardımcı olur."
+
+#: src/Lib/Admin.php:257
+msgid "Disable Rest API"
+msgstr "Rest API'yi Devre Dışı Bırak"
+
+#: src/Lib/Admin.php:259
+msgid ""
+"Conceals sensitive information from attackers, such as Admin user IDs, user "
+"lists, and their IDs."
+msgstr ""
+"Yönetici kullanıcı kimlikleri, kullanıcı listeleri ve kimlikleri gibi hassas "
+"bilgileri saldırganlardan gizler."
+
+#: src/Lib/Admin.php:265
+msgid "Manage your security features"
+msgstr "Güvenlik özelliklerinizi yönetin"
+
+#: src/Lib/Admin.php:267
+msgid "Go to settings"
+msgstr "Ayarlara git"
+
+#: src/Lib/Admin.php:282
+msgid ""
+"Only use this if you have an SSL certificate; otherwise, it cannot be "
+"enabled."
+msgstr ""
+"Bunu yalnızca bir SSL sertifikanız varsa kullanın; aksi takdirde "
+"etkinleştirilemez."
+
+#: src/Lib/Admin.php:286
+msgid "ERROR! You don’t have any valid SSL certificate. "
+msgstr "HATA! Geçerli bir SSL sertifikanız yok."
+
+#: src/Lib/Admin.php:289
+msgid "Free SSL certificate providers"
+msgstr "Ücretsiz SSL sertifika sağlayıcıları"
+
+#: src/Lib/Admin.php:291
+msgid "Let’s Encrypt"
+msgstr "Let's Encrypt"
+
+#: src/Lib/Admin.php:295
+msgid "Cloudflare"
+msgstr "Cloudflare"
+
+#: src/Lib/Admin.php:300
+msgid "Comodo / Sectigo"
+msgstr "Comodo / Sectigo"
+
+#: src/Lib/Admin.php:303
+msgid "Digicert"
+msgstr "Digicert"
+
+#: src/Lib/Admin.php:313
+msgid "SecureFusion Security Settings"
+msgstr "SecureFusion Güvenlik Ayarları"
+
+#: src/Lib/Admin.php:315
+#, php-format
+msgid "Version %s - Check out"
+msgstr "Sürüm %s - Kontrol edin"
+
+#: src/Lib/Admin.php:317
+msgid "What's New"
+msgstr "Neler Yeni"
+
+#: src/Lib/Admin.php:323
+msgid "Additional Plugins"
+msgstr "Ek Eklentiler"
+
+#: src/Lib/Admin.php:328
+msgid "You could manage your WordPress security settings."
+msgstr "WordPress güvenlik ayarlarınızı yönetebilirsiniz."
+
+#: src/Lib/Admin.php:337
+msgid "XMLRPC"
+msgstr "XMLRPC"
+
+#: src/Lib/Admin.php:341
+msgid "Login"
+msgstr "Giriş"
+
+#: src/Lib/Admin.php:345
+msgid "SSL"
+msgstr "SSL"
+
+#: src/Lib/Admin.php:349
+msgid "Firewall"
+msgstr "Güvenlik Duvarı"
+
+#: src/Lib/Admin.php:353
+msgid "Advanced"
+msgstr "Gelişmiş"
+
+#: src/Lib/Admin.php:376
+msgid ""
+"If you don't have experience in cybersecurity or regular expressions, do not "
+"modify these areas."
+msgstr ""
+"Siber güvenlik veya düzenli ifadeler konusunda deneyiminiz yoksa bu "
+"alanlarda değişiklik yapmayın."
+
+#: src/Lib/Admin.php:405
+msgid "Welcome to SecureFusion"
+msgstr "SecureFusion'a Hoş Geldiniz"
+
+#: src/Lib/Admin.php:411
+#, php-format
+msgid ""
+"Thank you for installing SecureFusion! Check out <a href=\"%s\">the Plugin "
+"Settings</a>"
+msgstr ""
+"SecureFusion'ı yüklediğiniz için teşekkür ederiz! <a href=\"%s\">Eklenti "
+"Ayarlarına</a> göz atın"
+
+#: src/Lib/Admin.php:422
+msgid "Get started"
+msgstr "Başlayın"
+
+#: src/Lib/Admin.php:444
+msgid "XML-RPC SETTINGS"
+msgstr "XML-RPC AYARLARI"
+
+#: src/Lib/Admin.php:445
+msgid "You can prevent to xmlrpc attacks."
+msgstr "Xmlrpc saldırılarını önleyebilirsiniz."
+
+#: src/Lib/Admin.php:451
+msgid "Disable All XML-RPC Services"
+msgstr "Tüm XML-RPC Hizmetlerini Devre Dışı Bırakın"
+
+#: src/Lib/Admin.php:455 src/Lib/Admin.php:471 src/Lib/Admin.php:487
+#: src/Lib/Admin.php:503 src/Lib/Admin.php:528 src/Lib/Admin.php:543
+#: src/Lib/Admin.php:558 src/Lib/Admin.php:573 src/Lib/Admin.php:588
+msgid "No"
+msgstr "Hayır"
+
+#: src/Lib/Admin.php:459 src/Lib/Admin.php:475 src/Lib/Admin.php:491
+#: src/Lib/Admin.php:507 src/Lib/Admin.php:532 src/Lib/Admin.php:547
+#: src/Lib/Admin.php:562 src/Lib/Admin.php:577 src/Lib/Admin.php:592
+msgid "Yes"
+msgstr "Evet"
+
+#: src/Lib/Admin.php:462
+msgid ""
+"Enabling this option will completely disable XML-RPC functionality, which "
+"can prevent certain types of attacks but may affect integrations with other "
+"systems and applications."
+msgstr ""
+"Bu seçeneğin etkinleştirilmesi XML-RPC işlevselliğini tamamen devre dışı "
+"bırakır, bu da belirli saldırı türlerini önleyebilir ancak diğer sistemler "
+"ve uygulamalarla entegrasyonları etkileyebilir."
+
+#: src/Lib/Admin.php:467
+msgid "Disable XML-RPC Login Service"
+msgstr "XML-RPC Oturum Açma Hizmetini Devre Dışı Bırakma"
+
+#: src/Lib/Admin.php:478
+msgid ""
+"If checked, this will disable login capability through XML-RPC. This helps "
+"prevent brute force attacks but may affect some legitimate XML-RPC uses."
+msgstr ""
+"İşaretlenirse bu, XML-RPC aracılığıyla oturum açma özelliğini devre dışı "
+"bırakır. Bu, kaba kuvvet saldırılarını önlemeye yardımcı olur ancak bazı "
+"meşru XML-RPC kullanımlarını etkileyebilir."
+
+#: src/Lib/Admin.php:483
+msgid "Disable XML-RPC Pingback Service"
+msgstr "XML-RPC Pingback Hizmetini Devre Dışı Bırakma"
+
+#: src/Lib/Admin.php:494
+msgid ""
+"Pingbacks can be abused for DDoS attacks. Disabling this will prevent "
+"pingbacks, improving security."
+msgstr ""
+"Pingback'ler DDoS saldırıları için kötüye kullanılabilir. Bunu devre dışı "
+"bırakmak, geri pingback'leri önleyerek güvenliği artıracaktır."
+
+#: src/Lib/Admin.php:499
+msgid "Disable Self Pingback Service"
+msgstr "Self Pingback Hizmetini Devre Dışı Bırak"
+
+#: src/Lib/Admin.php:510
+msgid ""
+"WordPress generates pingbacks to its own posts by default. This option "
+"disables such self-pingbacks."
+msgstr ""
+"WordPress varsayılan olarak kendi gönderilerine geri pingback oluşturur. Bu "
+"seçenek, bu tür kendi kendine pingback'leri devre dışı bırakır."
+
+#: src/Lib/Admin.php:517
+msgid "FIREWALL SETTINGS"
+msgstr "GÜVENLIK DUVARI AYARLARI"
+
+#: src/Lib/Admin.php:518
+msgid "Firewall security settings. (Beta)"
+msgstr "Güvenlik duvarı güvenlik ayarları. (Beta)"
+
+#: src/Lib/Admin.php:539
+msgid "Disable Rest API for Visitors"
+msgstr "Ziyaretçiler için Rest API'yi Devre Dışı Bırak"
+
+#: src/Lib/Admin.php:554
+msgid "Hide apache and PHP version"
+msgstr "Apache ve PHP sürümünü gizle"
+
+#: src/Lib/Admin.php:569
+msgid "Block bad bots"
+msgstr "Kötü botları engelleyin"
+
+#: src/Lib/Admin.php:584
+msgid "Add HTTP Headers for Browser Security"
+msgstr "Tarayıcı Güvenliği için HTTP Üstbilgileri Ekleme"
+
+#: src/Lib/Admin.php:601
+msgid "LOGIN SETTINGS - BE CAREFUL!"
+msgstr "GIRIŞ AYARLARI - DIKKATLI OLUN!"
+
+#: src/Lib/Admin.php:602
+msgid ""
+"You can hide or secure your login page against the attackers. Please save "
+"your new login url before you change it."
+msgstr ""
+"Giriş sayfanızı saldırganlara karşı gizleyebilir veya güvenli hale "
+"getirebilirsiniz. Lütfen değiştirmeden önce yeni giriş url'nizi kaydedin."
+
+#: src/Lib/Admin.php:608
+msgid "Min. Wait Time"
+msgstr "Min. Bekleme Süresi"
+
+#: src/Lib/Admin.php:610
+msgid " hour(s)"
+msgstr " saat"
+
+#: src/Lib/Admin.php:610
+msgid "Minimum Wait Time After Failed Attempt"
+msgstr "Başarısız Denemeden Sonra Minimum Bekleme Süresi"
+
+#: src/Lib/Admin.php:615
+msgid "Max. Attempt Limit"
+msgstr "Maks. Girişim Sınırı"
+
+#: src/Lib/Admin.php:617
+msgid " time(s)"
+msgstr " defa"
+
+#: src/Lib/Admin.php:617
+msgid "Maksimum Failed Login Attempt Limit"
+msgstr "Maksimum Başarısız Giriş Denemesi Sınırı"
+
+#: src/Lib/Admin.php:622
+msgid "Custom Login Path"
+msgstr "Özel Giriş Yolu"
+
+#: src/Lib/Admin.php:629
+msgid "Custom Login Error Message"
+msgstr "Özel Oturum Açma Hata Mesajı"
+
+#: src/Lib/Admin.php:634
+msgid "Your Admin ID"
+msgstr "Yönetici Kimliğiniz"
+
+#: src/Lib/Admin.php:646
+msgid "SSL SETTINGS"
+msgstr "SSL AYARLARI"
+
+#: src/Lib/Admin.php:647
+msgid "HTTPS/SSL security settings."
+msgstr "HTTPS/SSL güvenlik ayarları."
+
+#: src/Lib/Admin.php:654
+msgid "HTTPS Support"
+msgstr "HTTPS Desteği"
+
+#: src/Lib/Admin.php:657 src/Lib/Admin.php:673 src/Lib/Admin.php:689
+#: src/Lib/Admin.php:705 src/Lib/Admin.php:721
+msgid "Disabled"
+msgstr "Devre dışı"
+
+#: src/Lib/Admin.php:661 src/Lib/Admin.php:677 src/Lib/Admin.php:693
+#: src/Lib/Admin.php:709 src/Lib/Admin.php:725
+msgid "Enabled"
+msgstr "Etkin"
+
+#: src/Lib/Admin.php:670
+msgid "Force HTTPS on login page"
+msgstr "Giriş sayfasında HTTPS'yi zorla"
+
+#: src/Lib/Admin.php:686
+msgid "Force HTTPS on admin page"
+msgstr "Yönetici sayfasında HTTPS'yi zorla"
+
+#: src/Lib/Admin.php:702
+msgid "Force HTTPS on front page"
+msgstr "Ön sayfada HTTPS'yi zorla"
+
+#: src/Lib/Admin.php:718
+msgid "Force HTTPS site-wide"
+msgstr "Site genelinde HTTPS'yi zorla"
+
+#: src/Lib/Admin.php:735
+msgid "ADVANCED SETTINGS"
+msgstr "GELİŞMİŞ AYARLAR"
+
+#: src/Lib/Admin.php:736
+msgid ""
+"Advanced security settings. `Filter Bad Requests` must be active for it to "
+"work. Separated by lines. For example: [a-z0-9]+/#[a-z]*"
+msgstr ""
+"Gelişmiş güvenlik ayarları. çalışması için `Filter Bad Requests` etkin "
+"olmalıdır. Satırlarla ayrılmış. Örneğin: [a-z0-9]+/#[a-z]*"
+
+#: src/Lib/Admin.php:742
+msgid "Cookie Regex Patterns"
+msgstr "Çerez Regex Kalıpları"
+
+#: src/Lib/Admin.php:748
+msgid "Get/Post Request Regex Patterns"
+msgstr "Get/Post İstek Regex Kalıpları"
+
+#: src/Lib/Admin.php:803
+msgid "enabled"
+msgstr "etkin"
+
+#: src/Lib/Admin.php:803
+msgid "disabled"
+msgstr "devre dışı"
+
+#: src/Lib/Middleware.php:156
+msgid "SecureFusion Firewall has been denied this cookie request."
+msgstr "SecureFusion Güvenlik Duvarı bu çerez isteğini reddetti."
+
+#: src/Lib/Middleware.php:157
+msgid "Cookie Failure"
+msgstr "Kurabiye Arızası"
+
+#: src/Lib/Middleware.php:207
+msgid "SecureFusion Firewall has been denied this comment submission."
+msgstr "SecureFusion Güvenlik Duvarı'nın bu yorum gönderimi reddedildi."
+
+#: src/Lib/Middleware.php:208
+msgid "Comment Submission Failure"
+msgstr "Yorum Gönderme Hatası"
+
+#: src/Lib/Middleware.php:216
+msgid "SecureFusion Firewall has been denied this request."
+msgstr "SecureFusion Güvenlik Duvarı bu isteği reddetti."
+
+#: src/Lib/Middleware.php:217
+msgid "Request Failure"
+msgstr "Talep Başarısızlığı"
+
+#: src/Lib/Middleware.php:230
+msgid "SecureFusion Firewall has been denied this WP Queries."
+msgstr "SecureFusion Güvenlik Duvarı bu WP Sorgularını reddetti."
+
+#: src/Lib/Middleware.php:231
+msgid "WP Query Failure"
+msgstr "WP Sorgu Hatası"
+
+#: src/Lib/Middleware.php:361
+msgid "<strong>ERROR</strong>: You have reached the login attempts limit."
+msgstr "<strong>HATA</strong>: Giriş denemeleri sınırına ulaştınız."
+
+#: src/Lib/Middleware.php:362
+msgid "Too many failed login attempts"
+msgstr "Çok fazla başarısız giriş denemesi"
+
+#: xmlrpc_server.php:47
+msgid "XMLRPC login disabled"
+msgstr "XMLRPC oturum açma devre dışı"
+
+#: xmlrpc_server.php:64
+msgid "XMLRPC pingback disabled"
+msgstr "XMLRPC pingback devre dışı"
+
+#. Plugin URI of the plugin/theme
+msgid "https://codeplus.dev/securefusion"
+msgstr "https://codeplus.dev/securefusion"
+
+#. Description of the plugin/theme
+msgid "SecureFusion is a lightweight, robust security plugin for WordPress."
+msgstr ""
+"SecureFusion, WordPress için hafif ve sağlam bir güvenlik eklentisidir."
+
+#. Author of the plugin/theme
+msgid "codeplusdev <contact@codeplus.dev>"
+msgstr "codeplusdev <contact@codeplus.dev>"
+
+#. Author URI of the plugin/theme
+msgid "https://profiles.wordpress.org/codeplusdev/"
+msgstr "https://profiles.wordpress.org/codeplusdev/"

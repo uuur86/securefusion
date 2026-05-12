@@ -1,0 +1,2 @@
+# SecureFusion
+WordPress security plugin

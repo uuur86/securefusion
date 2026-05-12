@@ -1,0 +1,11 @@
+{
+	"require": {
+		"collizo4sky/persist-admin-notices-dismissal": "^1.4",
+		"uuur86/wasp": "^2.1"
+	},
+	"autoload": {
+		"psr-4": {
+			"SecureFusion\\": "src/"
+		}
+	}
+}
