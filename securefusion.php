@@ -26,6 +26,10 @@ if ( ! defined( 'SECUREFUSION_PATH' ) ) {
 	define( 'SECUREFUSION_PATH', plugin_dir_path( __FILE__ ) );
 }
 
+if ( ! defined( 'SECUREFUSION_URL' ) ) {
+	define( 'SECUREFUSION_URL', plugin_dir_url( __FILE__ ) );
+}
+
 if ( ! defined( 'SECUREFUSION_BASENAME' ) ) {
 	define( 'SECUREFUSION_BASENAME', plugin_basename( __FILE__ ) );
 }

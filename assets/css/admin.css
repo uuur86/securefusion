@@ -286,3 +286,138 @@ input:checked + .slider:before {
         margin-bottom: 20px;
     }
 }
+
+/*
+ * Taginput component for CSP fields
+ */
+.taginput-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 4px;
+    background: #fff;
+    min-height: 50px;
+}
+
+.taginput-wrapper:focus-within {
+    border-color: #01b9ba;
+    box-shadow: 0 0 0 1px #01b9ba;
+}
+
+.taginput-input-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.taginput-input {
+    border: 1px solid #ddd;
+    outline: none;
+    flex: 1;
+    min-width: 200px;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+.taginput-input:focus {
+    border-color: #01b9ba;
+}
+
+.taginput-input::placeholder {
+    color: #999;
+}
+
+.taginput-add-btn {
+    background: #01b9ba;
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.taginput-add-btn:hover {
+    background: #019daa;
+}
+
+.taginput-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.taginput-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #e8f5f5;
+    color: #01b9ba;
+    padding: 5px 10px;
+    border-radius: 3px;
+    font-size: 13px;
+    border: 1px solid #01b9ba;
+}
+
+.taginput-tag .taginput-remove {
+    cursor: pointer;
+    font-weight: bold;
+    color: #01b9ba;
+    line-height: 1;
+    font-size: 16px;
+}
+
+.taginput-tag .taginput-remove:hover {
+    color: #ff6600;
+}
+
+.taginput-presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed #ddd;
+}
+
+.taginput-presets-label {
+    font-size: 11px;
+    color: #666;
+    width: 100%;
+    margin-bottom: 4px;
+}
+
+.taginput-preset-btn {
+    background: #f0f0f0;
+    color: #555;
+    border: 1px solid #ddd;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.taginput-preset-btn:hover {
+    background: #01b9ba;
+    color: #fff;
+    border-color: #01b9ba;
+}
+
+.taginput-hidden {
+    display: none;
+}
+
+.taginput-error {
+    color: #dc3545;
+    font-size: 12px;
+    margin-top: 4px;
+    display: none;
+}
+
+.taginput-error.show {
+    display: block;
+}

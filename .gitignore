@@ -1,4 +1,6 @@
 *.log
 .idea/
 vendor/
-
+.claude/
+docs/
+dist/
