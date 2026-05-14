@@ -4,3 +4,4 @@ vendor/
 .claude/
 docs/
 dist/
+composer.lock

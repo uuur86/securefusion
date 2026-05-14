@@ -1,7 +1,7 @@
 <?php
-
 /**
  * Main Class
+ *
  * @package securefusion
  */
 
@@ -10,146 +10,169 @@ namespace SecureFusion\Lib;
 use SecureFusion\Lib as Sources;
 
 
+/**
+ * Main Class
+ *
+ * @package securefusion
+ */
+class Main {
 
-class Main
-{
+	/**
+	 * Protected variables
+	 *
+	 * @access  protected
+	 * @var     object
+	 */
+	protected $login;
+	/**
+	 * Protected variables
+	 *
+	 * @access  protected
+	 * @var     object
+	 */
+	protected $admin;
+	/**
+	 * Protected variables
+	 *
+	 * @access  protected
+	 * @var     object
+	 */
+	protected $xmlrpc;
+	/**
+	 * Protected variables
+	 *
+	 * @access  protected
+	 * @var     object
+	 */
+	protected $ssl_control;
+	/**
+	 * Protected variables
+	 *
+	 * @access  protected
+	 * @var     object
+	 */
+	protected $middleware;
 
-    protected $login;
-    protected $admin;
-    protected $xmlrpc;
-    protected $ssl_control;
-    protected $middleware;
-
-    protected $default_settings;
-
-
-
-    public function __construct()
-    {
-        // Default values
-        $default_settings = array(
-            "disable_xmlrpc" => "0",
-            "disable_xmlrpc_user_login" => "1",
-            "disable_xmlrpc_pingback" => "1",
-            "disable_self_pingback" => "1",
-            "ip_time_limit" => "10",
-            "ip_login_limit" => "5",
-            "custom_login_url" => "",
-            "change_login_error" => "",
-            "change_admin_id" => "",
-            "filter_bad_requests" => "1",
-            "disable_rest_api" => "1",
-            "hide_versions" => "1",
-            "bad_bots" => "1",
-            "http_headers" => "1",
-            "cookie_patterns" => "",
-            "request_patterns" => "",
-
-            /**
-             * WARNING: 'unsafe-inline' is needed for compatibility with many WordPress plugins,
-             * but it is a security risk. The ideal solution is a nonce-based policy,
-             * which is complex to implement across a theme and plugins.
-             */
-            "csp_allowed_style_sources" => '\'unsafe-inline\'' . PHP_EOL .
-                'https://fonts.googleapis.com' . PHP_EOL .
-                'https://cdnjs.cloudflare.com' . PHP_EOL .
-                'https://www.googletagmanager.com'
-            ,
-            "csp_allowed_script_sources" => '\'unsafe-inline\'' . PHP_EOL .
-                'https://www.googletagmanager.com'
-            ,
-            "csp_allowed_font_sources" => 'data:' . PHP_EOL .
-                'https://fonts.gstatic.com' . PHP_EOL .
-                'https://cdnjs.cloudflare.com',
-            "csp_allowed_img_sources" => 'data:' . PHP_EOL .
-                'https://secure.gravatar.com' . PHP_EOL .
-                'https://s.w.org',
-            "csp_allowed_frame_sources" => 'data:' . PHP_EOL .
-                'https://youtube.com' . PHP_EOL .
-                'https://www.youtube.com',
-            "csp_allowed_worker_sources" => 'blob:',
-        );
-
-        $this->default_settings = $default_settings;
-
-        $this->admin = new Sources\Admin($default_settings);
-        $this->login = new Sources\Login();
-        $this->ssl_control = new Sources\SSLControl();
-        $this->xmlrpc = new Sources\XMLRPC();
-        $this->middleware = new Sources\Middleware();
-
-        add_action('admin_init', array('PAnD', 'init'));
-
-        // ADMIN
-        add_action('init', array($this->admin, 'init'));
-
-        // XMLRPC
-        add_action('init', array($this->xmlrpc, 'init'));
-
-        // LOGIN
-        add_action('init', array($this->login, 'init'));
-
-        // SSL CONTROL
-        add_action('plugin_loaded', array($this->ssl_control, 'init'));
-
-        // MIDDLEWARE
-        add_action('plugin_loaded', array($this->middleware, 'init'));
-        add_action('init', array($this->middleware, 'filter_bad_requests'), 10);
-        add_filter('wp_authenticate_user', array($this->middleware, 'track_authenticate_user'), 30, 2);
-        add_action('wp_authenticate', array($this->middleware, 'track_limit_login_attempts'), 10, 2);
-        add_action('init', array($this->middleware, 'headers'), 9);
-    }
+	/**
+	 * Protected variables
+	 *
+	 * @access  protected
+	 * @var     array
+	 */
+	protected $default_settings;
 
 
 
-    public function activate()
-    {
-        global $wpdb;
+	/**
+	 * Constructor
+	 */
+	public function __construct() {
+		// Default values.
+		$default_settings = array(
+			'disable_xmlrpc'             => '0',
+			'disable_xmlrpc_user_login'  => '1',
+			'disable_xmlrpc_pingback'    => '1',
+			'disable_self_pingback'      => '1',
+			'ip_time_limit'              => '10',
+			'ip_login_limit'             => '5',
+			'custom_login_url'           => '',
+			'change_login_error'         => '',
+			'change_admin_id'            => '',
+			'filter_bad_requests'        => '1',
+			'disable_rest_api'           => '1',
+			'hide_versions'              => '1',
+			'bad_bots'                   => '1',
+			'http_headers'               => '1',
+			'cookie_patterns'            => '',
+			'request_patterns'           => '',
 
-        $old_settings = get_option('secuplug_settings');
-        $new_settings = get_option('securefusion_settings', array());
+			/**
+			 * WARNING: 'unsafe-inline' is needed for compatibility with many WordPress plugins,
+			 * but it is a security risk. The ideal solution is a nonce-based policy,
+			 * which is complex to implement across a theme and plugins.
+			 */
+			'csp_allowed_style_sources'  => '\'unsafe-inline\'' . PHP_EOL .
+				'https://fonts.googleapis.com' . PHP_EOL .
+				'https://cdnjs.cloudflare.com' . PHP_EOL .
+				'https://www.googletagmanager.com',
+			'csp_allowed_script_sources' => '\'unsafe-inline\'' . PHP_EOL .
+				'https://www.googletagmanager.com',
+			'csp_allowed_font_sources'   => 'data:' . PHP_EOL .
+				'https://fonts.gstatic.com' . PHP_EOL .
+				'https://cdnjs.cloudflare.com',
+			'csp_allowed_img_sources'    => 'data:' . PHP_EOL .
+				'https://secure.gravatar.com' . PHP_EOL .
+				'https://s.w.org',
+			'csp_allowed_frame_sources'  => 'data:' . PHP_EOL .
+				'https://youtube.com' . PHP_EOL .
+				'https://www.youtube.com',
+			'csp_allowed_worker_sources' => 'blob:',
+		);
 
-        // Update new slug in option table
-        if ($old_settings !== false) {
+		$this->default_settings = $default_settings;
 
-            delete_option('secuplug_settings');
-            $new_settings = $old_settings;
+		$this->admin       = new Sources\Admin( $default_settings );
+		$this->login       = new Sources\Login();
+		$this->ssl_control = new Sources\SSLControl();
+		$this->xmlrpc      = new Sources\XMLRPC();
+		$this->middleware  = new Sources\Middleware();
 
-        }
+		add_action( 'admin_init', array( 'PAnD', 'init' ) );
 
-        // Override exists settings
-        $new_settings = array_merge($this->default_settings, $new_settings);
+		// ADMIN.
+		add_action( 'init', array( $this->admin, 'init' ) );
 
-        // Update final settings
-        update_option('securefusion_settings', $new_settings);
+		// XMLRPC.
+		add_action( 'init', array( $this->xmlrpc, 'init' ) );
 
-        $old_bf_table = $wpdb->prefix . 'secuplug_brute_force_table';
-        $new_bf_table = $wpdb->prefix . 'securefusion_brute_force_table';
+		// LOGIN.
+		add_action( 'init', array( $this->login, 'init' ) );
 
-        // Check if old table exists
-        if ($wpdb->get_var("SHOW TABLES LIKE '$old_bf_table'") == $old_bf_table) {
-            // Rename old table
-            $wpdb->query("RENAME TABLE $old_bf_table TO $new_bf_table");
-        }
+		// SSL CONTROL.
+		add_action( 'plugin_loaded', array( $this->ssl_control, 'init' ) );
 
-        $charset_collate = $wpdb->get_charset_collate();
+		// MIDDLEWARE.
+		add_action( 'plugin_loaded', array( $this->middleware, 'init' ) );
+		add_action( 'init', array( $this->middleware, 'filter_bad_requests' ), 10 );
+		add_filter( 'wp_authenticate_user', array( $this->middleware, 'track_authenticate_user' ), 30, 2 );
+		add_action( 'wp_authenticate', array( $this->middleware, 'track_limit_login_attempts' ), 10, 2 );
+		add_action( 'init', array( $this->middleware, 'headers' ), 9 );
+	}
 
-        $sql = "CREATE TABLE $new_bf_table (
-            id mediumint(9) NOT NULL AUTO_INCREMENT,
-            ip varchar(50) NOT NULL,
-            attempts int DEFAULT '0' NOT NULL,
-            expiration int DEFAULT '0' NOT NULL,
-            last_attempt int DEFAULT '0' NOT NULL,
-            PRIMARY KEY  (id)
-        ) $charset_collate;";
 
-        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-        dbDelta($sql);
-    }
+	/**
+	 * Activate plugin.
+	 */
+	public function activate() {
+		$old_settings = get_option( 'secuplug_settings' );
+		$new_settings = get_option( 'securefusion_settings', array() );
 
-    public function deactivate()
-    {
-        delete_option('secuplug_settings');
-        delete_option('securefusion_settings');
-    }
+		// Update new slug in option table.
+		if ( $old_settings !== false ) {
+
+			delete_option( 'secuplug_settings' );
+			$new_settings = $old_settings;
+
+		}
+
+		// Override exists settings.
+		$new_settings = array_merge( $this->default_settings, $new_settings );
+
+		// Update final settings.
+		update_option( 'securefusion_settings', $new_settings );
+
+		// Database schema operations via centralized service.
+		$brute_force_db = new BruteForceDB();
+		$brute_force_db->maybe_migrate_old_table();
+		$brute_force_db->create_table();
+	}
+
+
+	/**
+	 * Deactivate plugin.
+	 */
+	public function deactivate() {
+		delete_option( 'secuplug_settings' );
+		delete_option( 'securefusion_settings' );
+	}
 }
