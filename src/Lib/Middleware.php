@@ -142,6 +142,8 @@ class Middleware {
 			$csp_policy .= "frame-ancestors 'self'; ";
 			$csp_policy .= 'upgrade-insecure-requests; ';
 
+			$csp_policy = str_replace( array( "\r\n", "\r", "\n", "\t" ), '', $csp_policy );
+
 			header( 'Content-Security-Policy: ' . $csp_policy );
 
 			/**
