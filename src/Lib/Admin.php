@@ -128,6 +128,15 @@ class Admin {
 			'securefusion-settings',
 			array( $this, 'get_settings_html' )
 		);
+
+		$this->menu_pages['login_log'] = \add_submenu_page(
+			'securefusion',
+			esc_html__( 'Login Log', 'securefusion' ),
+			esc_html__( 'Login Log', 'securefusion' ),
+			'manage_options',
+			'securefusion-login-log',
+			array( $this, 'get_login_log_html' )
+		);
 	}
 
 
@@ -243,6 +252,12 @@ class Admin {
 					echo ' ' . (int) $unique_ips_count;
 					?>
 					</p>
+					<p>
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=securefusion-login-log' ) ); ?>" class="button button-secondary">
+							<span class="dashicons dashicons-list-view" style="vertical-align:text-top;font-size:16px;width:16px;height:16px;margin-right:4px;"></span>
+							<?php esc_html_e( 'View Login Log', 'securefusion' ); ?>
+						</a>
+					</p>
 					<?php if ( $security_pass ) : ?>
 						<p class="status enabled">
 							<?php esc_html_e( 'Everything is running smoothly. No security issues have been detected.', 'securefusion' ); ?>
@@ -342,6 +357,19 @@ class Admin {
 			</section>
 		</div>
 		<?php
+	}
+
+
+	/**
+	 * Get login log HTML.
+	 *
+	 * Delegates rendering to the LoginLog class.
+	 *
+	 * @return void
+	 */
+	public function get_login_log_html() {
+		$log = new LoginLog();
+		$log->render();
 	}
 
 
@@ -704,7 +732,7 @@ class Admin {
 						'placeholder'       => 'fonts.googleapis.com',
 						'field_type'        => 'url',
 						'sanitize_callback' => [ CSP::class, 'validate_csp_source' ],
-						'presets'           => '<button type="button" class="taginput-preset-btn" data-preset="\'self\'">self</button><button type="button" class="taginput-preset-btn" data-preset="\'unsafe-inline\'">unsafe-inline</button><button type="button" class="taginput-preset-btn" data-preset="https://fonts.googleapis.com">Google Fonts</button><button type="button" class="taginput-preset-btn" data-preset="https://cdnjs.cloudflare.com">Cloudflare</button>',
+						'presets'           => '<button type="button" class="taginput-preset-btn" data-preset="\'unsafe-inline\'">unsafe-inline</button><button type="button" class="taginput-preset-btn" data-preset="https://fonts.googleapis.com">Google Fonts</button><button type="button" class="taginput-preset-btn" data-preset="https://cdnjs.cloudflare.com">Cloudflare</button>',
 					],
 					[
 						'type'              => 'taginput',
@@ -713,7 +741,7 @@ class Admin {
 						'placeholder'       => 'googletagmanager.com',
 						'field_type'        => 'url',
 						'sanitize_callback' => [ CSP::class, 'validate_csp_source' ],
-						'presets'           => '<button type="button" class="taginput-preset-btn" data-preset="\'self\'">self</button><button type="button" class="taginput-preset-btn" data-preset="\'unsafe-inline\'">unsafe-inline</button><button type="button" class="taginput-preset-btn" data-preset="https://www.googletagmanager.com">Google Tag Manager</button><button type="button" class="taginput-preset-btn" data-preset="https://www.google-analytics.com">GA4</button>',
+						'presets'           => '<button type="button" class="taginput-preset-btn" data-preset="\'unsafe-inline\'">unsafe-inline</button><button type="button" class="taginput-preset-btn" data-preset="https://www.googletagmanager.com">Google Tag Manager</button><button type="button" class="taginput-preset-btn" data-preset="https://www.google-analytics.com">GA4</button>',
 					],
 					[
 						'type'              => 'taginput',
@@ -722,7 +750,7 @@ class Admin {
 						'placeholder'       => 'fonts.gstatic.com',
 						'field_type'        => 'url',
 						'sanitize_callback' => [ CSP::class, 'validate_csp_source' ],
-						'presets'           => '<button type="button" class="taginput-preset-btn" data-preset="\'self\'">self</button><button type="button" class="taginput-preset-btn" data-preset="data:">data:</button><button type="button" class="taginput-preset-btn" data-preset="https://fonts.gstatic.com">Google Fonts</button><button type="button" class="taginput-preset-btn" data-preset="https://cdnjs.cloudflare.com">Cloudflare</button>',
+						'presets'           => '<button type="button" class="taginput-preset-btn" data-preset="data:">data:</button><button type="button" class="taginput-preset-btn" data-preset="https://fonts.gstatic.com">Google Fonts</button><button type="button" class="taginput-preset-btn" data-preset="https://cdnjs.cloudflare.com">Cloudflare</button>',
 					],
 					[
 						'type'              => 'taginput',
@@ -731,7 +759,7 @@ class Admin {
 						'placeholder'       => 'youtube.com',
 						'field_type'        => 'url',
 						'sanitize_callback' => [ CSP::class, 'validate_csp_source' ],
-						'presets'           => '<button type="button" class="taginput-preset-btn" data-preset="\'self\'">self</button><button type="button" class="taginput-preset-btn" data-preset="https://www.youtube.com">YouTube</button><button type="button" class="taginput-preset-btn" data-preset="https://www.google.com">Google</button><button type="button" class="taginput-preset-btn" data-preset="https://maps.google.com">Google Maps</button>',
+						'presets'           => '<button type="button" class="taginput-preset-btn" data-preset="https://www.youtube.com">YouTube</button><button type="button" class="taginput-preset-btn" data-preset="https://www.google.com">Google</button><button type="button" class="taginput-preset-btn" data-preset="https://maps.google.com">Google Maps</button>',
 					],
 					[
 						'type'              => 'taginput',
@@ -740,7 +768,7 @@ class Admin {
 						'placeholder'       => 'blob:',
 						'field_type'        => 'url',
 						'sanitize_callback' => [ CSP::class, 'validate_csp_source' ],
-						'presets'           => '<button type="button" class="taginput-preset-btn" data-preset="\'self\'">self</button><button type="button" class="taginput-preset-btn" data-preset="blob:">blob:</button>',
+						'presets'           => '<button type="button" class="taginput-preset-btn" data-preset="blob:">blob:</button>',
 					],
 					[
 						'type'              => 'taginput',
@@ -749,7 +777,7 @@ class Admin {
 						'placeholder'       => 'example.com',
 						'field_type'        => 'url',
 						'sanitize_callback' => [ CSP::class, 'validate_csp_source' ],
-						'presets'           => '<button type="button" class="taginput-preset-btn" data-preset="\'self\'">self</button><button type="button" class="taginput-preset-btn" data-preset="data:">data:</button><button type="button" class="taginput-preset-btn" data-preset="https:">https:</button>',
+						'presets'           => '<button type="button" class="taginput-preset-btn" data-preset="data:">data:</button><button type="button" class="taginput-preset-btn" data-preset="https:">https:</button>',
 					],
 				],
 			],

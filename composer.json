@@ -1,7 +1,7 @@
 {
 	"require": {
 		"collizo4sky/persist-admin-notices-dismissal": "^1.4",
-		"uuur86/wasp": "^2.1",
+		"uuur86/wasp": "^3.0",
 		"php": ">=7.0.0"
 	},
 	"autoload": {

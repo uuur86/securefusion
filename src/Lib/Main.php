@@ -137,6 +137,10 @@ class Main {
 		add_filter( 'wp_authenticate_user', array( $this->middleware, 'track_authenticate_user' ), 30, 2 );
 		add_action( 'wp_authenticate', array( $this->middleware, 'track_limit_login_attempts' ), 10, 2 );
 		add_action( 'init', array( $this->middleware, 'headers' ), 9 );
+
+		// LOGIN LOG — AJAX handlers.
+		$login_log = new Sources\LoginLog();
+		$login_log->register_ajax();
 	}
 
 

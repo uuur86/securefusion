@@ -1,0 +1,617 @@
+/**
+ * Login Log Page Styles
+ *
+ * @package securefusion
+ */
+
+/* Screen-reader only title (for WP notice injection) */
+.securefusion-login-log .sf-sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+/* Header */
+.securefusion-login-log .sf-log-header {
+	display: flex;
+	align-items: center;
+	gap: 20px;
+	margin-bottom: 24px;
+	padding: 20px;
+	background: #fff;
+	border-radius: 6px;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+	border-left: 4px solid #01b9ba;
+}
+
+.securefusion-login-log .sf-log-logo {
+	width: 64px;
+	height: 64px;
+}
+
+.securefusion-login-log .sf-log-title {
+	margin: 0 0 4px;
+	font-size: 22px;
+	color: #1d2327;
+}
+
+.securefusion-login-log .sf-log-desc {
+	margin: 0;
+	color: #646970;
+	font-size: 14px;
+}
+
+/* Stat cards */
+.securefusion-login-log .sf-log-stats {
+	display: flex;
+	gap: 16px;
+	margin-bottom: 20px;
+	flex-wrap: wrap;
+}
+
+.securefusion-login-log .sf-stat-card {
+	flex: 1;
+	min-width: 200px;
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	padding: 18px 20px;
+	background: #fff;
+	border-radius: 6px;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+	border-left: 3px solid #01b9ba;
+}
+
+.securefusion-login-log .sf-stat-icon {
+	font-size: 28px;
+	width: 28px;
+	height: 28px;
+	color: #01b9ba;
+}
+
+.securefusion-login-log .sf-stat-data {
+	display: flex;
+	flex-direction: column;
+}
+
+.securefusion-login-log .sf-stat-value {
+	font-size: 24px;
+	font-weight: 600;
+	color: #1d2327;
+	line-height: 1.2;
+}
+
+.securefusion-login-log .sf-stat-label {
+	font-size: 12px;
+	color: #646970;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+/* IP Range Section */
+.securefusion-login-log .sf-range-section {
+	margin-bottom: 20px;
+	padding: 16px 20px;
+	background: #fff;
+	border-radius: 6px;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.securefusion-login-log .sf-range-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 12px;
+}
+
+.securefusion-login-log .sf-range-header h3 {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin: 0;
+	font-size: 14px;
+	color: #1d2327;
+}
+
+.securefusion-login-log .sf-range-header h3 .dashicons {
+	color: #01b9ba;
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
+}
+
+.securefusion-login-log .sf-clear-filter .dashicons {
+	font-size: 14px;
+	width: 14px;
+	height: 14px;
+	vertical-align: text-top;
+}
+
+.securefusion-login-log .sf-range-badges {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+}
+
+.securefusion-login-log .sf-range-badge {
+	display: flex;
+	align-items: stretch;
+	border-radius: 6px;
+	overflow: hidden;
+	background: #f6f7f7;
+	border: 1px solid #e0e0e0;
+	transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.securefusion-login-log .sf-range-badge:hover {
+	border-color: #01b9ba;
+	box-shadow: 0 0 0 1px rgba(1, 185, 186, 0.15);
+}
+
+.securefusion-login-log .sf-range-badge.sf-range-active {
+	border-color: #01b9ba;
+	background: #e8f9f9;
+}
+
+.securefusion-login-log .sf-range-link {
+	display: flex;
+	flex-direction: column;
+	padding: 10px 14px;
+	text-decoration: none;
+	color: inherit;
+	gap: 2px;
+	min-width: 140px;
+}
+
+.securefusion-login-log .sf-range-name {
+	font-weight: 600;
+	font-size: 13px;
+	color: #1d2327;
+	font-family: monospace;
+}
+
+.securefusion-login-log .sf-range-count {
+	font-size: 11px;
+	color: #01b9ba;
+	font-weight: 600;
+}
+
+.securefusion-login-log .sf-range-attempts {
+	font-size: 11px;
+	color: #888;
+}
+
+.securefusion-login-log .sf-range-detail-btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	border: none;
+	border-left: 1px solid #e0e0e0;
+	background: transparent;
+	cursor: pointer;
+	color: #646970;
+	transition: background 0.15s, color 0.15s;
+}
+
+.securefusion-login-log .sf-range-detail-btn:hover {
+	background: #01b9ba;
+	color: #fff;
+}
+
+.securefusion-login-log .sf-range-detail-btn .dashicons {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+}
+
+/* IP Range Modal */
+.securefusion-login-log .sf-range-modal {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 100100;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(0, 0, 0, 0.5);
+}
+
+.securefusion-login-log .sf-range-modal-content {
+	background: #fff;
+	border-radius: 8px;
+	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+	width: 90%;
+	max-width: 520px;
+	max-height: 80vh;
+	display: flex;
+	flex-direction: column;
+}
+
+.securefusion-login-log .sf-range-modal-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 16px 20px;
+	border-bottom: 1px solid #e0e0e0;
+}
+
+.securefusion-login-log .sf-range-modal-header h3 {
+	margin: 0;
+	font-size: 16px;
+	color: #1d2327;
+}
+
+.securefusion-login-log .sf-range-modal-close {
+	background: none;
+	border: none;
+	font-size: 24px;
+	cursor: pointer;
+	color: #646970;
+	line-height: 1;
+	padding: 4px 8px;
+	border-radius: 4px;
+}
+
+.securefusion-login-log .sf-range-modal-close:hover {
+	background: #f0f0f1;
+	color: #1d2327;
+}
+
+.securefusion-login-log .sf-range-modal-body {
+	padding: 20px;
+	overflow: auto;
+}
+
+.securefusion-login-log .sf-range-modal-body textarea {
+	width: 100%;
+	font-family: monospace;
+	font-size: 13px;
+	line-height: 1.8;
+	padding: 12px;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	background: #f9f9f9;
+	resize: vertical;
+	box-sizing: border-box;
+}
+
+.securefusion-login-log .sf-range-modal-footer {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 12px 20px;
+	border-top: 1px solid #e0e0e0;
+}
+
+.securefusion-login-log .sf-range-modal-footer .button .dashicons {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+	vertical-align: text-top;
+	margin-right: 4px;
+}
+
+.securefusion-login-log .sf-copy-status {
+	font-size: 13px;
+	color: #00a32a;
+	transition: opacity 0.3s;
+}
+
+/* Active filter banner */
+.securefusion-login-log .sf-active-filter {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 10px 16px;
+	background: #f0f6fc;
+	border-bottom: 1px solid #c3c4c7;
+	font-size: 13px;
+	color: #1d2327;
+}
+
+.securefusion-login-log .sf-active-filter .dashicons {
+	color: #72aee6;
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+}
+
+.securefusion-login-log .sf-filter-clear-link {
+	margin-left: auto;
+	text-decoration: none;
+	color: #2271b1;
+	font-weight: 500;
+}
+
+.securefusion-login-log .sf-filter-clear-link:hover {
+	color: #135e96;
+}
+
+/* Toolbar */
+.securefusion-login-log .sf-log-toolbar {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 12px;
+	margin-bottom: 16px;
+	padding: 12px 16px;
+	background: #fff;
+	border-radius: 6px;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+	flex-wrap: wrap;
+}
+
+.securefusion-login-log .sf-toolbar-left,
+.securefusion-login-log .sf-toolbar-right {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+	flex-wrap: wrap;
+}
+
+.securefusion-login-log .sf-log-toolbar .button .dashicons {
+	margin-right: 4px;
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+	vertical-align: text-top;
+}
+
+.securefusion-login-log .sf-btn-danger {
+	background: #dc3545 !important;
+	border-color: #dc3545 !important;
+	color: #fff !important;
+}
+
+.securefusion-login-log .sf-btn-danger:hover {
+	background: #c82333 !important;
+	border-color: #bd2130 !important;
+}
+
+.securefusion-login-log .sf-btn-danger:focus {
+	box-shadow: 0 0 0 1px #fff, 0 0 0 3px #dc3545 !important;
+}
+
+.securefusion-login-log .sf-hidden-file {
+	display: none;
+}
+
+.securefusion-login-log .sf-import-label {
+	cursor: pointer;
+}
+
+/* Notice */
+.securefusion-login-log .sf-log-notice {
+	padding: 10px 16px;
+	border-radius: 4px;
+	margin-bottom: 16px;
+	font-size: 14px;
+	line-height: 1.5;
+}
+
+.securefusion-login-log .sf-log-notice.sf-notice-success {
+	background: #ecf7ed;
+	border-left: 4px solid #00a32a;
+	color: #1d2327;
+}
+
+.securefusion-login-log .sf-log-notice.sf-notice-error {
+	background: #fcf0f1;
+	border-left: 4px solid #dc3545;
+	color: #1d2327;
+}
+
+.securefusion-login-log .sf-log-notice.sf-notice-info {
+	background: #f0f6fc;
+	border-left: 4px solid #72aee6;
+	color: #1d2327;
+}
+
+/* Table */
+.securefusion-login-log .sf-log-table-wrap {
+	background: #fff;
+	border-radius: 6px;
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+	overflow: hidden;
+}
+
+.securefusion-login-log .sf-log-table {
+	border: 0;
+	margin: 0;
+}
+
+.securefusion-login-log .sf-log-table thead th {
+	background: #f6f7f7;
+	border-bottom: 1px solid #e0e0e0;
+	font-weight: 600;
+	padding: 12px 16px;
+	font-size: 13px;
+}
+
+.securefusion-login-log .sf-log-table tbody td {
+	padding: 12px 16px;
+	vertical-align: middle;
+}
+
+.securefusion-login-log .sf-log-table .column-ip code {
+	padding: 3px 8px;
+	background: #f0f0f1;
+	border-radius: 3px;
+	font-size: 13px;
+	color: #1d2327;
+}
+
+/* Attempt badges */
+.securefusion-login-log .sf-attempt-badge {
+	display: inline-block;
+	min-width: 32px;
+	padding: 3px 10px;
+	border-radius: 12px;
+	font-size: 13px;
+	font-weight: 600;
+	text-align: center;
+	line-height: 1.5;
+}
+
+.securefusion-login-log .sf-attempt-badge.sf-normal {
+	background: #ecf7ed;
+	color: #00a32a;
+}
+
+.securefusion-login-log .sf-attempt-badge.sf-warning {
+	background: #fff3cd;
+	color: #856404;
+}
+
+.securefusion-login-log .sf-attempt-badge.sf-danger {
+	background: #fcf0f1;
+	color: #dc3545;
+}
+
+.securefusion-login-log .sf-time-ago {
+	color: #888;
+	font-size: 12px;
+}
+
+/* Empty state */
+.securefusion-login-log .sf-log-empty {
+	text-align: center;
+	padding: 60px 20px;
+	color: #646970;
+}
+
+.securefusion-login-log .sf-log-empty .dashicons {
+	font-size: 48px;
+	width: 48px;
+	height: 48px;
+	color: #01b9ba;
+	margin-bottom: 12px;
+}
+
+.securefusion-login-log .sf-log-empty p {
+	font-size: 16px;
+	margin: 0;
+}
+
+/* Pagination */
+.securefusion-login-log .sf-log-pagination {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 14px 16px;
+	border-top: 1px solid #e0e0e0;
+	gap: 12px;
+	flex-wrap: wrap;
+}
+
+.securefusion-login-log .sf-pagination-info {
+	font-size: 13px;
+	color: #646970;
+}
+
+.securefusion-login-log .sf-pagination-links {
+	display: flex;
+	align-items: center;
+	gap: 0;
+}
+
+.securefusion-login-log .sf-pagination-links .page-numbers {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 34px;
+	height: 34px;
+	padding: 0 8px;
+	margin: 0 2px;
+	font-size: 13px;
+	font-weight: 500;
+	color: #2271b1;
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 4px;
+	text-decoration: none;
+	transition: all 0.15s ease;
+}
+
+.securefusion-login-log .sf-pagination-links .page-numbers:hover {
+	background: #f0f0f1;
+	border-color: #8c8f94;
+	color: #135e96;
+}
+
+.securefusion-login-log .sf-pagination-links .page-numbers.current {
+	background: #01b9ba;
+	border-color: #01b9ba;
+	color: #fff;
+	font-weight: 600;
+	pointer-events: none;
+}
+
+.securefusion-login-log .sf-pagination-links .page-numbers.dots {
+	border: none;
+	background: none;
+	color: #646970;
+	pointer-events: none;
+	min-width: 24px;
+}
+
+.securefusion-login-log .sf-pagination-links .page-numbers.prev,
+.securefusion-login-log .sf-pagination-links .page-numbers.next {
+	font-weight: 700;
+	font-size: 16px;
+}
+
+/* Sorting indicators */
+.securefusion-login-log .sf-log-table thead th a {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	text-decoration: none;
+	color: inherit;
+}
+
+/* Processing state */
+.securefusion-login-log .sf-processing {
+	opacity: 0.6;
+	pointer-events: none;
+}
+
+/* Responsive */
+@media screen and (max-width: 782px) {
+	.securefusion-login-log .sf-log-stats {
+		flex-direction: column;
+	}
+
+	.securefusion-login-log .sf-log-toolbar {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.securefusion-login-log .sf-toolbar-left,
+	.securefusion-login-log .sf-toolbar-right {
+		justify-content: center;
+	}
+
+	.securefusion-login-log .sf-range-badges {
+		flex-direction: column;
+	}
+
+	.securefusion-login-log .sf-log-pagination {
+		flex-direction: column;
+		text-align: center;
+	}
+
+	.securefusion-login-log .sf-range-modal-content {
+		width: 95%;
+		max-height: 90vh;
+	}
+}

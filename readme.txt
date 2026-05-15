@@ -2,8 +2,8 @@
 Contributors: codeplusdev, ugurbicer
 Tags: firewall, security, anti-spam, ssl, xml-rpc
 Requires at least: 4.9
-Tested up to: 6.8
-Stable tag: 1.4.4
+Tested up to: 6.9
+Stable tag: 1.5.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 Requires PHP: 7.4
@@ -96,6 +96,12 @@ For complete information, please visit our website [the SecureFusion website](ht
 If you have any question, you can post [a support request](https://wordpress.org/support/plugin/secuplug/)
 
 == Changelog ==
+= 1.5.0 =
+* Updated: Wasp (v3)
+* Improvement: Code quality and performance
+* Improvement: UI and UX
+* Fixed: Some form field bugs in the plugin admin settings page
+
 = 1.4.4 =
 * Fixed: Fixed a PHP Fatal Error during initial plugin activation
 
