@@ -75,6 +75,8 @@ class Main {
 			'disable_self_pingback'      => '1',
 			'ip_time_limit'              => '10',
 			'ip_login_limit'             => '5',
+			'cleanup_ip_days'            => '30',
+			'cleanup_ip_attempts'        => '10',
 			'custom_login_url'           => '',
 			'change_login_error'         => '',
 			'change_admin_id'            => '',
@@ -85,6 +87,16 @@ class Main {
 			'http_headers'               => '1',
 			'cookie_patterns'            => '',
 			'request_patterns'           => '',
+
+			'enable_csp_style'              => '0',
+			'enable_csp_script'             => '0',
+			'enable_csp_font'               => '0',
+			'enable_csp_img'                => '0',
+			'enable_csp_frame'              => '0',
+			'enable_csp_worker'             => '0',
+			'csp_upgrade_insecure_requests' => '0',
+			'csp_block_all_mixed_content'   => '0',
+			'csp_sandbox'                   => '0',
 
 			/**
 			 * WARNING: 'unsafe-inline' is needed for compatibility with many WordPress plugins,
@@ -141,6 +153,23 @@ class Main {
 		// LOGIN LOG — AJAX handlers.
 		$login_log = new Sources\LoginLog();
 		$login_log->register_ajax();
+
+		// CRON JOB FOR IP CLEANUP.
+		add_action( 'securefusion_cleanup_ips_cron', array( $this, 'cron_cleanup_old_ips' ) );
+	}
+
+	/**
+	 * Cron callback to clean up old IP records.
+	 */
+	public function cron_cleanup_old_ips() {
+		$settings = get_option( 'securefusion_settings', array() );
+		$days     = isset( $settings['cleanup_ip_days'] ) ? absint( $settings['cleanup_ip_days'] ) : 0;
+		$attempts = isset( $settings['cleanup_ip_attempts'] ) ? absint( $settings['cleanup_ip_attempts'] ) : 0;
+
+		if ( $days > 0 && $attempts > 0 ) {
+			$brute_force_db = new BruteForceDB();
+			$brute_force_db->cleanup_old_ips( $days, $attempts );
+		}
 	}
 
 
@@ -169,6 +198,10 @@ class Main {
 		$brute_force_db = new BruteForceDB();
 		$brute_force_db->maybe_migrate_old_table();
 		$brute_force_db->create_table();
+
+		if ( ! wp_next_scheduled( 'securefusion_cleanup_ips_cron' ) ) {
+			wp_schedule_event( time(), 'daily', 'securefusion_cleanup_ips_cron' );
+		}
 	}
 
 
@@ -176,7 +209,6 @@ class Main {
 	 * Deactivate plugin.
 	 */
 	public function deactivate() {
-		delete_option( 'secuplug_settings' );
-		delete_option( 'securefusion_settings' );
+		wp_clear_scheduled_hook( 'securefusion_cleanup_ips_cron' );
 	}
 }

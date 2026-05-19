@@ -59,7 +59,7 @@ class BruteForceDB {
 		global $wpdb;
 
 		$this->wpdb       = $wpdb;
-		$this->table_name = $wpdb->prefix . 'securefusion_brute_force_table';
+		$this->table_name = esc_sql( $wpdb->prefix ) . 'securefusion_brute_force_table';
 	}
 
 
@@ -83,7 +83,7 @@ class BruteForceDB {
 	 * @return object|null The row object with 'ip', 'attempts', 'last_attempt' properties, or null if not found.
 	 */
 	public function get_row_by_ip( $ip ) {
-		$cache_key = 'bf_ip_' . md5( $ip );
+		$cache_key = 'securefusion_bf_ip_' . md5( $ip );
 		$cached    = wp_cache_get( $cache_key, self::CACHE_GROUP );
 
 		if ( false !== $cached ) {
@@ -166,7 +166,7 @@ class BruteForceDB {
 	 * @return int The total number of failed attempts.
 	 */
 	public function get_total_attempts() {
-		$cached = wp_cache_get( 'bf_total_attempts', self::CACHE_GROUP );
+		$cached = wp_cache_get( 'securefusion_bf_total_attempts', self::CACHE_GROUP );
 
 		if ( false !== $cached ) {
 			return (int) $cached;
@@ -179,7 +179,7 @@ class BruteForceDB {
 		);
 
 		$total = (int) $total;
-		wp_cache_set( 'bf_total_attempts', $total, self::CACHE_GROUP, self::CACHE_TTL );
+		wp_cache_set( 'securefusion_bf_total_attempts', $total, self::CACHE_GROUP, self::CACHE_TTL );
 
 		return $total;
 	}
@@ -193,7 +193,7 @@ class BruteForceDB {
 	 * @return int The count of unique IP addresses.
 	 */
 	public function get_unique_ips_count() {
-		$cached = wp_cache_get( 'bf_unique_ips', self::CACHE_GROUP );
+		$cached = wp_cache_get( 'securefusion_bf_unique_ips', self::CACHE_GROUP );
 
 		if ( false !== $cached ) {
 			return (int) $cached;
@@ -206,7 +206,7 @@ class BruteForceDB {
 		);
 
 		$count = (int) $count;
-		wp_cache_set( 'bf_unique_ips', $count, self::CACHE_GROUP, self::CACHE_TTL );
+		wp_cache_set( 'securefusion_bf_unique_ips', $count, self::CACHE_GROUP, self::CACHE_TTL );
 
 		return $count;
 	}
@@ -223,20 +223,26 @@ class BruteForceDB {
 	 */
 	public function get_all_rows( $per_page = 20, $offset = 0, $orderby = 'last_attempt', $order = 'DESC' ) {
 		$allowed_columns = [ 'id', 'ip', 'attempts', 'last_attempt' ];
-		$orderby         = in_array( $orderby, $allowed_columns, true ) ? $orderby : 'last_attempt';
+		$orderby         = \in_array( $orderby, $allowed_columns, true ) ? $orderby : 'last_attempt';
 		$order           = strtoupper( $order ) === 'ASC' ? 'ASC' : 'DESC';
 		$per_page        = absint( $per_page );
 		$offset          = absint( $offset );
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$orderby_sql = $orderby;
+
+		if ( $orderby === 'ip' ) {
+			$orderby_sql = 'INET_ATON(ip)';
+		}
+
+		// phpcs:disable
 		return $this->wpdb->get_results(
-			/* phpcs:ignore */
 			$this->wpdb->prepare(
-				"SELECT id, ip, attempts, last_attempt FROM {$this->table_name} ORDER BY {$orderby} {$order} LIMIT %d OFFSET %d",
+				"SELECT id, ip, attempts, last_attempt FROM {$this->table_name} ORDER BY {$orderby_sql} {$order} LIMIT %d OFFSET %d",
 				$per_page,
 				$offset
 			)
 		);
+		// phpcs:enable
 	}
 
 
@@ -246,7 +252,7 @@ class BruteForceDB {
 	 * @return int Total row count.
 	 */
 	public function get_total_rows() {
-		$cached = wp_cache_get( 'bf_total_rows', self::CACHE_GROUP );
+		$cached = wp_cache_get( 'securefusion_bf_total_rows', self::CACHE_GROUP );
 
 		if ( false !== $cached ) {
 			return (int) $cached;
@@ -259,7 +265,7 @@ class BruteForceDB {
 		);
 
 		$count = (int) $count;
-		wp_cache_set( 'bf_total_rows', $count, self::CACHE_GROUP, self::CACHE_TTL );
+		wp_cache_set( 'securefusion_bf_total_rows', $count, self::CACHE_GROUP, self::CACHE_TTL );
 
 		return $count;
 	}
@@ -288,17 +294,101 @@ class BruteForceDB {
 	 * @return array Array of objects with range_prefix, ip_count, total_attempts.
 	 */
 	public function get_ip_ranges() {
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		return $this->wpdb->get_results(
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name from validated $wpdb->prefix constant.
+		$cached = wp_cache_get( 'securefusion_bf_ip_ranges', self::CACHE_GROUP );
+
+		if ( false !== $cached ) {
+			return $cached;
+		}
+
+		// phpcs:disable
+		$rows = $this->wpdb->get_results(
 			"SELECT SUBSTRING_INDEX(ip, '.', 3) AS range_prefix,
 				COUNT(DISTINCT ip) AS ip_count,
-				SUM(attempts) AS total_attempts
+				SUM(attempts) AS total_attempts,
+				MIN(CAST(SUBSTRING_INDEX(ip, '.', -1) AS UNSIGNED)) AS min_last_octet,
+				MAX(CAST(SUBSTRING_INDEX(ip, '.', -1) AS UNSIGNED)) AS max_last_octet
 			FROM {$this->table_name}
 			WHERE ip LIKE '%.%.%.%'
 			GROUP BY range_prefix
-			ORDER BY ip_count DESC"
+			ORDER BY INET_ATON(CONCAT(SUBSTRING_INDEX(ip, '.', 3), '.0')) ASC"
 		);
+		// phpcs:enable
+
+		// Cache for 5 minutes.
+		wp_cache_set( 'securefusion_bf_ip_ranges', $rows, self::CACHE_GROUP, self::CACHE_TTL );
+
+		return $rows;
+	}
+
+
+	/**
+	 * Get paginated IP ranges grouped by /24 subnet.
+	 *
+	 * @param int    $per_page Number of items per page.
+	 * @param int    $offset   Pagination offset.
+	 * @param string $orderby  Column to order by (whitelisted).
+	 * @param string $order    ASC or DESC.
+	 *
+	 * @return array Array of objects.
+	 */
+	public function get_paginated_ip_ranges( $per_page = 20, $offset = 0, $orderby = 'ip_count', $order = 'DESC' ) {
+		$allowed_columns = [ 'range_prefix', 'ip_count', 'total_attempts' ];
+		$orderby         = in_array( $orderby, $allowed_columns, true ) ? $orderby : 'ip_count';
+		$order           = strtoupper( $order ) === 'ASC' ? 'ASC' : 'DESC';
+		$per_page        = absint( $per_page );
+		$offset          = absint( $offset );
+
+		if ( $orderby === 'range_prefix' ) {
+			$orderby_sql = "INET_ATON(CONCAT(SUBSTRING_INDEX(ip, '.', 3), '.0'))";
+		} else {
+			$orderby_sql = $orderby;
+		}
+
+		// phpcs:disable
+		return $this->wpdb->get_results(
+			$this->wpdb->prepare(
+				"SELECT SUBSTRING_INDEX(ip, '.', 3) AS range_prefix,
+					COUNT(DISTINCT ip) AS ip_count,
+					SUM(attempts) AS total_attempts,
+					MIN(CAST(SUBSTRING_INDEX(ip, '.', -1) AS UNSIGNED)) AS min_last_octet,
+					MAX(CAST(SUBSTRING_INDEX(ip, '.', -1) AS UNSIGNED)) AS max_last_octet
+				FROM {$this->table_name}
+				WHERE ip LIKE '%.%.%.%'
+				GROUP BY range_prefix
+				ORDER BY {$orderby_sql} {$order}
+				LIMIT %d OFFSET %d",
+				$per_page,
+				$offset
+			)
+		);
+		// phpcs:enable
+	}
+
+
+	/**
+	 * Get total count of unique IP ranges.
+	 *
+	 * @return int Total number of unique /24 ranges.
+	 */
+	public function get_total_ip_ranges() {
+		$cached = wp_cache_get( 'securefusion_bf_total_ip_ranges', self::CACHE_GROUP );
+
+		if ( false !== $cached ) {
+			return (int) $cached;
+		}
+
+		// phpcs:disable
+		$count = $this->wpdb->get_var(
+			"SELECT COUNT(DISTINCT SUBSTRING_INDEX(ip, '.', 3))
+			FROM {$this->table_name}
+			WHERE ip LIKE '%.%.%.%'"
+		);
+		// phpcs:enable
+
+		$count = (int) $count;
+		wp_cache_set( 'securefusion_bf_total_ip_ranges', $count, self::CACHE_GROUP, self::CACHE_TTL );
+
+		return $count;
 	}
 
 
@@ -309,14 +399,14 @@ class BruteForceDB {
 	 * @return array Array of row objects with ip property.
 	 */
 	public function get_ips_by_range_prefix( $range_prefix ) {
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		return $this->wpdb->get_results(
-			/* phpcs:ignore */
-			$this->wpdb->prepare(
-				"SELECT DISTINCT ip FROM {$this->table_name} WHERE ip LIKE %s ORDER BY ip ASC",
-				$this->wpdb->esc_like( $range_prefix ) . '.%'
-			)
+		// phpcs:disable
+		$query = $this->wpdb->prepare(
+			"SELECT DISTINCT ip FROM {$this->table_name} WHERE ip LIKE %s ORDER BY CAST(SUBSTRING_INDEX(ip, '.', -1) AS UNSIGNED) ASC",
+			$this->wpdb->esc_like( $range_prefix ) . '.%'
 		);
+
+		return $this->wpdb->get_results( $query );
+		// phpcs:enable
 	}
 
 
@@ -336,17 +426,24 @@ class BruteForceDB {
 		$order           = strtoupper( $order ) === 'ASC' ? 'ASC' : 'DESC';
 		$per_page        = absint( $per_page );
 		$offset          = absint( $offset );
+		$table_name      = $this->table_name;
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		return $this->wpdb->get_results(
-			/* phpcs:ignore */
-			$this->wpdb->prepare(
-				"SELECT id, ip, attempts, last_attempt FROM {$this->table_name} WHERE ip LIKE %s ORDER BY {$orderby} {$order} LIMIT %d OFFSET %d",
-				$this->wpdb->esc_like( $range_prefix ) . '.%',
-				$per_page,
-				$offset
-			)
+		$orderby_sql = $orderby;
+
+		if ( $orderby === 'ip' ) {
+			$orderby_sql = 'INET_ATON(ip)';
+		}
+
+		// phpcs:disable
+		$query = $this->wpdb->prepare(
+			"SELECT id, ip, attempts, last_attempt FROM {$table_name} WHERE ip LIKE %s ORDER BY {$orderby_sql} {$order} LIMIT %d OFFSET %d",
+			$this->wpdb->esc_like( $range_prefix ) . '.%',
+			$per_page,
+			$offset
 		);
+
+		return $this->wpdb->get_results( $query );
+		// phpcs:enable
 	}
 
 
@@ -357,14 +454,45 @@ class BruteForceDB {
 	 * @return int Total row count for the range.
 	 */
 	public function get_total_rows_by_range( $range_prefix ) {
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		return (int) $this->wpdb->get_var(
-			/* phpcs:ignore */
+		$range_prefix = $this->wpdb->esc_like( $range_prefix );
+		$table_name   = $this->table_name;
+
+		$query = $this->wpdb->prepare(
+			'SELECT COUNT(*) FROM ' . esc_sql( $table_name ) . ' WHERE ip LIKE %s',
+			$range_prefix . '%'
+		);
+
+		// phpcs:ignore
+		return (int) $this->wpdb->get_var( $query );
+	}
+
+
+	/**
+	 * Clean up old IP addresses based on inactivity and attempt count.
+	 *
+	 * @param int $days         Number of days of inactivity required for deletion.
+	 * @param int $max_attempts Maximum number of attempts allowed for an IP to be deleted.
+	 * @return int|false Number of deleted rows, or false on failure.
+	 */
+	public function cleanup_old_ips( $days, $max_attempts ) {
+		$cutoff_time = time() - ( absint( $days ) * DAY_IN_SECONDS );
+		$table_name  = $this->table_name;
+
+		// phpcs:disable
+		$result      = $this->wpdb->query(
 			$this->wpdb->prepare(
-				"SELECT COUNT(*) FROM {$this->table_name} WHERE ip LIKE %s",
-				$this->wpdb->esc_like( $range_prefix ) . '.%'
+				"DELETE FROM {$table_name} WHERE attempts < %d AND last_attempt < %d",
+				absint( $max_attempts ),
+				absint( $cutoff_time )
 			)
 		);
+		// phpcs:enable
+
+		if ( $result !== false && $result > 0 ) {
+			$this->invalidate_all_cache();
+		}
+
+		return $result;
 	}
 
 
@@ -438,7 +566,7 @@ class BruteForceDB {
 	 * @return void
 	 */
 	private function invalidate_cache_for_ip( $ip ) {
-		$cache_key = 'bf_ip_' . md5( $ip );
+		$cache_key = 'securefusion_bf_ip_' . md5( $ip );
 
 		wp_cache_delete( $cache_key, self::CACHE_GROUP );
 		$this->invalidate_all_cache();
@@ -451,9 +579,10 @@ class BruteForceDB {
 	 * @return void
 	 */
 	private function invalidate_all_cache() {
-		wp_cache_delete( 'bf_total_attempts', self::CACHE_GROUP );
-		wp_cache_delete( 'bf_unique_ips', self::CACHE_GROUP );
-		wp_cache_delete( 'bf_total_rows', self::CACHE_GROUP );
+		wp_cache_delete( 'securefusion_bf_total_attempts', self::CACHE_GROUP );
+		wp_cache_delete( 'securefusion_bf_unique_ips', self::CACHE_GROUP );
+		wp_cache_delete( 'securefusion_bf_total_rows', self::CACHE_GROUP );
+		wp_cache_delete( 'securefusion_bf_total_ip_ranges', self::CACHE_GROUP );
 	}
 
 

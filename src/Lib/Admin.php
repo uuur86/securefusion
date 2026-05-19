@@ -137,6 +137,15 @@ class Admin {
 			'securefusion-login-log',
 			array( $this, 'get_login_log_html' )
 		);
+
+		$this->menu_pages['ip_ranges'] = \add_submenu_page(
+			'securefusion',
+			esc_html__( 'IP Ranges', 'securefusion' ),
+			esc_html__( 'IP Ranges', 'securefusion' ),
+			'manage_options',
+			'securefusion-ip-ranges',
+			array( $this, 'get_ip_ranges_html' )
+		);
 	}
 
 
@@ -370,6 +379,19 @@ class Admin {
 	public function get_login_log_html() {
 		$log = new LoginLog();
 		$log->render();
+	}
+
+
+	/**
+	 * Get IP ranges HTML.
+	 *
+	 * Delegates rendering to the IPRanges class.
+	 *
+	 * @return void
+	 */
+	public function get_ip_ranges_html() {
+		$ranges = new IPRanges();
+		$ranges->render();
 	}
 
 
@@ -726,6 +748,22 @@ class Admin {
 						],
 					],
 					[
+						'type'    => 'radio',
+						'name'    => 'enable_csp_style',
+						'default' => $this->default_settings['enable_csp_style'] ?? '0',
+						'label'   => esc_html__( 'Enable CSP Style Sources', 'securefusion' ),
+						'options' => [
+							[
+								'value' => '0',
+								'label' => esc_html__( 'Disable', 'securefusion' ),
+							],
+							[
+								'value' => '1',
+								'label' => esc_html__( 'Enable', 'securefusion' ),
+							],
+						],
+					],
+					[
 						'type'              => 'taginput',
 						'name'              => 'csp_allowed_style_sources',
 						'label'             => esc_html__( 'CSP Allowed Style Sources', 'securefusion' ),
@@ -733,6 +771,22 @@ class Admin {
 						'field_type'        => 'url',
 						'sanitize_callback' => [ CSP::class, 'validate_csp_source' ],
 						'presets'           => '<button type="button" class="taginput-preset-btn" data-preset="\'unsafe-inline\'">unsafe-inline</button><button type="button" class="taginput-preset-btn" data-preset="https://fonts.googleapis.com">Google Fonts</button><button type="button" class="taginput-preset-btn" data-preset="https://cdnjs.cloudflare.com">Cloudflare</button>',
+					],
+					[
+						'type'    => 'radio',
+						'name'    => 'enable_csp_script',
+						'default' => $this->default_settings['enable_csp_script'] ?? '0',
+						'label'   => esc_html__( 'Enable CSP Script Sources', 'securefusion' ),
+						'options' => [
+							[
+								'value' => '0',
+								'label' => esc_html__( 'Disable', 'securefusion' ),
+							],
+							[
+								'value' => '1',
+								'label' => esc_html__( 'Enable', 'securefusion' ),
+							],
+						],
 					],
 					[
 						'type'              => 'taginput',
@@ -744,6 +798,22 @@ class Admin {
 						'presets'           => '<button type="button" class="taginput-preset-btn" data-preset="\'unsafe-inline\'">unsafe-inline</button><button type="button" class="taginput-preset-btn" data-preset="https://www.googletagmanager.com">Google Tag Manager</button><button type="button" class="taginput-preset-btn" data-preset="https://www.google-analytics.com">GA4</button>',
 					],
 					[
+						'type'    => 'radio',
+						'name'    => 'enable_csp_font',
+						'default' => $this->default_settings['enable_csp_font'] ?? '0',
+						'label'   => esc_html__( 'Enable CSP Font Sources', 'securefusion' ),
+						'options' => [
+							[
+								'value' => '0',
+								'label' => esc_html__( 'Disable', 'securefusion' ),
+							],
+							[
+								'value' => '1',
+								'label' => esc_html__( 'Enable', 'securefusion' ),
+							],
+						],
+					],
+					[
 						'type'              => 'taginput',
 						'name'              => 'csp_allowed_font_sources',
 						'label'             => esc_html__( 'CSP Allowed Font Sources', 'securefusion' ),
@@ -751,6 +821,22 @@ class Admin {
 						'field_type'        => 'url',
 						'sanitize_callback' => [ CSP::class, 'validate_csp_source' ],
 						'presets'           => '<button type="button" class="taginput-preset-btn" data-preset="data:">data:</button><button type="button" class="taginput-preset-btn" data-preset="https://fonts.gstatic.com">Google Fonts</button><button type="button" class="taginput-preset-btn" data-preset="https://cdnjs.cloudflare.com">Cloudflare</button>',
+					],
+					[
+						'type'    => 'radio',
+						'name'    => 'enable_csp_frame',
+						'default' => $this->default_settings['enable_csp_frame'] ?? '0',
+						'label'   => esc_html__( 'Enable CSP Frame Sources', 'securefusion' ),
+						'options' => [
+							[
+								'value' => '0',
+								'label' => esc_html__( 'Disable', 'securefusion' ),
+							],
+							[
+								'value' => '1',
+								'label' => esc_html__( 'Enable', 'securefusion' ),
+							],
+						],
 					],
 					[
 						'type'              => 'taginput',
@@ -762,6 +848,22 @@ class Admin {
 						'presets'           => '<button type="button" class="taginput-preset-btn" data-preset="https://www.youtube.com">YouTube</button><button type="button" class="taginput-preset-btn" data-preset="https://www.google.com">Google</button><button type="button" class="taginput-preset-btn" data-preset="https://maps.google.com">Google Maps</button>',
 					],
 					[
+						'type'    => 'radio',
+						'name'    => 'enable_csp_worker',
+						'default' => $this->default_settings['enable_csp_worker'] ?? '0',
+						'label'   => esc_html__( 'Enable CSP Worker Sources', 'securefusion' ),
+						'options' => [
+							[
+								'value' => '0',
+								'label' => esc_html__( 'Disable', 'securefusion' ),
+							],
+							[
+								'value' => '1',
+								'label' => esc_html__( 'Enable', 'securefusion' ),
+							],
+						],
+					],
+					[
 						'type'              => 'taginput',
 						'name'              => 'csp_allowed_worker_sources',
 						'label'             => esc_html__( 'CSP Worker Sources', 'securefusion' ),
@@ -771,6 +873,22 @@ class Admin {
 						'presets'           => '<button type="button" class="taginput-preset-btn" data-preset="blob:">blob:</button>',
 					],
 					[
+						'type'    => 'radio',
+						'name'    => 'enable_csp_img',
+						'default' => $this->default_settings['enable_csp_img'] ?? '0',
+						'label'   => esc_html__( 'Enable CSP Image Sources', 'securefusion' ),
+						'options' => [
+							[
+								'value' => '0',
+								'label' => esc_html__( 'Disable', 'securefusion' ),
+							],
+							[
+								'value' => '1',
+								'label' => esc_html__( 'Enable', 'securefusion' ),
+							],
+						],
+					],
+					[
 						'type'              => 'taginput',
 						'name'              => 'csp_allowed_img_sources',
 						'label'             => esc_html__( 'CSP Image Sources', 'securefusion' ),
@@ -778,6 +896,57 @@ class Admin {
 						'field_type'        => 'url',
 						'sanitize_callback' => [ CSP::class, 'validate_csp_source' ],
 						'presets'           => '<button type="button" class="taginput-preset-btn" data-preset="data:">data:</button><button type="button" class="taginput-preset-btn" data-preset="https:">https:</button>',
+					],
+					[
+						'type'    => 'radio',
+						'name'    => 'csp_upgrade_insecure_requests',
+						'default' => $this->default_settings['csp_upgrade_insecure_requests'] ?? '0',
+						'label'   => esc_html__( 'Upgrade Insecure Requests', 'securefusion' ),
+						'after'   => '<p class="description">' . esc_html__( 'Instructs the browser to upgrade all HTTP requests to HTTPS.', 'securefusion' ) . '</p>',
+						'options' => [
+							[
+								'value' => '0',
+								'label' => esc_html__( 'Disable', 'securefusion' ),
+							],
+							[
+								'value' => '1',
+								'label' => esc_html__( 'Enable', 'securefusion' ),
+							],
+						],
+					],
+					[
+						'type'    => 'radio',
+						'name'    => 'csp_block_all_mixed_content',
+						'default' => $this->default_settings['csp_block_all_mixed_content'] ?? '0',
+						'label'   => esc_html__( 'Block All Mixed Content', 'securefusion' ),
+						'after'   => '<p class="description">' . esc_html__( 'Prevents loading any HTTP content on an HTTPS page.', 'securefusion' ) . '</p>',
+						'options' => [
+							[
+								'value' => '0',
+								'label' => esc_html__( 'Disable', 'securefusion' ),
+							],
+							[
+								'value' => '1',
+								'label' => esc_html__( 'Enable', 'securefusion' ),
+							],
+						],
+					],
+					[
+						'type'    => 'radio',
+						'name'    => 'csp_sandbox',
+						'default' => $this->default_settings['csp_sandbox'] ?? '0',
+						'label'   => esc_html__( 'Sandbox', 'securefusion' ),
+						'after'   => '<p class="description">' . esc_html__( 'Enables a sandbox for the requested resource similar to the iframe sandbox attribute. This can block some features of your website (like payment gateway integration). Use with caution!', 'securefusion' ) . '</p>',
+						'options' => [
+							[
+								'value' => '0',
+								'label' => esc_html__( 'Disable', 'securefusion' ),
+							],
+							[
+								'value' => '1',
+								'label' => esc_html__( 'Enable', 'securefusion' ),
+							],
+						],
 					],
 				],
 			],
@@ -801,6 +970,20 @@ class Admin {
 						'label'  => esc_html__( 'Max. Attempt Limit', 'securefusion' ),
 						'before' => '',
 						'after'  => esc_html__( ' time(s)', 'securefusion' ) . '<span class="field-tip"> ' . esc_html__( 'Maksimum Failed Login Attempt Limit', 'securefusion' ) . '</span>',
+					],
+					[
+						'type'   => 'text_input',
+						'name'   => 'cleanup_ip_days',
+						'label'  => esc_html__( 'Auto-Delete IPs: Older Than', 'securefusion' ),
+						'before' => '',
+						'after'  => esc_html__( ' day(s)', 'securefusion' ) . '<span class="field-tip"> ' . esc_html__( 'Delete IPs inactive for this many days (0 to disable).', 'securefusion' ) . '</span>',
+					],
+					[
+						'type'   => 'text_input',
+						'name'   => 'cleanup_ip_attempts',
+						'label'  => esc_html__( 'Auto-Delete IPs: Fewer Than', 'securefusion' ),
+						'before' => '',
+						'after'  => esc_html__( ' attempt(s)', 'securefusion' ) . '<span class="field-tip"> ' . esc_html__( 'Only delete IPs that have fewer than this many total attempts.', 'securefusion' ) . '</span>',
 					],
 					[
 						'type'   => 'text_input',

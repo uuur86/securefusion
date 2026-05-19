@@ -269,8 +269,7 @@ class LoginLog {
 			$rows = $db->get_all_rows( self::PER_PAGE, $offset, $orderby, $order );
 		}
 
-		// IP ranges for the range section.
-		$ip_ranges = $db->get_ip_ranges();
+
 
 		$plugin_url = plugins_url( '/', SECUREFUSION_BASENAME );
 		$page_url   = admin_url( 'admin.php?page=securefusion-login-log' );
@@ -326,68 +325,7 @@ class LoginLog {
 				</div>
 			</div>
 
-			<?php if ( ! empty( $ip_ranges ) ) : ?>
-				<div class="sf-range-section">
-					<div class="sf-range-header">
-						<h3>
-							<span class="dashicons dashicons-networking"></span>
-							<?php esc_html_e( 'IP Ranges', 'securefusion' ); ?>
-						</h3>
-						<?php if ( $range_filter ) : ?>
-							<a href="<?php echo esc_url( admin_url( 'admin.php?page=securefusion-login-log' ) ); ?>" class="button button-small sf-clear-filter">
-								<span class="dashicons dashicons-no-alt"></span>
-								<?php esc_html_e( 'Clear Filter', 'securefusion' ); ?>
-							</a>
-						<?php endif; ?>
-					</div>
-					<div class="sf-range-badges">
-						<?php foreach ( $ip_ranges as $range ) : ?>
-							<?php
-							$range_url = add_query_arg(
-								[
-									'range' => $range->range_prefix,
-									'paged' => 1,
-								],
-								admin_url( 'admin.php?page=securefusion-login-log' )
-							);
-							$is_active = ( $range_filter === $range->range_prefix );
-							?>
-							<div class="sf-range-badge <?php echo $is_active ? 'sf-range-active' : ''; ?>">
-								<a href="<?php echo esc_url( $range_url ); ?>" class="sf-range-link" title="<?php esc_attr_e( 'Filter by this range', 'securefusion' ); ?>">
-									<span class="sf-range-name"><?php echo esc_html( $range->range_prefix ); ?>.0/24</span>
-									<span class="sf-range-count"><?php echo (int) $range->ip_count; ?> IPs</span>
-									<span class="sf-range-attempts"><?php echo (int) $range->total_attempts; ?> <?php esc_html_e( 'attempts', 'securefusion' ); ?></span>
-								</a>
-								<button type="button"
-									class="sf-range-detail-btn"
-									data-range="<?php echo esc_attr( $range->range_prefix ); ?>"
-									title="<?php esc_attr_e( 'Show IP list', 'securefusion' ); ?>">
-									<span class="dashicons dashicons-visibility"></span>
-								</button>
-							</div>
-						<?php endforeach; ?>
-					</div>
-				</div>
 
-				<div id="sf-range-modal" class="sf-range-modal" style="display:none;">
-					<div class="sf-range-modal-content">
-						<div class="sf-range-modal-header">
-							<h3 id="sf-range-modal-title"></h3>
-							<button type="button" id="sf-range-modal-close" class="sf-range-modal-close">&times;</button>
-						</div>
-						<div class="sf-range-modal-body">
-							<textarea id="sf-range-modal-textarea" readonly rows="10"></textarea>
-						</div>
-						<div class="sf-range-modal-footer">
-							<button type="button" id="sf-range-copy-btn" class="button button-primary">
-								<span class="dashicons dashicons-clipboard"></span>
-								<?php esc_html_e( 'Copy to Clipboard', 'securefusion' ); ?>
-							</button>
-							<span id="sf-range-copy-status" class="sf-copy-status"></span>
-						</div>
-					</div>
-				</div>
-			<?php endif; ?>
 
 			<div class="sf-log-toolbar">
 				<div class="sf-toolbar-left">

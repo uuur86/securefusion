@@ -81,7 +81,23 @@ class Middleware {
 		$bad_bots      = $this->get_settings( 'bad_bots' );
 		$http_headers  = $this->get_settings( 'http_headers' );
 
-		// CSP.
+		// Helper to resolve null to a default for backward compatibility before settings are re-saved.
+		$resolve_csp_toggle = function ( $key, $fallback ) {
+			$val = $this->get_settings( $key );
+			return ( null === $val ) ? $fallback : $val;
+		};
+
+		$enable_csp_style              = $resolve_csp_toggle( 'enable_csp_style', '0' );
+		$enable_csp_script             = $resolve_csp_toggle( 'enable_csp_script', '0' );
+		$enable_csp_font               = $resolve_csp_toggle( 'enable_csp_font', '0' );
+		$enable_csp_frame              = $resolve_csp_toggle( 'enable_csp_frame', '0' );
+		$enable_csp_worker             = $resolve_csp_toggle( 'enable_csp_worker', '0' );
+		$enable_csp_img                = $resolve_csp_toggle( 'enable_csp_img', '0' );
+		$csp_upgrade_insecure_requests = $resolve_csp_toggle( 'csp_upgrade_insecure_requests', '1' );
+		$csp_block_all_mixed_content   = $resolve_csp_toggle( 'csp_block_all_mixed_content', '1' );
+		$csp_sandbox                   = $resolve_csp_toggle( 'csp_sandbox', '0' );
+
+		// CSP Sources.
 		$csp_allowed_style_sources  = $this->get_settings( 'csp_allowed_style_sources' );
 		$csp_allowed_style_sources  = str_replace( '|', ' ', $csp_allowed_style_sources );
 		$csp_allowed_script_sources = $this->get_settings( 'csp_allowed_script_sources' );
@@ -127,24 +143,57 @@ class Middleware {
 			 * Helps prevent Cross-Site Scripting (XSS) and data injection attacks.
 			 * This policy is more specific to reduce risks highlighted by security scanners.
 			 */
-			$csp_policy  = "default-src 'self'; ";
-			$csp_policy .= "frame-src 'self' " . $csp_allowed_frame_sources . '; ';
-			$csp_policy .= "worker-src 'self' " . $csp_allowed_worker_sources . '; ';
-			$csp_policy .= "script-src 'self' " . $csp_allowed_script_sources . '; ';
-			$csp_policy .= "style-src 'self' " . $csp_allowed_style_sources . '; ';
-			$csp_policy .= "img-src 'self' " . $csp_allowed_img_sources . '; ';
-			$csp_policy .= "font-src 'self' " . $csp_allowed_font_sources . '; ';
+			$csp_policy = '';
 
-			// Disallows plugins like Flash.
-			$csp_policy .= "object-src 'none'; ";
+			if ( $enable_csp_frame ) {
+				$csp_policy .= "frame-src 'self' " . $csp_allowed_frame_sources . '; ';
+			}
 
-			// Mitigates clickjacking.
-			$csp_policy .= "frame-ancestors 'self'; ";
-			$csp_policy .= 'upgrade-insecure-requests; ';
+			if ( $enable_csp_worker ) {
+				$csp_policy .= "worker-src 'self' " . $csp_allowed_worker_sources . '; ';
+			}
 
-			$csp_policy = str_replace( array( "\r\n", "\r", "\n", "\t" ), '', $csp_policy );
+			if ( $enable_csp_script ) {
+				$csp_policy .= "script-src 'self' " . $csp_allowed_script_sources . '; ';
+			}
 
-			header( 'Content-Security-Policy: ' . $csp_policy );
+			if ( $enable_csp_style ) {
+				$csp_policy .= "style-src 'self' " . $csp_allowed_style_sources . '; ';
+			}
+
+			if ( $enable_csp_img ) {
+				$csp_policy .= "img-src 'self' " . $csp_allowed_img_sources . '; ';
+			}
+
+			if ( $enable_csp_font ) {
+				$csp_policy .= "font-src 'self' " . $csp_allowed_font_sources . '; ';
+			}
+
+			if ( ! empty( $csp_policy ) ) {
+				if ( $csp_upgrade_insecure_requests ) {
+					$csp_policy .= 'upgrade-insecure-requests; ';
+				}
+
+				if ( $csp_block_all_mixed_content ) {
+					$csp_policy .= 'block-all-mixed-content; ';
+				}
+
+				if ( $csp_sandbox ) {
+					$csp_policy .= 'sandbox; ';
+				}
+
+				$csp_policy = str_replace( array( "\r\n", "\r", "\n", "\t" ), '', $csp_policy );
+
+				// Disallows plugins like Flash.
+				$csp_policy .= "object-src 'none'; ";
+
+				// Mitigates clickjacking.
+				$csp_policy .= "frame-ancestors 'self'; ";
+
+				$csp_policy = "default-src 'self'; " . $csp_policy;
+
+				header( 'Content-Security-Policy: ' . $csp_policy );
+			}
 
 			/**
 			 * HTTP Strict Transport Security (HSTS)
@@ -188,10 +237,11 @@ class Middleware {
 		}
 
 		// All HTTP Methods: GET / POST / PUT / HEAD / DELETE / PATCH / OPTIONS / CONNECT / TRACE.
-		$method = in_array(
+		$method = \in_array(
 			$_SERVER['REQUEST_METHOD'],
 			// Methods that have the same function as POST.
-			array( 'POST', 'PUT', 'PATCH' )
+			array( 'POST', 'PUT', 'PATCH' ),
+			true
 		) ? 'POST' : 'GET';
 
 		$custom_cookie_patterns  = $this->get_settings( 'cookie_patterns' );

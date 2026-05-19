@@ -97,10 +97,11 @@ If you have any question, you can post [a support request](https://wordpress.org
 
 == Changelog ==
 = 1.5.0 =
-* Updated: Wasp (v3)
-* Improvement: Code quality and performance
-* Improvement: UI and UX
-* Fixed: Some form field bugs in the plugin admin settings page
+* Updated: Wasp library to v3.0.0
+* Added: Intrusion log table to track and list unauthorized access attempts
+* Added: New Content Security Policy (CSP) control fields
+* Improvement: Enhanced UI and usability for the CSP configuration section
+* Fixed: Issues related to missing CSP directives
 
 = 1.4.4 =
 * Fixed: Fixed a PHP Fatal Error during initial plugin activation
