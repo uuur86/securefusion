@@ -10,9 +10,7 @@
 namespace SecureFusion\Lib;
 
 /**
- * IPRanges Class
- *
- * @package securefusion
+ * IPRanges functionality class.
  */
 class IPRanges {
 
@@ -182,7 +180,7 @@ class IPRanges {
 										</a>
 									</th>
 								<?php endforeach; ?>
-								<th scope="col" class="manage-column"><?php esc_html_e( 'Actions', 'securefusion' ); ?></th>
+								<th scope="col" class="manage-column column-actions"><?php esc_html_e( 'Actions', 'securefusion' ); ?></th>
 							</tr>
 						</thead>
 						<tbody>
@@ -197,29 +195,31 @@ class IPRanges {
 								);
 								?>
 								<tr>
-									<td class="column-ip">
+									<td class="column-range_prefix column-ip">
 										<?php $cidr = $this->calculate_cidr( $row->range_prefix, $row->min_last_octet, $row->max_last_octet ); ?>
 										<strong><code><?php echo esc_html( $cidr ); ?></code></strong>
 									</td>
-									<td class="column-attempts">
+									<td class="column-ip_count column-attempts">
 										<span class="fynd-sf-attempt-badge fynd-sf-normal">
 											<?php echo (int) $row->ip_count; ?>
 										</span>
 									</td>
-									<td class="column-last_attempt">
+									<td class="column-total_attempts column-last_attempt">
 										<span class="fynd-sf-attempt-badge <?php echo (int) $row->total_attempts >= 50 ? 'fynd-sf-danger' : ( (int) $row->total_attempts >= 20 ? 'fynd-sf-warning' : 'fynd-sf-normal' ); ?>">
 											<?php echo (int) $row->total_attempts; ?>
 										</span>
 									</td>
-									<td>
-										<a href="<?php echo esc_url( $range_url ); ?>" class="fynd-sf-btn fynd-sf-btn-secondary" style="height: 28px; padding: 2px 10px; font-size: 12px;">
-											<span class="dashicons dashicons-filter"></span>
-											<?php esc_html_e( 'Filter Logs', 'securefusion' ); ?>
-										</a>
-										<button type="button" class="fynd-sf-btn fynd-sf-btn-secondary fynd-sf-range-detail-btn" data-range="<?php echo esc_attr( $row->range_prefix ); ?>" style="height: 28px; padding: 2px 10px; font-size: 12px; margin-left: 5px;">
-											<span class="dashicons dashicons-visibility"></span>
-											<?php esc_html_e( 'View IPs', 'securefusion' ); ?>
-										</button>
+									<td class="column-actions">
+										<div class="fynd-sf-actions-wrap">
+											<a href="<?php echo esc_url( $range_url ); ?>" class="fynd-sf-btn fynd-sf-btn-secondary">
+												<span class="dashicons dashicons-filter"></span>
+												<?php esc_html_e( 'Filter Logs', 'securefusion' ); ?>
+											</a>
+											<button type="button" class="fynd-sf-btn fynd-sf-btn-secondary fynd-sf-range-detail-btn" data-range="<?php echo esc_attr( $row->range_prefix ); ?>">
+												<span class="dashicons dashicons-visibility"></span>
+												<?php esc_html_e( 'View IPs', 'securefusion' ); ?>
+											</button>
+										</div>
 									</td>
 								</tr>
 							<?php endforeach; ?>
@@ -278,24 +278,24 @@ class IPRanges {
 					</div>
 				<?php endif; ?>
 			</div>
-		</div>
 
-		<!-- IP Range Detail Modal -->
-		<div id="fynd-sf-range-modal" class="fynd-sf-range-modal" style="display:none;">
-			<div class="fynd-sf-range-modal-content">
-				<div class="fynd-sf-range-modal-header">
-					<h3 id="fynd-sf-range-modal-title"><?php esc_html_e( 'IPs in Range', 'securefusion' ); ?></h3>
-					<button type="button" id="fynd-sf-range-modal-close" class="fynd-sf-range-modal-close">&times;</button>
-				</div>
-				<div class="fynd-sf-range-modal-body">
-					<textarea id="fynd-sf-range-modal-textarea" readonly></textarea>
-				</div>
-				<div class="fynd-sf-range-modal-footer">
-					<button type="button" id="fynd-sf-range-copy-btn" class="fynd-sf-btn fynd-sf-btn-primary">
-						<span class="dashicons dashicons-clipboard"></span>
-						<?php esc_html_e( 'Copy IP List', 'securefusion' ); ?>
-					</button>
-					<span id="fynd-sf-range-copy-status" class="fynd-sf-copy-status"></span>
+			<!-- IP Range Detail Modal -->
+			<div id="fynd-sf-range-modal" class="fynd-sf-range-modal" style="display:none;">
+				<div class="fynd-sf-range-modal-content">
+					<div class="fynd-sf-range-modal-header">
+						<h3 id="fynd-sf-range-modal-title"><?php esc_html_e( 'IPs in Range', 'securefusion' ); ?></h3>
+						<button type="button" id="fynd-sf-range-modal-close" class="fynd-sf-range-modal-close">&times;</button>
+					</div>
+					<div class="fynd-sf-range-modal-body">
+						<textarea id="fynd-sf-range-modal-textarea" readonly></textarea>
+					</div>
+					<div class="fynd-sf-range-modal-footer">
+						<button type="button" id="fynd-sf-range-copy-btn" class="fynd-sf-btn fynd-sf-btn-primary">
+							<span class="dashicons dashicons-clipboard"></span>
+							<?php esc_html_e( 'Copy IP List', 'securefusion' ); ?>
+						</button>
+						<span id="fynd-sf-range-copy-status" class="fynd-sf-copy-status"></span>
+					</div>
 				</div>
 			</div>
 		</div>

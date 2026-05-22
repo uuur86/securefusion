@@ -11,9 +11,7 @@ use WaspCreators\Wasp;
 use SecureFusion\Lib\Traits\WPCommon;
 
 /**
- * Admin Class
- *
- * @package securefusion
+ * Admin functionality class.
  */
 class Admin {
 
@@ -1187,8 +1185,8 @@ class Admin {
 	 * @return void
 	 */
 	public function admin_theme_styles() {
-		\wp_enqueue_style( 'securefusion-admin-theme-main-css', \plugins_url( 'assets/css/admin.css', SECUREFUSION_BASENAME ), array(), '1.1.17' );
-		\wp_enqueue_script( 'securefusion-admin-js', \plugins_url( 'assets/js/admin.js', SECUREFUSION_BASENAME ), array(), '1.1.26', true );
+		\wp_enqueue_style( 'securefusion-admin-theme-main-css', \plugins_url( 'assets/css/admin.css', SECUREFUSION_BASENAME ), array(), SECUREFUSION_VERSION );
+		\wp_enqueue_script( 'securefusion-admin-js', \plugins_url( 'assets/js/admin.js', SECUREFUSION_BASENAME ), array(), SECUREFUSION_VERSION, true );
 	}
 
 

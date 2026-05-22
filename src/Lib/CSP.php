@@ -8,7 +8,7 @@
 namespace SecureFusion\Lib;
 
 /**
- * CSP Class
+ * CSP functionality class.
  */
 class CSP {
 

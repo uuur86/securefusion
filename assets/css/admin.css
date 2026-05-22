@@ -385,6 +385,11 @@
     font-weight: 600;
 }
 
+.fynd-sf-settings .nav-tab:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
 .fynd-sf-settings .nav-tab .dashicons {
     font-size: 18px;
     width: 18px;
@@ -733,36 +738,25 @@
  * Consolidated Button & Interactive Element Styles (from login-log.css)
  * --------------------------------------------------------- */
 
-/* IP Range visibility button */
-.fynd-sf-login-log .fynd-sf-range-detail-btn {
-    display: inline-flex;
+/* IP Range Actions Column Layout */
+.fynd-sf-ip-ranges .column-actions {
+    width: 220px;
+}
+
+.fynd-sf-actions-wrap {
+    display: flex;
+    gap: 6px;
     align-items: center;
-    justify-content: center;
-    width: 36px;
-    border: none;
-    border-left: 1px solid #e0e0e0;
-    background: transparent;
-    cursor: pointer;
-    color: #646970;
-    transition: background 0.15s, color 0.15s;
-    box-sizing: border-box;
 }
 
-.fynd-sf-login-log .fynd-sf-range-detail-btn:hover {
-    background: #01b9ba;
-    color: #fff;
-}
-
-.fynd-sf-login-log .fynd-sf-range-detail-btn .dashicons {
-    font-size: 16px;
-    width: 16px;
-    height: 16px;
-    line-height: 16px;
-    margin: 0;
+.fynd-sf-actions-wrap .fynd-sf-btn {
+    height: 28px;
+    padding: 0 10px;
+    font-size: 12px;
 }
 
 /* Modal Close Button */
-.fynd-sf-login-log .fynd-sf-range-modal-close {
+.fynd-sf-range-modal-close {
     background: none;
     border: none;
     font-size: 24px;
@@ -773,7 +767,7 @@
     border-radius: 4px;
 }
 
-.fynd-sf-login-log .fynd-sf-range-modal-close:hover {
+.fynd-sf-range-modal-close:hover {
     background: #f0f0f1;
     color: #1d2327;
 }
@@ -852,4 +846,31 @@
 .fynd-sf-login-log .fynd-sf-pagination-links .fynd-sf-page-number.next {
     font-weight: 700;
     font-size: 16px;
+}
+
+/* ---------------------------------------------------------
+ * Responsive Tables for Mobile Viewports
+ * --------------------------------------------------------- */
+@media screen and (max-width: 782px) {
+    .fynd-sf-login-log .fynd-sf-log-table-wrap {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+        border: 1px solid #ccd0d4;
+        border-radius: 6px;
+        margin-bottom: 20px;
+    }
+    
+    .fynd-sf-login-log .fynd-sf-log-table-wrap .fynd-sf-log-table {
+        min-width: 750px !important;
+        table-layout: auto !important;
+    }
+    
+    .fynd-sf-login-log .fynd-sf-log-table-wrap .fynd-sf-log-table th,
+    .fynd-sf-login-log .fynd-sf-log-table-wrap .fynd-sf-log-table td {
+        white-space: nowrap !important;
+    }
+    
+    .fynd-sf-actions-wrap {
+        justify-content: flex-start;
+    }
 }

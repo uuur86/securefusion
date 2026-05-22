@@ -10,9 +10,7 @@ namespace SecureFusion\Lib;
 use SecureFusion\Lib\Traits\WPCommon;
 
 /**
- * Middleware Class
- *
- * @package securefusion
+ * Middleware functionality class.
  */
 class Middleware {
 
@@ -295,6 +293,7 @@ class Middleware {
 			}
 		}
 
+		// phpcs:ignore -- No validation needed.
 		if ( $method === 'GET' && empty( $_GET ) ) {
 			return;
 		}
@@ -392,8 +391,10 @@ class Middleware {
 
 		$input = urldecode( $input );
 
+		$checker = preg_match( $pattern, $input );
+
 		// detect unwanted requests.
-		if ( preg_match( $pattern, $input ) != false ) {
+		if ( $checker === 1 ) {
 			return true;
 		}
 

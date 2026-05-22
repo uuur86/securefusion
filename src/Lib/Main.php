@@ -11,9 +11,7 @@ use SecureFusion\Lib as Sources;
 
 
 /**
- * Main Class
- *
- * @package securefusion
+ * Main functionality class.
  */
 class Main {
 
@@ -69,24 +67,24 @@ class Main {
 	public function __construct() {
 		// Default values.
 		$default_settings = array(
-			'disable_xmlrpc'             => '0',
-			'disable_xmlrpc_user_login'  => '1',
-			'disable_xmlrpc_pingback'    => '1',
-			'disable_self_pingback'      => '1',
-			'ip_time_limit'              => '10',
-			'ip_login_limit'             => '5',
-			'cleanup_ip_days'            => '30',
-			'cleanup_ip_attempts'        => '10',
-			'custom_login_url'           => '',
-			'change_login_error'         => '',
-			'change_admin_id'            => '',
-			'filter_bad_requests'        => '1',
-			'disable_rest_api'           => '1',
-			'hide_versions'              => '1',
-			'bad_bots'                   => '1',
-			'http_headers'               => '1',
-			'cookie_patterns'            => '',
-			'request_patterns'           => '',
+			'disable_xmlrpc'                => '0',
+			'disable_xmlrpc_user_login'     => '1',
+			'disable_xmlrpc_pingback'       => '1',
+			'disable_self_pingback'         => '1',
+			'ip_time_limit'                 => '10',
+			'ip_login_limit'                => '5',
+			'cleanup_ip_days'               => '30',
+			'cleanup_ip_attempts'           => '10',
+			'custom_login_url'              => '',
+			'change_login_error'            => '',
+			'change_admin_id'               => '',
+			'filter_bad_requests'           => '1',
+			'disable_rest_api'              => '1',
+			'hide_versions'                 => '1',
+			'bad_bots'                      => '1',
+			'http_headers'                  => '1',
+			'cookie_patterns'               => '',
+			'request_patterns'              => '',
 
 			'enable_csp_style'              => '0',
 			'enable_csp_script'             => '0',
@@ -103,22 +101,22 @@ class Main {
 			 * but it is a security risk. The ideal solution is a nonce-based policy,
 			 * which is complex to implement across a theme and plugins.
 			 */
-			'csp_allowed_style_sources'  => '\'unsafe-inline\'' . PHP_EOL .
+			'csp_allowed_style_sources'     => '\'unsafe-inline\'' . PHP_EOL .
 				'https://fonts.googleapis.com' . PHP_EOL .
 				'https://cdnjs.cloudflare.com' . PHP_EOL .
 				'https://www.googletagmanager.com',
-			'csp_allowed_script_sources' => '\'unsafe-inline\'' . PHP_EOL .
+			'csp_allowed_script_sources'    => '\'unsafe-inline\'' . PHP_EOL .
 				'https://www.googletagmanager.com',
-			'csp_allowed_font_sources'   => 'data:' . PHP_EOL .
+			'csp_allowed_font_sources'      => 'data:' . PHP_EOL .
 				'https://fonts.gstatic.com' . PHP_EOL .
 				'https://cdnjs.cloudflare.com',
-			'csp_allowed_img_sources'    => 'data:' . PHP_EOL .
+			'csp_allowed_img_sources'       => 'data:' . PHP_EOL .
 				'https://secure.gravatar.com' . PHP_EOL .
 				'https://s.w.org',
-			'csp_allowed_frame_sources'  => 'data:' . PHP_EOL .
+			'csp_allowed_frame_sources'     => 'data:' . PHP_EOL .
 				'https://youtube.com' . PHP_EOL .
 				'https://www.youtube.com',
-			'csp_allowed_worker_sources' => 'blob:',
+			'csp_allowed_worker_sources'    => 'blob:',
 		);
 
 		$this->default_settings = $default_settings;

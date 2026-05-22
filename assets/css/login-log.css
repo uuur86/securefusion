@@ -190,7 +190,7 @@
 
 
 /* IP Range Modal */
-.fynd-sf-login-log .fynd-sf-range-modal {
+.fynd-sf-range-modal {
 	position: fixed;
 	top: 0;
 	left: 0;
@@ -203,7 +203,7 @@
 	background: rgba(0, 0, 0, 0.5);
 }
 
-.fynd-sf-login-log .fynd-sf-range-modal-content {
+.fynd-sf-range-modal-content {
 	background: #fff;
 	border-radius: 8px;
 	box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
@@ -214,7 +214,7 @@
 	flex-direction: column;
 }
 
-.fynd-sf-login-log .fynd-sf-range-modal-header {
+.fynd-sf-range-modal-header {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
@@ -222,7 +222,7 @@
 	border-bottom: 1px solid #e0e0e0;
 }
 
-.fynd-sf-login-log .fynd-sf-range-modal-header h3 {
+.fynd-sf-range-modal-header h3 {
 	margin: 0;
 	font-size: 16px;
 	color: #1d2327;
@@ -230,12 +230,12 @@
 
 
 
-.fynd-sf-login-log .fynd-sf-range-modal-body {
+.fynd-sf-range-modal-body {
 	padding: 20px;
 	overflow: auto;
 }
 
-.fynd-sf-login-log .fynd-sf-range-modal-body textarea {
+.fynd-sf-range-modal-body textarea {
 	width: 100%;
 	font-family: monospace;
 	font-size: 13px;
@@ -248,7 +248,7 @@
 	box-sizing: border-box;
 }
 
-.fynd-sf-login-log .fynd-sf-range-modal-footer {
+.fynd-sf-range-modal-footer {
 	display: flex;
 	align-items: center;
 	gap: 12px;
@@ -256,7 +256,7 @@
 	border-top: 1px solid #e0e0e0;
 }
 
-.fynd-sf-login-log .fynd-sf-range-modal-footer .button .dashicons {
+.fynd-sf-range-modal-footer .fynd-sf-btn .dashicons {
 	font-size: 16px;
 	width: 16px;
 	height: 16px;
@@ -264,7 +264,7 @@
 	margin-right: 4px;
 }
 
-.fynd-sf-login-log .fynd-sf-copy-status {
+.fynd-sf-copy-status {
 	font-size: 13px;
 	color: #00a32a;
 	transition: opacity 0.3s;
@@ -493,7 +493,7 @@
 		text-align: center;
 	}
 
-	.fynd-sf-login-log .fynd-sf-range-modal-content {
+	.fynd-sf-range-modal-content {
 		width: 95%;
 		max-height: 90vh;
 	}

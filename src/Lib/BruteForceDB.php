@@ -2,9 +2,8 @@
 /**
  * BruteForceDB Class
  *
- * Centralized, secure database access layer for the brute force protection table.
- * All SQL operations use $wpdb->prepare() for parameterized values.
- * Table name is validated once at construction and reused safely.
+ * Provides secure CRUD operations for the securefusion_brute_force_table.
+ * Manages object caching for all read/write operations.
  *
  * @package securefusion
  */
@@ -12,12 +11,7 @@
 namespace SecureFusion\Lib;
 
 /**
- * BruteForceDB Class
- *
- * Provides secure CRUD operations for the securefusion_brute_force_table.
- * Manages object caching for all read/write operations.
- *
- * @package securefusion
+ * BruteForceDB functionality class.
  */
 class BruteForceDB {
 

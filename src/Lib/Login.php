@@ -10,9 +10,7 @@ namespace SecureFusion\Lib;
 use SecureFusion\Lib\Traits\WPCommon;
 
 /**
- * Login Class
- *
- * @package securefusion
+ * Login functionality class.
  */
 class Login {
 	use WPCommon;
@@ -104,6 +102,7 @@ class Login {
 	public function redirect_to_login_page() {
 		if ( ! SECUREFUSION_HIDE_LOGIN_DISABLE ) {
 			if ( $this->hide_wp_login() ) {
+				// phpcs:ignore -- No needed nonce check.
 				if ( isset( $_GET['loggedout'] ) && $_GET['loggedout'] === 'true' ) {
 					wp_safe_redirect( home_url(), 302 );
 					exit;
@@ -144,7 +143,7 @@ class Login {
 		}
 
 		if ( ! empty( $redirect ) ) {
-			$login_url = add_query_arg( 'redirect_to', urlencode( $redirect ), $login_url );
+			$login_url = add_query_arg( 'redirect_to', rawurlencode( $redirect ), $login_url );
 		}
 
 		if ( $force_reauth ) {
@@ -230,6 +229,7 @@ class Login {
 	public function my_show_login_error( $param ) {
 		$login_err_msg = $this->get_settings( 'change_login_error' );
 
+		// phpcs:ignore -- No needed nonce check.
 		if ( empty( $login_err_msg ) || empty( $_REQUEST['log'] ) || empty( $_REQUEST['pwd'] ) ) {
 			return $param;
 		} else {

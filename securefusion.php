@@ -1,8 +1,5 @@
 <?php
-
 /**
- * @package SecureFusion
- * @license GPL v3
  * Plugin Name: SecureFusion
  * Plugin URI: https://codeplus.dev/securefusion
  * Description: SecureFusion is a lightweight, robust security plugin for WordPress.
@@ -14,12 +11,17 @@
  * Text Domain : securefusion
  * Domain Path:  /languages
  * Requires PHP: 7.4 or later
+ *
+ * @package SecureFusion
+ * @license GPL v3
  */
 
-if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
 
 if ( ! defined( 'SECUREFUSION_VERSION' ) ) {
-	define( 'SECUREFUSION_VERSION', '1.5.0' );
+	define( 'SECUREFUSION_VERSION', '1.4.6' );
 }
 
 if ( ! defined( 'SECUREFUSION_PATH' ) ) {
@@ -38,16 +40,14 @@ if ( ! defined( 'SECUREFUSION_HIDE_LOGIN_DISABLE' ) ) {
 	define( 'SECUREFUSION_HIDE_LOGIN_DISABLE', false );
 }
 
-require_once( SECUREFUSION_PATH . 'vendor/autoload.php' );
-require_once( SECUREFUSION_PATH . 'xmlrpc_server.php' );
+require_once SECUREFUSION_PATH . 'vendor/autoload.php';
+require_once SECUREFUSION_PATH . 'xmlrpc_server.php';
 
 use SecureFusion\Lib\Main;
 
-$args = array();
-
 $securefusion = new Main();
 
-load_textdomain('securefusion', SECUREFUSION_PATH . 'languages/' . get_locale() . '.mo');
+load_textdomain( 'securefusion', SECUREFUSION_PATH . 'languages/' . get_locale() . '.mo' );
 
 register_activation_hook( __FILE__, array( $securefusion, 'activate' ) );
 register_deactivation_hook( __FILE__, array( $securefusion, 'deactivate' ) );

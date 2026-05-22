@@ -10,7 +10,7 @@ namespace SecureFusion\Lib;
 use SecureFusion\Lib\Traits\WPCommon;
 
 /**
- * SSL Control
+ * SSL Control functionality class.
  */
 class SSLControl {
 
@@ -75,7 +75,7 @@ class SSLControl {
 		$cert_data = \get_transient( 'securefusion_ssl_cert_data' );
 
 		if ( ! $cert_data ) {
-			$url_parse = parse_url( $url, PHP_URL_HOST );
+			$url_parse = wp_parse_url( $url, PHP_URL_HOST );
 
 			if ( $url_parse === 'localhost' ) {
 				$cert_data = 'not-valid';
@@ -88,6 +88,7 @@ class SSLControl {
 				$socket_url  = 'ssl://' . $url_parse . ':443';
 
 				if ( $get_context ) {
+					// phpcs:ignore
 					set_error_handler( [ $this, 'ssl_error_handling' ] );
 					$stream = stream_socket_client(
 						$socket_url,
@@ -99,7 +100,7 @@ class SSLControl {
 					);
 					restore_error_handler();
 
-					if ( $errno == 0 && $stream ) {
+					if ( $errno === 0 && $stream ) {
 						$cert_params = stream_context_get_params( $stream );
 						$cert_peer   = $cert_params['options']['ssl']['peer_certificate'];
 
@@ -134,7 +135,7 @@ class SSLControl {
 	protected function get_https_status() {
 		$server_var = wp_unslash( $_SERVER );
 
-		if ( isset( $server_var['REQUEST_SCHEME'] ) && $server_var['REQUEST_SCHEME'] == 'https' ) {
+		if ( isset( $server_var['REQUEST_SCHEME'] ) && $server_var['REQUEST_SCHEME'] === 'https' ) {
 			return true;
 		}
 
@@ -205,7 +206,8 @@ class SSLControl {
 			'securefusion-admin-ssl-fix-js',
 			plugins_url( 'assets/js/fix-ssl.js', SECUREFUSION_BASENAME ),
 			'jquery',
-			'1.02'
+			'1.02',
+			true
 		);
 	}
 
@@ -221,7 +223,7 @@ class SSLControl {
 
 		if ( ! $https ) {
 			$redirect    = false;
-			$url_parts   = parse_url( home_url() );
+			$url_parts   = wp_parse_url( home_url() );
 			$current_url = 'https://' . $url_parts['host'] . add_query_arg( [] );
 
 			// All pages will redirect to https.
@@ -253,7 +255,7 @@ class SSLControl {
 
 			if ( $redirect ) {
 				if ( function_exists( 'wp_redirect' ) ) {
-					wp_redirect( $this->do_ssl( $current_url ), 302 );
+					wp_safe_redirect( $this->do_ssl( $current_url ), 302 );
 				} else {
 					header( 'location: ' . $this->do_ssl( $current_url ), true, 302 );
 				}

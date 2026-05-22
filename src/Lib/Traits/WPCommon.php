@@ -12,7 +12,7 @@ use Exception;
 
 
 /**
- * WPCommon trait
+ * WPCommon trait with common WordPress methods.
  */
 trait WPCommon {
 

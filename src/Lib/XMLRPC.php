@@ -10,7 +10,7 @@ namespace SecureFusion\Lib;
 use SecureFusion\Lib\Traits\WPCommon;
 
 /**
- * XMLRPC Class
+ * XMLRPC functionality class.
  */
 class XMLRPC {
 

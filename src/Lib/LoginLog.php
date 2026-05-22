@@ -11,9 +11,7 @@
 namespace SecureFusion\Lib;
 
 /**
- * LoginLog Class
- *
- * @package securefusion
+ * LoginLog functionality class.
  */
 class LoginLog {
 

@@ -8,74 +8,36 @@ License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 Requires PHP: 7.4
 
-Firewall, XML-RPC Security, Spam Protection, Redirect HTTP traffic to HTTPS, Login Page Security.
+A high-performance, lightweight WordPress security suite. Protect your site from brute-force logins, DDoS pingbacks, bad request injections, and control Content Security Policies.
 
 == Description ==
-SecureFusion acts as a robust shield against many common attack types, including login attempts and DDoS attacks via XML-RPC.
-It not only enhances security but also significantly improves your site's performance.
-By helping to prevent unauthorized access and collection of sensitive information from your site, it neutralizes many attack vectors.
-This is an effective solution for ensuring user safety and maintaining the speed of your site.
 
-Features:
+Are you tired of bloated security plugins that slow down your website and clutter your database?
 
-= XMLRPC =
-SecureFusion aids in managing your critical XML-RPC services, often a prime target for WordPress hack attempts and spam comments.
-The plugin allows you to selectively disable specific XML-RPC services, defending your site from XML-RPC attacks like spam comments without entirely disabling all XML-RPC services.
-However, be aware that blocking all XML-RPC requests may impact the interaction of certain applications and services with WordPress.
+SecureFusion is designed for WordPress site administrators, developers, and agency owners who demand lightweight, robust, and performance-optimized protection. It acts as an active shield against brute-force attacks, remote XML-RPC exploits, and malicious injections, while keeping your loading speeds lightning fast.
 
-* XML-RPC FULL PROTECTION (Disable all XML-RPC)
-This feature blocks all incoming XML-RPC requests, offering an effective countermeasure against various remote attacks.
-Remember, this might impact certain functionalities that rely on XML-RPC.
+SecureFusion helps you enforce strict Content Security Policies (CSP), hide standard administrative entry points, block automated traffic clusters, and monitor unauthorized access patterns via a clean, modern dashboard.
 
-* XML-RPC LOGIN PROTECTION
-This feature denies remote login requests made via XML-RPC, providing an extra line of defense against brute force login attempts.
+== Features ==
 
-* XML-RPC PINGBACK PROTECTION
-This feature blocks remote pingback requests, assisting in the prevention of DDoS attacks.
+= 1. Login Protection & Interactive Monitoring =
+* **Failed Login Attempts Log:** Visually tracks unauthorized login attempts, displaying timestamps, IP addresses, and lockouts.
+* **IP Range Clustering (/24 Subnets):** Groups attacking IPs into standard /24 subnets. Admins can view individual subnet IPs and copy the CIDR lists to a firewall or Cloudflare blacklist.
+* **Custom Login URL:** Obfuscates `wp-login.php` and `wp-admin` access by changing it to a secret URL, stopping automated bots instantly.
+* **Brute-Force Lockout:** Restricts login attempts and locks out offending IPs.
+* **Modify Login Errors:** Alters generic authentication errors so hackers cannot verify whether they got the username or password correct.
 
-* SELF PINGBACK PROTECTION
-This feature prevents remote self pingback requests, further strengthening your defenses against DDoS attacks.
+= 2. Firewall & Active Guard =
+* **Filter Bad Requests:** Screens URL requests to block XSS, CSRF, and code injection attempts before they reach your theme or database.
+* **REST API Control:** Restricts public endpoint scraping, preventing attackers from harvesting user lists or plugin info.
+* **Content Security Policy (CSP):** Easily configure and inject headers to control script, style, and media execution sources in the client browser.
 
-= SSL =
-SecureFusion facilitates SSL integration into your site, provided you have an SSL certificate purchased from any SSL dealer or acquired through a free SSL service like Cloudflare.
-The plugin forces the redirection of selected zone URLs on your site to HTTPS/SSL.
-Note that SSL certificates must always be valid and correctly configured; otherwise, users may face issues accessing the site.
+= 3. XML-RPC Shield =
+* **DDoS Amplification Defense:** Fully disable XML-RPC, or selectively disable pingbacks, preventing your server from participating in DDoS botnets.
+* **XML-RPC Login Protection:** Specifically blocks remote credentials verification through XML-RPC.
 
-* Enable HTTPS / SSL
-Enforces the use of HTTPS/SSL across your site, ensuring that data is encrypted during transmission.
-
-* Force HTTPS Login
-Redirects login page protocol from HTTP to HTTPS.
-
-* Force HTTPS Admin
-Redirects admin page protocol from HTTP to HTTPS.
-
-* Force HTTPS Front Page
-Redirects front page protocol from HTTP to HTTPS.
-
-= Login =
-
-* Login Attempt Limit
-Set the maximum number of login attempts and the waiting time after reaching this limit to prevent brute force attacks on your login page.
-
-* Change Login Error
-SecureFusion allows you to modify default login errors, making it harder for potential attackers to gather information.
-
-* Change Admin Username
-This feature lets you change your administrator's username (e.g., the default 'admin' username), making it more difficult to guess user credentials. This provides an obscurity layer rather than direct protection from SQL vulnerabilities. (Note: This changes the username, not the numerical User ID).
-
-* New Custom Login URL
-This feature lets you change your login page URL name.
-Be aware that if your site uses SSL/HTTPS, ensure your overall SSL configuration is correct and all resources load securely after any URL changes to avoid potential issues.
-
-= Active Guard =
-
-* Filter Bad Requests
-The plugin helps secure your site against various attacks such as XSS, CSRF, and Code Injections.
-
-* Disable Rest API
-SecureFusion helps safeguard sensitive information by allowing you to disable REST API endpoints, which can prevent them from being used by attackers for information disclosure or exploitation.
-However, keep in mind that disabling the REST API can restrict the functionality of your WordPress site since some plugins and themes depend on it.
+= 4. Enforced SSL / HTTPS =
+* **Secure Protocol Redirection:** Forces HTTP to HTTPS redirection across admin screens, login pages, or the entire site to guarantee secure data transmission.
 
 For complete information, please visit our website [the SecureFusion website](https://fyndsoft.com/securefusion).
 
@@ -87,9 +49,10 @@ For complete information, please visit our website [the SecureFusion website](ht
 
 == Screenshots ==
 
-1. SecureFusion admin XML-RPC settings page
-2. SecureFusion admin Login settings page
-3. SecureFusion admin SSL/HTTPS settings page
+1. The SecureFusion dashboard overview screen showing status cards for active modules.
+2. The Failed Login Attempts log showing active filters and toolbar actions.
+3. The IP Ranges management screen showing subnet CIDR blocks and the "View IPs" modal popup.
+4. The Security settings panel showing custom login URL configurations and CSP headers control.
 
 == Frequently Asked Questions ==
 
