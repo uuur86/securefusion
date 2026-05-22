@@ -290,6 +290,12 @@ msgstr "Giriş"
 msgid "SSL"
 msgstr "SSL"
 
+msgid "Active Guard"
+msgstr "Aktif Koruma"
+
+msgid "Security Policies"
+msgstr "Güvenlik Politikaları"
+
 #: src/Lib/Admin.php:349
 msgid "Firewall"
 msgstr "Güvenlik Duvarı"
@@ -393,6 +399,15 @@ msgid ""
 msgstr ""
 "WordPress varsayılan olarak kendi gönderilerine geri pingback oluşturur. Bu "
 "seçenek, bu tür kendi kendine pingback'leri devre dışı bırakır."
+
+msgid "ACTIVE GUARD SETTINGS"
+msgstr "AKTİF KORUMA AYARLARI"
+
+msgid "Active guard and firewall settings. (Beta)"
+msgstr "Aktif koruma ve güvenlik duvarı ayarları. (Beta)"
+
+msgid "Content Security Policy (CSP) configurations."
+msgstr "İçerik Güvenliği Politikası (CSP) yapılandırmaları."
 
 #: src/Lib/Admin.php:517
 msgid "FIREWALL SETTINGS"

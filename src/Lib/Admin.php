@@ -18,13 +18,6 @@ use SecureFusion\Lib\Traits\WPCommon;
 class Admin {
 
 	/**
-	 * Filesystem instance.
-	 *
-	 * @var \WP_Filesystem
-	 */
-	protected $filesystem;
-
-	/**
 	 * Settings page instance.
 	 *
 	 * @var Wasp
@@ -201,20 +194,19 @@ class Admin {
 		$unique_ips_count = $brute_force_db->get_unique_ips_count();
 
 		?>
-		<div class="securefusion-dashboard container">
-			<header class="dashboard-header">
-				<img src="<?php echo esc_url( $this->plugin_url ); ?>assets/icon.svg" alt="SecureFusion Logo" class="dashboard-logo">
-				<div class="dashboard-title">
-					<h1>
-						<?php esc_html_e( 'SecureFusion Dashboard', 'securefusion' ); ?>
-					</h1>
-					<p class="description">
-						<?php esc_html_e( 'You could monitoring your WordPress security settings.', 'securefusion' ); ?>
-					</p>
+		<div class="wrap fynd-sf-dashboard">
+			<h1 class="fynd-sf-sr-only"><?php esc_html_e( 'SecureFusion Dashboard', 'securefusion' ); ?></h1>
+
+			<header class="fynd-sf-log-header">
+				<img src="<?php echo esc_url( $this->plugin_url ); ?>assets/icon.svg" alt="SecureFusion Logo" class="fynd-sf-log-logo">
+				<div class="fynd-sf-log-header-text">
+					<h2 class="fynd-sf-log-title"><?php esc_html_e( 'SecureFusion Dashboard', 'securefusion' ); ?></h2>
+					<p class="fynd-sf-log-desc"><?php esc_html_e( 'You could monitoring your WordPress security settings.', 'securefusion' ); ?></p>
 				</div>
 			</header>
+
 			<section class="dashboard-overview">
-				<div class="dashboard-item">
+				<div class="dashboard-item <?php echo esc_attr( $security_pass ? 'fynd-sf-status-enabled' : 'fynd-sf-status-disabled' ); ?>">
 					<h2><?php esc_html_e( 'Security Status', 'securefusion' ); ?></h2>
 
 					<p>
@@ -228,9 +220,9 @@ class Admin {
 					if ( version_compare( $wp_version, '6.7.0', '<' ) ) :
 						$security_pass = false;
 						?>
-						<p class="status disabled">
+						<span class="status disabled">
 							<?php esc_html_e( 'Your WordPress version has security vulnerabilities.', 'securefusion' ); ?>
-						</p>
+						</span>
 					<?php endif; ?>
 
 					<p>
@@ -244,9 +236,9 @@ class Admin {
 					if ( version_compare( phpversion(), '8.2.0', '<' ) ) :
 						$security_pass = false;
 						?>
-						<p class="status disabled">
+						<span class="status disabled">
 							<?php esc_html_e( 'Your PHP version has security vulnerabilities.', 'securefusion' ); ?>
-						</p>
+						</span>
 					<?php endif; ?>
 
 					<p>
@@ -261,16 +253,16 @@ class Admin {
 					echo ' ' . (int) $unique_ips_count;
 					?>
 					</p>
-					<p>
-						<a href="<?php echo esc_url( admin_url( 'admin.php?page=securefusion-login-log' ) ); ?>" class="button button-secondary">
-							<span class="dashicons dashicons-list-view" style="vertical-align:text-top;font-size:16px;width:16px;height:16px;margin-right:4px;"></span>
+					<p style="margin-top: 15px; margin-bottom: 15px;">
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=securefusion-login-log' ) ); ?>" class="fynd-sf-btn fynd-sf-btn-secondary">
+							<span class="dashicons dashicons-list-view"></span>
 							<?php esc_html_e( 'View Login Log', 'securefusion' ); ?>
 						</a>
 					</p>
 					<?php if ( $security_pass ) : ?>
-						<p class="status enabled">
+						<span class="status enabled">
 							<?php esc_html_e( 'Everything is running smoothly. No security issues have been detected.', 'securefusion' ); ?>
-						</p>
+						</span>
 					<?php endif; ?>
 				</div>
 				<?php
@@ -437,31 +429,32 @@ class Admin {
 		}
 
 		?>
-		<div class="secure-fusion-settings container" style="position: relative;float: left;width: 100%;">
-			<div class="header">
-				<img src="<?php echo esc_url( $this->plugin_url ); ?>assets/icon.svg" alt="SecureFusion Logo">
-				<div class="header-title">
-					<h1><?php esc_html_e( 'SecureFusion Security Settings', 'securefusion' ); ?></h1>
-					<p class="version-info">
-						<?php
-							/* translators: %s: Version number */
-							printf( esc_html__( 'Version %s - Check out.', 'securefusion' ), esc_html( SECUREFUSION_VERSION ) );
-						?>
-						<a href="https://codeplus.dev/securefusion/changelog" target="_blank" rel="noopener">
-							<?php esc_html_e( 'What\'s New', 'securefusion' ); ?>
-						</a>
+		<div class="wrap fynd-sf-settings">
+			<h1 class="fynd-sf-sr-only"><?php esc_html_e( 'SecureFusion Security Settings', 'securefusion' ); ?></h1>
+
+			<header class="fynd-sf-log-header">
+				<img src="<?php echo esc_url( $this->plugin_url ); ?>assets/icon.svg" alt="SecureFusion Logo" class="fynd-sf-log-logo">
+				<div class="fynd-sf-log-header-text" style="flex-grow: 1;">
+					<h2 class="fynd-sf-log-title"><?php esc_html_e( 'SecureFusion Security Settings', 'securefusion' ); ?></h2>
+					<p class="fynd-sf-log-desc">
+						<?php esc_html_e( 'You could manage your WordPress security settings.', 'securefusion' ); ?>
+						<span class="version-info" style="margin-left: 10px; color: #646970;">
+							<?php
+								/* translators: %s: Version number */
+								printf( esc_html__( 'Version %s - Check out.', 'securefusion' ), esc_html( SECUREFUSION_VERSION ) );
+							?>
+							<a href="https://codeplus.dev/securefusion/changelog" target="_blank" rel="noopener" style="color: #01b9ba; text-decoration: none; font-weight: 500;">
+								<?php esc_html_e( 'What\'s New', 'securefusion' ); ?>
+							</a>
+						</span>
 					</p>
 				</div>
 				<div class="plugin-links">
-					<a href="#">
+					<a href="#" class="fynd-sf-btn fynd-sf-btn-secondary">
 						<?php esc_html_e( 'Additional Plugins', 'securefusion' ); ?>
 					</a>
 				</div>
-			</div>
-			<p class="description">
-				<?php esc_html_e( 'You could manage your WordPress security settings.', 'securefusion' ); ?>
-			</p>
-			<div class="clear"></div>
+			</header>
 			<?php
 			if ( $this->settings_page->is_ready() ) {
 				?>
@@ -478,9 +471,13 @@ class Admin {
 						<span class="dashicons dashicons-admin-network"></span>
 						<?php esc_html_e( 'SSL', 'securefusion' ); ?>
 					</a>
-					<a href="#firewall" class="nav-tab">
-						<span class="dashicons dashicons-hidden"></span>
-						<?php esc_html_e( 'Firewall', 'securefusion' ); ?>
+					<a href="#active_guard" class="nav-tab">
+						<span class="dashicons dashicons-shield"></span>
+						<?php esc_html_e( 'Active Guard', 'securefusion' ); ?>
+					</a>
+					<a href="#security_policies" class="nav-tab">
+						<span class="dashicons dashicons-clipboard"></span>
+						<?php esc_html_e( 'Security Policies', 'securefusion' ); ?>
 					</a>
 					<a href="#advanced" class="nav-tab">
 						<span class="dashicons dashicons-warning"></span>
@@ -490,22 +487,25 @@ class Admin {
 				<div class="content-box">
 					<?php $this->settings_page->form_start(); ?>
 					<div class="content-tab-wrapper">
-						<div class="tab-content" id="securefusion-xmlrpc">
+						<div class="tab-content" id="fynd-sf-xmlrpc">
 							<?php $this->settings_page->run_section( 'xmlrpc_settings' ); ?>
 						</div>
-						<div class="tab-content hidden" id="securefusion-login">
+						<div class="tab-content hidden" id="fynd-sf-login">
 							<?php $this->settings_page->run_section( 'login_settings' ); ?>
 						</div>
-						<div class="tab-content hidden" id="securefusion-ssl">
+						<div class="tab-content hidden" id="fynd-sf-ssl">
 							<?php $this->settings_page->run_section( 'ssl_settings' ); ?>
 							<div class="notice notice-error">
 								<p><?php echo wp_kses_post( $ssl_error ); ?></p>
 							</div>
 						</div>
-						<div class="tab-content hidden" id="securefusion-firewall">
-							<?php $this->settings_page->run_section( 'firewall_settings' ); ?>
+						<div class="tab-content hidden" id="fynd-sf-active_guard">
+							<?php $this->settings_page->run_section( 'active_guard_settings' ); ?>
 						</div>
-						<div class="tab-content hidden" id="securefusion-advanced">
+						<div class="tab-content hidden" id="fynd-sf-security_policies">
+							<?php $this->settings_page->run_section( 'security_policies_settings' ); ?>
+						</div>
+						<div class="tab-content hidden" id="fynd-sf-advanced">
 							<?php $this->settings_page->run_section( 'advanced_settings' ); ?>
 							<div class="notice notice-error">
 								<p>
@@ -513,8 +513,13 @@ class Admin {
 								</p>
 							</div>
 						</div>
-					</div>
-					<?php $this->settings_page->form_end(); ?>
+					<?php
+					$submit_text = esc_html__( 'Save Settings', 'securefusion' );
+					?>
+					<p class="submit">
+						<input type="submit" name="submit" id="submit" class="fynd-sf-btn fynd-sf-btn-primary" value="<?php echo esc_attr( $submit_text ); ?>" style="height: auto; padding: 8px 20px; font-size: 14px;">
+					</p>
+					</form>
 				</div>
 			</div>
 				<?php
@@ -560,7 +565,7 @@ class Admin {
 				<div class="welcome-panel-column-container">
 					<div class="welcome-panel-column">
 						<p>
-							<a href="<?php echo esc_url( $settings_menu ); ?>" class="button button-primary button-hero">
+							<a href="<?php echo esc_url( $settings_menu ); ?>" class="fynd-sf-btn fynd-sf-btn-primary fynd-sf-btn-large">
 								<?php esc_html_e( 'Get started', 'securefusion' ); ?>
 							</a>
 						</p>
@@ -662,9 +667,9 @@ class Admin {
 			],
 			[
 				// Section info.
-				'name'  => 'firewall_settings',
-				'title' => esc_html__( 'FIREWALL SETTINGS', 'securefusion' ),
-				'desc'  => esc_html__( 'Firewall security settings. (Beta)', 'securefusion' ),
+				'name'  => 'active_guard_settings',
+				'title' => esc_html__( 'ACTIVE GUARD SETTINGS', 'securefusion' ),
+				'desc'  => esc_html__( 'Active guard and firewall settings. (Beta)', 'securefusion' ),
 				// Form items.
 				'items' => [
 					[
@@ -747,6 +752,15 @@ class Admin {
 							],
 						],
 					],
+				],
+			],
+			[
+				// Section info.
+				'name'  => 'security_policies_settings',
+				'title' => esc_html__( 'SECURITY POLICIES', 'securefusion' ),
+				'desc'  => esc_html__( 'Content Security Policy (CSP) configurations.', 'securefusion' ),
+				// Form items.
+				'items' => [
 					[
 						'type'    => 'radio',
 						'name'    => 'enable_csp_style',
@@ -770,7 +784,7 @@ class Admin {
 						'placeholder'       => 'fonts.googleapis.com',
 						'field_type'        => 'url',
 						'sanitize_callback' => [ CSP::class, 'validate_csp_source' ],
-						'presets'           => '<button type="button" class="taginput-preset-btn" data-preset="\'unsafe-inline\'">unsafe-inline</button><button type="button" class="taginput-preset-btn" data-preset="https://fonts.googleapis.com">Google Fonts</button><button type="button" class="taginput-preset-btn" data-preset="https://cdnjs.cloudflare.com">Cloudflare</button>',
+						'presets'           => '<button type="button" class="fynd-sf-taginput-preset-btn" data-preset="\'unsafe-inline\'">unsafe-inline</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://fonts.googleapis.com">Google Fonts</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://cdnjs.cloudflare.com">Cloudflare</button>',
 					],
 					[
 						'type'    => 'radio',
@@ -795,7 +809,7 @@ class Admin {
 						'placeholder'       => 'googletagmanager.com',
 						'field_type'        => 'url',
 						'sanitize_callback' => [ CSP::class, 'validate_csp_source' ],
-						'presets'           => '<button type="button" class="taginput-preset-btn" data-preset="\'unsafe-inline\'">unsafe-inline</button><button type="button" class="taginput-preset-btn" data-preset="https://www.googletagmanager.com">Google Tag Manager</button><button type="button" class="taginput-preset-btn" data-preset="https://www.google-analytics.com">GA4</button>',
+						'presets'           => '<button type="button" class="fynd-sf-taginput-preset-btn" data-preset="\'unsafe-inline\'">unsafe-inline</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://www.googletagmanager.com">Google Tag Manager</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://www.google-analytics.com">GA4</button>',
 					],
 					[
 						'type'    => 'radio',
@@ -820,7 +834,7 @@ class Admin {
 						'placeholder'       => 'fonts.gstatic.com',
 						'field_type'        => 'url',
 						'sanitize_callback' => [ CSP::class, 'validate_csp_source' ],
-						'presets'           => '<button type="button" class="taginput-preset-btn" data-preset="data:">data:</button><button type="button" class="taginput-preset-btn" data-preset="https://fonts.gstatic.com">Google Fonts</button><button type="button" class="taginput-preset-btn" data-preset="https://cdnjs.cloudflare.com">Cloudflare</button>',
+						'presets'           => '<button type="button" class="fynd-sf-taginput-preset-btn" data-preset="data:">data:</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://fonts.gstatic.com">Google Fonts</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://cdnjs.cloudflare.com">Cloudflare</button>',
 					],
 					[
 						'type'    => 'radio',
@@ -845,7 +859,7 @@ class Admin {
 						'placeholder'       => 'youtube.com',
 						'field_type'        => 'url',
 						'sanitize_callback' => [ CSP::class, 'validate_csp_source' ],
-						'presets'           => '<button type="button" class="taginput-preset-btn" data-preset="https://www.youtube.com">YouTube</button><button type="button" class="taginput-preset-btn" data-preset="https://www.google.com">Google</button><button type="button" class="taginput-preset-btn" data-preset="https://maps.google.com">Google Maps</button>',
+						'presets'           => '<button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://www.youtube.com">YouTube</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://www.google.com">Google</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://maps.google.com">Google Maps</button>',
 					],
 					[
 						'type'    => 'radio',
@@ -870,7 +884,7 @@ class Admin {
 						'placeholder'       => 'blob:',
 						'field_type'        => 'url',
 						'sanitize_callback' => [ CSP::class, 'validate_csp_source' ],
-						'presets'           => '<button type="button" class="taginput-preset-btn" data-preset="blob:">blob:</button>',
+						'presets'           => '<button type="button" class="fynd-sf-taginput-preset-btn" data-preset="blob:">blob:</button>',
 					],
 					[
 						'type'    => 'radio',
@@ -895,7 +909,7 @@ class Admin {
 						'placeholder'       => 'example.com',
 						'field_type'        => 'url',
 						'sanitize_callback' => [ CSP::class, 'validate_csp_source' ],
-						'presets'           => '<button type="button" class="taginput-preset-btn" data-preset="data:">data:</button><button type="button" class="taginput-preset-btn" data-preset="https:">https:</button>',
+						'presets'           => '<button type="button" class="fynd-sf-taginput-preset-btn" data-preset="data:">data:</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https:">https:</button>',
 					],
 					[
 						'type'    => 'radio',
@@ -1120,7 +1134,7 @@ class Admin {
 							// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
 							return @preg_match( '/' . $value . '/', '' ) !== false;
 						},
-						'presets'           => '<button type="button" class="taginput-preset-btn" data-preset="[a-z0-9]+">Alphanumeric</button><button type="button" class="taginput-preset-btn" data-preset="[a-zA-Z0-9_\-]+">Safe Chars</button>',
+						'presets'           => '<button type="button" class="fynd-sf-taginput-preset-btn" data-preset="[a-z0-9]+">Alphanumeric</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="[a-zA-Z0-9_\-]+">Safe Chars</button>',
 					],
 					[
 						'type'              => 'taginput',
@@ -1132,7 +1146,7 @@ class Admin {
 							// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
 							return @preg_match( '/' . $value . '/', '' ) !== false;
 						},
-						'presets'           => '<button type="button" class="taginput-preset-btn" data-preset="@@[\w\.\$]+">SQL Vars</button><button type="button" class="taginput-preset-btn" data-preset="(union|select|insert)\s+">SQL Keywords</button><button type="button" class="taginput-preset-btn" data-preset="base64_\w+\(">Base64 Func</button>',
+						'presets'           => '<button type="button" class="fynd-sf-taginput-preset-btn" data-preset="@@[\w\.\$]+">SQL Vars</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="(union|select|insert)\s+">SQL Keywords</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="base64_\w+\(">Base64 Func</button>',
 					],
 				],
 			],
@@ -1173,8 +1187,8 @@ class Admin {
 	 * @return void
 	 */
 	public function admin_theme_styles() {
-		\wp_enqueue_style( 'securefusion-admin-theme-main-css', \plugins_url( 'assets/css/admin.css', SECUREFUSION_BASENAME ), array(), '1.1.14' );
-		\wp_enqueue_script( 'securefusion-admin-js', \plugins_url( 'assets/js/admin.js', SECUREFUSION_BASENAME ), array(), '1.1.25', true );
+		\wp_enqueue_style( 'securefusion-admin-theme-main-css', \plugins_url( 'assets/css/admin.css', SECUREFUSION_BASENAME ), array(), '1.1.17' );
+		\wp_enqueue_script( 'securefusion-admin-js', \plugins_url( 'assets/js/admin.js', SECUREFUSION_BASENAME ), array(), '1.1.26', true );
 	}
 
 
@@ -1190,8 +1204,14 @@ class Admin {
 	 * @return void
 	 */
 	public function add_status_box( $title, $status = false, $desc = '', $button = [] ) {
+		$card_class = 'dashboard-item';
+		if ( $status !== false ) {
+			$card_class .= $status ? ' fynd-sf-status-enabled' : ' fynd-sf-status-disabled';
+		} else {
+			$card_class .= ' fynd-sf-status-neutral';
+		}
 		?>
-		<div class="dashboard-item">
+		<div class="<?php echo esc_attr( $card_class ); ?>">
 			<h2>
 				<?php echo esc_html( $title ); ?>
 			</h2>
@@ -1206,17 +1226,21 @@ class Admin {
 
 			if ( $status !== false ) :
 				?>
-				<p class="status <?php echo esc_attr( $status ? 'enabled' : 'disabled' ); ?>">
-					<?php $status ? esc_html_e( 'enabled', 'securefusion' ) : esc_html_e( 'disabled', 'securefusion' ); ?>
-				</p>
+				<div class="status-wrapper" style="margin-top: 10px;">
+					<span class="status <?php echo esc_attr( $status ? 'enabled' : 'disabled' ); ?>">
+						<?php $status ? esc_html_e( 'enabled', 'securefusion' ) : esc_html_e( 'disabled', 'securefusion' ); ?>
+					</span>
+				</div>
 				<?php
 			endif;
 
 			if ( ! empty( $button ) ) :
 				?>
-				<a href="<?php echo esc_attr( $button[1] ); ?>">
-					<?php echo esc_html( $button[0] ); ?>
-				</a>
+				<p style="margin-top: 15px; margin-bottom: 0;">
+					<a href="<?php echo esc_attr( $button[1] ); ?>" class="fynd-sf-btn fynd-sf-btn-secondary">
+						<?php echo esc_html( $button[0] ); ?>
+					</a>
+				</p>
 				<?php
 			endif;
 			?>
@@ -1251,7 +1275,7 @@ class Admin {
 				[
 					'confirm_message' => esc_html__( 'Are you sure you want to reset this field to its default value?', 'securefusion' ),
 					'button_text'     => esc_html__( 'Reset', 'securefusion' ),
-					'button_class'    => 'button button-secondary button-small',
+					'button_class'    => 'fynd-sf-btn fynd-sf-btn-secondary',
 					'wrapper_class'   => 'wasp-reset-wrapper',
 				],
 				$this->default_settings

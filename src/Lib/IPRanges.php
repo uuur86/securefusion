@@ -43,6 +43,33 @@ class IPRanges {
 			[],
 			SECUREFUSION_VERSION
 		);
+
+		wp_enqueue_script(
+			'securefusion-login-log-js',
+			plugins_url( 'assets/js/login-log.js', SECUREFUSION_BASENAME ),
+			[ 'jquery' ],
+			SECUREFUSION_VERSION,
+			true
+		);
+
+		wp_localize_script(
+			'securefusion-login-log-js',
+			'securefusionLog',
+			[
+				'ajaxUrl'       => admin_url( 'admin-ajax.php' ),
+				'nonce'         => wp_create_nonce( \SecureFusion\Lib\LoginLog::NONCE_ACTION ),
+				'confirmReset'  => esc_html__( 'WARNING: This action is irreversible! All failed login attempt data will be permanently deleted. Are you absolutely sure?', 'securefusion' ),
+				'confirmImport' => esc_html__( 'Importing data will add records to the existing table. Continue?', 'securefusion' ),
+				'resetSuccess'  => esc_html__( 'All data has been deleted successfully.', 'securefusion' ),
+				'exportEmpty'   => esc_html__( 'No data to export.', 'securefusion' ),
+				'importSuccess' => esc_html__( 'Import completed successfully.', 'securefusion' ),
+				'importError'   => esc_html__( 'Import failed. Please check the file format.', 'securefusion' ),
+				'invalidFile'   => esc_html__( 'Please select a valid JSON file.', 'securefusion' ),
+				'processing'    => esc_html__( 'Processing...', 'securefusion' ),
+				'copied'        => esc_html__( 'Copied to clipboard!', 'securefusion' ),
+				'copyFailed'    => esc_html__( 'Copy failed. Please select and copy manually.', 'securefusion' ),
+			]
+		);
 	}
 
 	/**
@@ -62,10 +89,10 @@ class IPRanges {
 
 		while ( $diff > 0 ) {
 			$diff >>= 1;
-			$mask--;
+			--$mask;
 		}
 
-		$shift_amount = 32 - $mask;
+		$shift_amount       = 32 - $mask;
 		$network_last_octet = $min & ( ~ ( ( 1 << $shift_amount ) - 1 ) & 0xFF );
 
 		return $range_prefix . '.' . $network_last_octet . '/' . $mask;
@@ -97,32 +124,32 @@ class IPRanges {
 
 		$this->enqueue_assets();
 		?>
-		<div class="wrap securefusion-login-log securefusion-ip-ranges">
-			<h1 class="sf-sr-only"><?php esc_html_e( 'IP Ranges', 'securefusion' ); ?></h1>
+		<div class="wrap fynd-sf-login-log fynd-sf-ip-ranges">
+			<h1 class="fynd-sf-sr-only"><?php esc_html_e( 'IP Ranges', 'securefusion' ); ?></h1>
 
-			<header class="sf-log-header">
-				<img src="<?php echo esc_url( $plugin_url ); ?>assets/icon.svg" alt="SecureFusion" class="sf-log-logo">
-				<div class="sf-log-header-text">
-					<h2 class="sf-log-title"><?php esc_html_e( 'IP Ranges Management', 'securefusion' ); ?></h2>
-					<p class="sf-log-desc"><?php esc_html_e( 'View and manage IP subnets that have generated failed login attempts.', 'securefusion' ); ?></p>
+			<header class="fynd-sf-log-header">
+				<img src="<?php echo esc_url( $plugin_url ); ?>assets/icon.svg" alt="SecureFusion" class="fynd-sf-log-logo">
+				<div class="fynd-sf-log-header-text">
+					<h2 class="fynd-sf-log-title"><?php esc_html_e( 'IP Ranges Management', 'securefusion' ); ?></h2>
+					<p class="fynd-sf-log-desc"><?php esc_html_e( 'View and manage IP subnets that have generated failed login attempts.', 'securefusion' ); ?></p>
 				</div>
 			</header>
 
-			<div class="sf-log-toolbar" style="margin-top: 20px;">
-				<div class="sf-toolbar-left">
-					<button type="button" id="sf-copy-txt-list" class="button button-primary">
+			<div class="fynd-sf-log-toolbar" style="margin-top: 20px;">
+				<div class="fynd-sf-toolbar-left">
+					<button type="button" id="fynd-sf-copy-txt-list" class="fynd-sf-btn fynd-sf-btn-primary">
 						<span class="dashicons dashicons-clipboard"></span>
 						<?php esc_html_e( 'Copy TXT List', 'securefusion' ); ?>
 					</button>
-					<span id="sf-copy-status" style="margin-left:10px; font-weight:bold; color:green; display:none;">
+					<span id="fynd-sf-copy-status" style="margin-left:10px; font-weight:bold; color:green; display:none;">
 						<?php esc_html_e( 'Copied!', 'securefusion' ); ?>
 					</span>
 				</div>
 			</div>
 
-			<div class="sf-log-table-wrap" style="margin-top: 20px;">
+			<div class="fynd-sf-log-table-wrap" style="margin-top: 20px;">
 				<?php if ( $total_rows > 0 ) : ?>
-					<table class="wp-list-table widefat fixed striped sf-log-table">
+					<table class="wp-list-table widefat fixed striped fynd-sf-log-table">
 						<thead>
 							<tr>
 								<?php
@@ -175,20 +202,24 @@ class IPRanges {
 										<strong><code><?php echo esc_html( $cidr ); ?></code></strong>
 									</td>
 									<td class="column-attempts">
-										<span class="sf-attempt-badge sf-normal">
+										<span class="fynd-sf-attempt-badge fynd-sf-normal">
 											<?php echo (int) $row->ip_count; ?>
 										</span>
 									</td>
 									<td class="column-last_attempt">
-										<span class="sf-attempt-badge <?php echo (int) $row->total_attempts >= 50 ? 'sf-danger' : ( (int) $row->total_attempts >= 20 ? 'sf-warning' : 'sf-normal' ); ?>">
+										<span class="fynd-sf-attempt-badge <?php echo (int) $row->total_attempts >= 50 ? 'fynd-sf-danger' : ( (int) $row->total_attempts >= 20 ? 'fynd-sf-warning' : 'fynd-sf-normal' ); ?>">
 											<?php echo (int) $row->total_attempts; ?>
 										</span>
 									</td>
 									<td>
-										<a href="<?php echo esc_url( $range_url ); ?>" class="button button-small">
-											<span class="dashicons dashicons-filter" style="margin-top:4px;"></span>
+										<a href="<?php echo esc_url( $range_url ); ?>" class="fynd-sf-btn fynd-sf-btn-secondary" style="height: 28px; padding: 2px 10px; font-size: 12px;">
+											<span class="dashicons dashicons-filter"></span>
 											<?php esc_html_e( 'Filter Logs', 'securefusion' ); ?>
 										</a>
+										<button type="button" class="fynd-sf-btn fynd-sf-btn-secondary fynd-sf-range-detail-btn" data-range="<?php echo esc_attr( $row->range_prefix ); ?>" style="height: 28px; padding: 2px 10px; font-size: 12px; margin-left: 5px;">
+											<span class="dashicons dashicons-visibility"></span>
+											<?php esc_html_e( 'View IPs', 'securefusion' ); ?>
+										</button>
 									</td>
 								</tr>
 							<?php endforeach; ?>
@@ -196,36 +227,44 @@ class IPRanges {
 					</table>
 
 					<?php if ( $total_pages > 1 ) : ?>
-						<div class="sf-log-pagination">
-							<span class="sf-pagination-info">
+						<div class="fynd-sf-log-pagination">
+							<span class="fynd-sf-pagination-info">
 								<?php
+								$current_page_f = number_format_i18n( $current_page );
+								$total_pages_f  = number_format_i18n( $total_pages );
+								$total_rows_f   = number_format_i18n( $total_rows );
+
 								printf(
 									/* translators: 1: Current page, 2: Total pages, 3: Total items. */
 									esc_html__( 'Page %1$s of %2$s (%3$s items)', 'securefusion' ),
-									number_format_i18n( $current_page ),
-									number_format_i18n( $total_pages ),
-									number_format_i18n( $total_rows )
+									esc_html( $current_page_f ),
+									esc_html( $total_pages_f ),
+									esc_html( $total_rows_f )
 								);
 								?>
 							</span>
-							<span class="sf-pagination-links">
+							<span class="fynd-sf-pagination-links">
 								<?php
 								// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- paginate_links() returns safe HTML.
-								echo paginate_links(
-									[
-										'base'      => add_query_arg( 'paged', '%#%', $page_url ),
-										'format'    => '',
-										'prev_text' => '&lsaquo;',
-										'next_text' => '&rsaquo;',
-										'total'     => $total_pages,
-										'current'   => $current_page,
-										'end_size'  => 1,
-										'mid_size'  => 2,
-										'add_args'  => [
-											'orderby' => $orderby,
-											'order'   => $order,
-										],
-									]
+								echo str_replace(
+									'page-numbers',
+									'fynd-sf-page-number',
+									paginate_links(
+										[
+											'base'      => add_query_arg( 'paged', '%#%', $page_url ),
+											'format'    => '',
+											'prev_text' => '&lsaquo;',
+											'next_text' => '&rsaquo;',
+											'total'     => $total_pages,
+											'current'   => $current_page,
+											'end_size'  => 1,
+											'mid_size'  => 2,
+											'add_args'  => [
+												'orderby' => $orderby,
+												'order'   => $order,
+											],
+										]
+									)
 								);
 								?>
 							</span>
@@ -233,7 +272,7 @@ class IPRanges {
 					<?php endif; ?>
 
 				<?php else : ?>
-					<div class="sf-log-empty">
+					<div class="fynd-sf-log-empty">
 						<span class="dashicons dashicons-shield-alt"></span>
 						<p><?php esc_html_e( 'No IP ranges found. Your site is clean!', 'securefusion' ); ?></p>
 					</div>
@@ -241,25 +280,45 @@ class IPRanges {
 			</div>
 		</div>
 
+		<!-- IP Range Detail Modal -->
+		<div id="fynd-sf-range-modal" class="fynd-sf-range-modal" style="display:none;">
+			<div class="fynd-sf-range-modal-content">
+				<div class="fynd-sf-range-modal-header">
+					<h3 id="fynd-sf-range-modal-title"><?php esc_html_e( 'IPs in Range', 'securefusion' ); ?></h3>
+					<button type="button" id="fynd-sf-range-modal-close" class="fynd-sf-range-modal-close">&times;</button>
+				</div>
+				<div class="fynd-sf-range-modal-body">
+					<textarea id="fynd-sf-range-modal-textarea" readonly></textarea>
+				</div>
+				<div class="fynd-sf-range-modal-footer">
+					<button type="button" id="fynd-sf-range-copy-btn" class="fynd-sf-btn fynd-sf-btn-primary">
+						<span class="dashicons dashicons-clipboard"></span>
+						<?php esc_html_e( 'Copy IP List', 'securefusion' ); ?>
+					</button>
+					<span id="fynd-sf-range-copy-status" class="fynd-sf-copy-status"></span>
+				</div>
+			</div>
+		</div>
+
 		<?php
-		// All ranges for the copy button
+		// All ranges for the copy button.
 		$all_ranges = $db->get_ip_ranges();
 		$txt_list   = '';
 		foreach ( $all_ranges as $range ) {
-			$cidr = $this->calculate_cidr( $range->range_prefix, $range->min_last_octet, $range->max_last_octet );
+			$cidr      = $this->calculate_cidr( $range->range_prefix, $range->min_last_octet, $range->max_last_octet );
 			$txt_list .= $cidr . "\n";
 		}
 		?>
-		<textarea id="sf-hidden-txt-list" style="display:none;" aria-hidden="true"><?php echo esc_textarea( $txt_list ); ?></textarea>
+		<textarea id="fynd-sf-hidden-txt-list" style="display:none;" aria-hidden="true"><?php echo esc_textarea( $txt_list ); ?></textarea>
 		<script>
 			document.addEventListener('DOMContentLoaded', function() {
-				var copyBtn = document.getElementById('sf-copy-txt-list');
+				var copyBtn = document.getElementById('fynd-sf-copy-txt-list');
 				if (copyBtn) {
 					copyBtn.addEventListener('click', function(e) {
 						e.preventDefault();
-						var txt = document.getElementById('sf-hidden-txt-list').value;
+						var txt = document.getElementById('fynd-sf-hidden-txt-list').value;
 						navigator.clipboard.writeText(txt).then(function() {
-							var status = document.getElementById('sf-copy-status');
+							var status = document.getElementById('fynd-sf-copy-status');
 							status.style.display = 'inline';
 							setTimeout(function() {
 								status.style.display = 'none';

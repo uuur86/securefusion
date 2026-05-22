@@ -29,7 +29,7 @@
 				}
 			}
 
-			var content_id = '#securefusion-' + selected_id;
+			var content_id = '#fynd-sf-' + selected_id;
 			var nav_id = 'a[ href = "#' + selected_id + '" ]';
 
 			$(nav_id).addClass('nav-tab-active');
@@ -57,6 +57,7 @@
 			var $inputRow = $wrapper.find('.taginput-input-row');
 			var $input = $wrapper.find('.taginput-input');
 			var $addBtn = $wrapper.find('.taginput-add-btn');
+			$addBtn.addClass('fynd-sf-btn fynd-sf-btn-primary fynd-sf-taginput-add-btn');
 			var $tags = $wrapper.find('.taginput-tags');
 			var $hidden = $wrapper.find('.taginput-hidden');
 			var $error = $wrapper.find('.taginput-error');
@@ -161,7 +162,7 @@
 			});
 
 			// Preset buttons
-			$presets.find('.taginput-preset-btn').on('click', function () {
+			$presets.find('.fynd-sf-taginput-preset-btn').on('click', function () {
 				var preset = $(this).data('preset');
 				if (preset) addTag(preset);
 				updateHidden();

@@ -70,18 +70,18 @@ class LoginLog {
 			'securefusion-login-log-js',
 			'securefusionLog',
 			[
-				'ajaxUrl'        => admin_url( 'admin-ajax.php' ),
-				'nonce'          => wp_create_nonce( self::NONCE_ACTION ),
-				'confirmReset'   => esc_html__( 'WARNING: This action is irreversible! All failed login attempt data will be permanently deleted. Are you absolutely sure?', 'securefusion' ),
-				'confirmImport'  => esc_html__( 'Importing data will add records to the existing table. Continue?', 'securefusion' ),
-				'resetSuccess'   => esc_html__( 'All data has been deleted successfully.', 'securefusion' ),
-				'exportEmpty'    => esc_html__( 'No data to export.', 'securefusion' ),
-				'importSuccess'  => esc_html__( 'Import completed successfully.', 'securefusion' ),
-				'importError'    => esc_html__( 'Import failed. Please check the file format.', 'securefusion' ),
-				'invalidFile'    => esc_html__( 'Please select a valid JSON file.', 'securefusion' ),
-				'processing'     => esc_html__( 'Processing...', 'securefusion' ),
-				'copied'         => esc_html__( 'Copied to clipboard!', 'securefusion' ),
-				'copyFailed'     => esc_html__( 'Copy failed. Please select and copy manually.', 'securefusion' ),
+				'ajaxUrl'       => admin_url( 'admin-ajax.php' ),
+				'nonce'         => wp_create_nonce( self::NONCE_ACTION ),
+				'confirmReset'  => esc_html__( 'WARNING: This action is irreversible! All failed login attempt data will be permanently deleted. Are you absolutely sure?', 'securefusion' ),
+				'confirmImport' => esc_html__( 'Importing data will add records to the existing table. Continue?', 'securefusion' ),
+				'resetSuccess'  => esc_html__( 'All data has been deleted successfully.', 'securefusion' ),
+				'exportEmpty'   => esc_html__( 'No data to export.', 'securefusion' ),
+				'importSuccess' => esc_html__( 'Import completed successfully.', 'securefusion' ),
+				'importError'   => esc_html__( 'Import failed. Please check the file format.', 'securefusion' ),
+				'invalidFile'   => esc_html__( 'Please select a valid JSON file.', 'securefusion' ),
+				'processing'    => esc_html__( 'Processing...', 'securefusion' ),
+				'copied'        => esc_html__( 'Copied to clipboard!', 'securefusion' ),
+				'copyFailed'    => esc_html__( 'Copy failed. Please select and copy manually.', 'securefusion' ),
 			]
 		);
 	}
@@ -169,7 +169,7 @@ class LoginLog {
 			return;
 		}
 
-		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- JSON data, decoded and validated field-by-field in bulk_insert().
+		// phpcs:ignore -- Already sanitized and validated with validate_ajax_request function.
 		$raw_data = isset( $_POST['import_data'] ) ? wp_unslash( $_POST['import_data'] ) : '';
 
 		$data = json_decode( $raw_data, true );
@@ -201,7 +201,7 @@ class LoginLog {
 			return;
 		}
 
-		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Validated below.
+		// phpcs:ignore -- Already sanitized and validated with validate_ajax_request function.
 		$range_prefix = isset( $_POST['range_prefix'] ) ? sanitize_text_field( wp_unslash( $_POST['range_prefix'] ) ) : '';
 
 		if ( empty( $range_prefix ) || ! preg_match( '/^\d{1,3}\.\d{1,3}\.\d{1,3}$/', $range_prefix ) ) {
@@ -219,10 +219,10 @@ class LoginLog {
 
 		wp_send_json_success(
 			[
-				'ips'    => $ip_list,
-				'range'  => $range_prefix . '.0/24',
+				'ips'   => $ip_list,
+				'range' => $range_prefix . '.0/24',
 				/* translators: %d: Number of IPs in the range. */
-				'title'  => sprintf( esc_html__( '%d IPs in range %s', 'securefusion' ), count( $ip_list ), $range_prefix . '.0/24' ),
+				'title' => sprintf( esc_html__( '%1$d IPs in range %2$s', 'securefusion' ), count( $ip_list ), $range_prefix . '.0/24' ),
 			]
 		);
 	}
@@ -231,7 +231,7 @@ class LoginLog {
 	/**
 	 * Normalize the order parameter.
 	 *
-	 * sanitize_key() lowercases the value, so we must normalize to uppercase
+	 * The sanitize_key() function lowercases the value, so we must normalize to uppercase
 	 * before any comparison.
 	 *
 	 * @param string $order Raw order value (may be lowercase from sanitize_key).
@@ -269,8 +269,6 @@ class LoginLog {
 			$rows = $db->get_all_rows( self::PER_PAGE, $offset, $orderby, $order );
 		}
 
-
-
 		$plugin_url = plugins_url( '/', SECUREFUSION_BASENAME );
 		$page_url   = admin_url( 'admin.php?page=securefusion-login-log' );
 
@@ -281,7 +279,7 @@ class LoginLog {
 
 		$this->enqueue_assets();
 		?>
-		<div class="wrap securefusion-login-log">
+		<div class="wrap fynd-sf-login-log">
 			<?php
 			/*
 			 * WordPress injects admin_notices after the first <h1> inside .wrap.
@@ -289,67 +287,67 @@ class LoginLog {
 			 * outside our styled header component.
 			 */
 			?>
-			<h1 class="sf-sr-only"><?php esc_html_e( 'Failed Login Attempts', 'securefusion' ); ?></h1>
+			<h1 class="fynd-sf-sr-only"><?php esc_html_e( 'Failed Login Attempts', 'securefusion' ); ?></h1>
 
-			<header class="sf-log-header">
-				<img src="<?php echo esc_url( $plugin_url ); ?>assets/icon.svg" alt="SecureFusion" class="sf-log-logo">
-				<div class="sf-log-header-text">
-					<h2 class="sf-log-title"><?php esc_html_e( 'Failed Login Attempts', 'securefusion' ); ?></h2>
-					<p class="sf-log-desc"><?php esc_html_e( 'Monitor and manage brute force login attempt records.', 'securefusion' ); ?></p>
+			<header class="fynd-sf-log-header">
+				<img src="<?php echo esc_url( $plugin_url ); ?>assets/icon.svg" alt="SecureFusion" class="fynd-sf-log-logo">
+				<div class="fynd-sf-log-header-text">
+					<h2 class="fynd-sf-log-title"><?php esc_html_e( 'Failed Login Attempts', 'securefusion' ); ?></h2>
+					<p class="fynd-sf-log-desc"><?php esc_html_e( 'Monitor and manage brute force login attempt records.', 'securefusion' ); ?></p>
 				</div>
 			</header>
 
-			<div id="sf-log-notice" class="sf-log-notice" style="display:none;"></div>
+			<div id="fynd-sf-log-notice" class="fynd-sf-log-notice" style="display:none;"></div>
 
-			<div class="sf-log-stats">
-				<div class="sf-stat-card">
-					<span class="sf-stat-icon dashicons dashicons-warning"></span>
-					<div class="sf-stat-data">
-						<span class="sf-stat-value"><?php echo (int) $db->get_total_attempts(); ?></span>
-						<span class="sf-stat-label"><?php esc_html_e( 'Total Failed Attempts', 'securefusion' ); ?></span>
+			<div class="fynd-sf-log-stats">
+				<div class="fynd-sf-stat-card">
+					<span class="fynd-sf-stat-icon dashicons dashicons-warning"></span>
+					<div class="fynd-sf-stat-data">
+						<span class="fynd-sf-stat-value"><?php echo (int) $db->get_total_attempts(); ?></span>
+						<span class="fynd-sf-stat-label"><?php esc_html_e( 'Total Failed Attempts', 'securefusion' ); ?></span>
 					</div>
 				</div>
-				<div class="sf-stat-card">
-					<span class="sf-stat-icon dashicons dashicons-admin-site-alt3"></span>
-					<div class="sf-stat-data">
-						<span class="sf-stat-value"><?php echo (int) $db->get_unique_ips_count(); ?></span>
-						<span class="sf-stat-label"><?php esc_html_e( 'Unique IP Addresses', 'securefusion' ); ?></span>
+				<div class="fynd-sf-stat-card">
+					<span class="fynd-sf-stat-icon dashicons dashicons-admin-site-alt3"></span>
+					<div class="fynd-sf-stat-data">
+						<span class="fynd-sf-stat-value"><?php echo (int) $db->get_unique_ips_count(); ?></span>
+						<span class="fynd-sf-stat-label"><?php esc_html_e( 'Unique IP Addresses', 'securefusion' ); ?></span>
 					</div>
 				</div>
-				<div class="sf-stat-card">
-					<span class="sf-stat-icon dashicons dashicons-database"></span>
-					<div class="sf-stat-data">
-						<span class="sf-stat-value"><?php echo (int) $total_rows; ?></span>
-						<span class="sf-stat-label"><?php esc_html_e( 'Total Records', 'securefusion' ); ?></span>
+				<div class="fynd-sf-stat-card">
+					<span class="fynd-sf-stat-icon dashicons dashicons-database"></span>
+					<div class="fynd-sf-stat-data">
+						<span class="fynd-sf-stat-value"><?php echo (int) $total_rows; ?></span>
+						<span class="fynd-sf-stat-label"><?php esc_html_e( 'Total Records', 'securefusion' ); ?></span>
 					</div>
 				</div>
 			</div>
 
 
 
-			<div class="sf-log-toolbar">
-				<div class="sf-toolbar-left">
-					<button type="button" id="sf-log-export" class="button button-secondary">
+			<div class="fynd-sf-log-toolbar">
+				<div class="fynd-sf-toolbar-left">
+					<button type="button" id="fynd-sf-log-export" class="fynd-sf-btn fynd-sf-btn-secondary">
 						<span class="dashicons dashicons-download"></span>
 						<?php esc_html_e( 'Export JSON', 'securefusion' ); ?>
 					</button>
-					<label for="sf-log-import-file" class="button button-secondary sf-import-label">
+					<label for="fynd-sf-log-import-file" class="fynd-sf-btn fynd-sf-btn-secondary fynd-sf-import-label">
 						<span class="dashicons dashicons-upload"></span>
 						<?php esc_html_e( 'Import JSON', 'securefusion' ); ?>
 					</label>
-					<input type="file" id="sf-log-import-file" accept=".json" class="sf-hidden-file">
+					<input type="file" id="fynd-sf-log-import-file" accept=".json" class="fynd-sf-hidden-file">
 				</div>
-				<div class="sf-toolbar-right">
-					<button type="button" id="sf-log-reset" class="button sf-btn-danger">
+				<div class="fynd-sf-toolbar-right">
+					<button type="button" id="fynd-sf-log-reset" class="fynd-sf-btn fynd-sf-btn-danger">
 						<span class="dashicons dashicons-trash"></span>
 						<?php esc_html_e( 'Reset All Data', 'securefusion' ); ?>
 					</button>
 				</div>
 			</div>
 
-			<div class="sf-log-table-wrap">
+			<div class="fynd-sf-log-table-wrap">
 				<?php if ( $range_filter ) : ?>
-					<div class="sf-active-filter">
+					<div class="fynd-sf-active-filter">
 						<span class="dashicons dashicons-filter"></span>
 						<?php
 						printf(
@@ -358,14 +356,14 @@ class LoginLog {
 							'<strong>' . esc_html( $range_filter ) . '.0/24</strong>'
 						);
 						?>
-						<a href="<?php echo esc_url( admin_url( 'admin.php?page=securefusion-login-log' ) ); ?>" class="sf-filter-clear-link">
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=securefusion-login-log' ) ); ?>" class="fynd-sf-filter-clear-link">
 							<?php esc_html_e( 'Show all', 'securefusion' ); ?>
 						</a>
 					</div>
 				<?php endif; ?>
 
 				<?php if ( $total_rows > 0 ) : ?>
-					<table class="wp-list-table widefat fixed striped sf-log-table">
+					<table class="wp-list-table widefat fixed striped fynd-sf-log-table">
 						<thead>
 							<tr>
 								<?php
@@ -400,14 +398,14 @@ class LoginLog {
 								<?php endforeach; ?>
 							</tr>
 						</thead>
-						<tbody id="sf-log-tbody">
+						<tbody id="fynd-sf-log-tbody">
 							<?php foreach ( $rows as $row ) : ?>
 								<tr>
 									<td class="column-ip">
 										<code><?php echo esc_html( $row->ip ); ?></code>
 									</td>
 									<td class="column-attempts">
-										<span class="sf-attempt-badge <?php echo (int) $row->attempts >= 10 ? 'sf-danger' : ( (int) $row->attempts >= 5 ? 'sf-warning' : 'sf-normal' ); ?>">
+										<span class="fynd-sf-attempt-badge <?php echo (int) $row->attempts >= 10 ? 'fynd-sf-danger' : ( (int) $row->attempts >= 5 ? 'fynd-sf-warning' : 'fynd-sf-normal' ); ?>">
 											<?php echo (int) $row->attempts; ?>
 										</span>
 									</td>
@@ -421,7 +419,7 @@ class LoginLog {
 													$timestamp
 												)
 											);
-											echo '<br><small class="sf-time-ago">';
+											echo '<br><small class="fynd-sf-time-ago">';
 											echo esc_html( human_time_diff( $timestamp, time() ) . ' ' . __( 'ago', 'securefusion' ) );
 											echo '</small>';
 										} else {
@@ -435,36 +433,44 @@ class LoginLog {
 					</table>
 
 					<?php if ( $total_pages > 1 ) : ?>
-						<div class="sf-log-pagination">
-							<span class="sf-pagination-info">
+						<div class="fynd-sf-log-pagination">
+							<span class="fynd-sf-pagination-info">
 								<?php
+								$current_page_f = number_format_i18n( $current_page );
+								$total_pages_f  = number_format_i18n( $total_pages );
+								$total_rows_f   = number_format_i18n( $total_rows );
+
 								printf(
 									/* translators: 1: Current page, 2: Total pages, 3: Total items. */
 									esc_html__( 'Page %1$s of %2$s (%3$s items)', 'securefusion' ),
-									number_format_i18n( $current_page ),
-									number_format_i18n( $total_pages ),
-									number_format_i18n( $total_rows )
+									esc_html( $current_page_f ),
+									esc_html( $total_pages_f ),
+									esc_html( $total_rows_f )
 								);
 								?>
 							</span>
-							<span class="sf-pagination-links">
+							<span class="fynd-sf-pagination-links">
 								<?php
 								// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- paginate_links() returns safe HTML.
-								echo paginate_links(
-									[
-										'base'      => add_query_arg( 'paged', '%#%', $page_url ),
-										'format'    => '',
-										'prev_text' => '&lsaquo;',
-										'next_text' => '&rsaquo;',
-										'total'     => $total_pages,
-										'current'   => $current_page,
-										'end_size'  => 1,
-										'mid_size'  => 2,
-										'add_args'  => [
-											'orderby' => $orderby,
-											'order'   => $order,
-										],
-									]
+								echo str_replace(
+									'page-numbers',
+									'fynd-sf-page-number',
+									paginate_links(
+										[
+											'base'      => add_query_arg( 'paged', '%#%', $page_url ),
+											'format'    => '',
+											'prev_text' => '&lsaquo;',
+											'next_text' => '&rsaquo;',
+											'total'     => $total_pages,
+											'current'   => $current_page,
+											'end_size'  => 1,
+											'mid_size'  => 2,
+											'add_args'  => [
+												'orderby' => $orderby,
+												'order'   => $order,
+											],
+										]
+									)
 								);
 								?>
 							</span>
@@ -472,7 +478,7 @@ class LoginLog {
 					<?php endif; ?>
 
 				<?php else : ?>
-					<div class="sf-log-empty">
+					<div class="fynd-sf-log-empty">
 						<span class="dashicons dashicons-shield-alt"></span>
 						<p>
 							<?php if ( $range_filter ) : ?>

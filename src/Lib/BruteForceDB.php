@@ -59,7 +59,7 @@ class BruteForceDB {
 		global $wpdb;
 
 		$this->wpdb       = $wpdb;
-		$this->table_name = esc_sql( $wpdb->prefix ) . 'securefusion_brute_force_table';
+		$this->table_name = \esc_sql( $wpdb->prefix ) . 'securefusion_brute_force_table';
 	}
 
 
@@ -84,7 +84,7 @@ class BruteForceDB {
 	 */
 	public function get_row_by_ip( $ip ) {
 		$cache_key = 'securefusion_bf_ip_' . md5( $ip );
-		$cached    = wp_cache_get( $cache_key, self::CACHE_GROUP );
+		$cached    = \wp_cache_get( $cache_key, self::CACHE_GROUP );
 
 		if ( false !== $cached ) {
 			return $cached;
@@ -166,7 +166,7 @@ class BruteForceDB {
 	 * @return int The total number of failed attempts.
 	 */
 	public function get_total_attempts() {
-		$cached = wp_cache_get( 'securefusion_bf_total_attempts', self::CACHE_GROUP );
+		$cached = \wp_cache_get( 'securefusion_bf_total_attempts', self::CACHE_GROUP );
 
 		if ( false !== $cached ) {
 			return (int) $cached;
@@ -179,7 +179,7 @@ class BruteForceDB {
 		);
 
 		$total = (int) $total;
-		wp_cache_set( 'securefusion_bf_total_attempts', $total, self::CACHE_GROUP, self::CACHE_TTL );
+		\wp_cache_set( 'securefusion_bf_total_attempts', $total, self::CACHE_GROUP, self::CACHE_TTL );
 
 		return $total;
 	}
@@ -193,7 +193,7 @@ class BruteForceDB {
 	 * @return int The count of unique IP addresses.
 	 */
 	public function get_unique_ips_count() {
-		$cached = wp_cache_get( 'securefusion_bf_unique_ips', self::CACHE_GROUP );
+		$cached = \wp_cache_get( 'securefusion_bf_unique_ips', self::CACHE_GROUP );
 
 		if ( false !== $cached ) {
 			return (int) $cached;
@@ -206,7 +206,7 @@ class BruteForceDB {
 		);
 
 		$count = (int) $count;
-		wp_cache_set( 'securefusion_bf_unique_ips', $count, self::CACHE_GROUP, self::CACHE_TTL );
+		\wp_cache_set( 'securefusion_bf_unique_ips', $count, self::CACHE_GROUP, self::CACHE_TTL );
 
 		return $count;
 	}
@@ -252,7 +252,7 @@ class BruteForceDB {
 	 * @return int Total row count.
 	 */
 	public function get_total_rows() {
-		$cached = wp_cache_get( 'securefusion_bf_total_rows', self::CACHE_GROUP );
+		$cached = \wp_cache_get( 'securefusion_bf_total_rows', self::CACHE_GROUP );
 
 		if ( false !== $cached ) {
 			return (int) $cached;
@@ -265,7 +265,7 @@ class BruteForceDB {
 		);
 
 		$count = (int) $count;
-		wp_cache_set( 'securefusion_bf_total_rows', $count, self::CACHE_GROUP, self::CACHE_TTL );
+		\wp_cache_set( 'securefusion_bf_total_rows', $count, self::CACHE_GROUP, self::CACHE_TTL );
 
 		return $count;
 	}
@@ -294,7 +294,7 @@ class BruteForceDB {
 	 * @return array Array of objects with range_prefix, ip_count, total_attempts.
 	 */
 	public function get_ip_ranges() {
-		$cached = wp_cache_get( 'securefusion_bf_ip_ranges', self::CACHE_GROUP );
+		$cached = \wp_cache_get( 'securefusion_bf_ip_ranges', self::CACHE_GROUP );
 
 		if ( false !== $cached ) {
 			return $cached;
@@ -315,7 +315,7 @@ class BruteForceDB {
 		// phpcs:enable
 
 		// Cache for 5 minutes.
-		wp_cache_set( 'securefusion_bf_ip_ranges', $rows, self::CACHE_GROUP, self::CACHE_TTL );
+		\wp_cache_set( 'securefusion_bf_ip_ranges', $rows, self::CACHE_GROUP, self::CACHE_TTL );
 
 		return $rows;
 	}
@@ -371,7 +371,7 @@ class BruteForceDB {
 	 * @return int Total number of unique /24 ranges.
 	 */
 	public function get_total_ip_ranges() {
-		$cached = wp_cache_get( 'securefusion_bf_total_ip_ranges', self::CACHE_GROUP );
+		$cached = \wp_cache_get( 'securefusion_bf_total_ip_ranges', self::CACHE_GROUP );
 
 		if ( false !== $cached ) {
 			return (int) $cached;
@@ -386,7 +386,7 @@ class BruteForceDB {
 		// phpcs:enable
 
 		$count = (int) $count;
-		wp_cache_set( 'securefusion_bf_total_ip_ranges', $count, self::CACHE_GROUP, self::CACHE_TTL );
+		\wp_cache_set( 'securefusion_bf_total_ip_ranges', $count, self::CACHE_GROUP, self::CACHE_TTL );
 
 		return $count;
 	}
@@ -458,7 +458,7 @@ class BruteForceDB {
 		$table_name   = $this->table_name;
 
 		$query = $this->wpdb->prepare(
-			'SELECT COUNT(*) FROM ' . esc_sql( $table_name ) . ' WHERE ip LIKE %s',
+			'SELECT COUNT(*) FROM ' . \esc_sql( $table_name ) . ' WHERE ip LIKE %s',
 			$range_prefix . '%'
 		);
 
@@ -568,7 +568,7 @@ class BruteForceDB {
 	private function invalidate_cache_for_ip( $ip ) {
 		$cache_key = 'securefusion_bf_ip_' . md5( $ip );
 
-		wp_cache_delete( $cache_key, self::CACHE_GROUP );
+		\wp_cache_delete( $cache_key, self::CACHE_GROUP );
 		$this->invalidate_all_cache();
 	}
 
@@ -579,10 +579,10 @@ class BruteForceDB {
 	 * @return void
 	 */
 	private function invalidate_all_cache() {
-		wp_cache_delete( 'securefusion_bf_total_attempts', self::CACHE_GROUP );
-		wp_cache_delete( 'securefusion_bf_unique_ips', self::CACHE_GROUP );
-		wp_cache_delete( 'securefusion_bf_total_rows', self::CACHE_GROUP );
-		wp_cache_delete( 'securefusion_bf_total_ip_ranges', self::CACHE_GROUP );
+		\wp_cache_delete( 'securefusion_bf_total_attempts', self::CACHE_GROUP );
+		\wp_cache_delete( 'securefusion_bf_unique_ips', self::CACHE_GROUP );
+		\wp_cache_delete( 'securefusion_bf_total_rows', self::CACHE_GROUP );
+		\wp_cache_delete( 'securefusion_bf_total_ip_ranges', self::CACHE_GROUP );
 	}
 
 
@@ -637,6 +637,6 @@ class BruteForceDB {
         ) {$charset_collate};";
 
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-		dbDelta( $sql );
+		\dbDelta( $sql );
 	}
 }

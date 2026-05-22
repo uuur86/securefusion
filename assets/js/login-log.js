@@ -18,11 +18,11 @@
 	 * @param {string} type    Notice type (success|error|info).
 	 */
 	function showNotice(message, type) {
-		var $notice = $('#sf-log-notice');
+		var $notice = $('#fynd-sf-log-notice');
 
 		$notice
-			.removeClass('sf-notice-success sf-notice-error sf-notice-info')
-			.addClass('sf-notice-' + type)
+			.removeClass('fynd-sf-notice-success fynd-sf-notice-error fynd-sf-notice-info')
+			.addClass('fynd-sf-notice-' + type)
 			.text(message)
 			.fadeIn(200);
 
@@ -37,7 +37,7 @@
 	 * @param {boolean} state True to enable processing.
 	 */
 	function setProcessing(state) {
-		$('.sf-log-toolbar').toggleClass('sf-processing', state);
+		$('.fynd-sf-log-toolbar').toggleClass('fynd-sf-processing', state);
 	}
 
 	/**
@@ -63,7 +63,7 @@
 	$(document).ready(function () {
 
 		// Reset handler with double confirmation.
-		$('#sf-log-reset').on('click', function () {
+		$('#fynd-sf-log-reset').on('click', function () {
 			if (!window.confirm(securefusionLog.confirmReset)) {
 				return;
 			}
@@ -102,7 +102,7 @@
 		});
 
 		// Export handler.
-		$('#sf-log-export').on('click', function () {
+		$('#fynd-sf-log-export').on('click', function () {
 			setProcessing(true);
 
 			$.post(securefusionLog.ajaxUrl, {
@@ -132,7 +132,7 @@
 		});
 
 		// Import handler.
-		$('#sf-log-import-file').on('change', function (e) {
+		$('#fynd-sf-log-import-file').on('change', function (e) {
 			var file = e.target.files[0];
 
 			if (!file) {
@@ -194,11 +194,11 @@
 
 		// ===== IP Range Detail Modal =====
 
-		var $modal    = $('#sf-range-modal');
-		var $textarea = $('#sf-range-modal-textarea');
-		var $title    = $('#sf-range-modal-title');
-		var $copyBtn  = $('#sf-range-copy-btn');
-		var $copyStatus = $('#sf-range-copy-status');
+		var $modal    = $('#fynd-sf-range-modal');
+		var $textarea = $('#fynd-sf-range-modal-textarea');
+		var $title    = $('#fynd-sf-range-modal-title');
+		var $copyBtn  = $('#fynd-sf-range-copy-btn');
+		var $copyStatus = $('#fynd-sf-range-copy-status');
 
 		/**
 		 * Open the range detail modal with IP list.
@@ -236,7 +236,7 @@
 		}
 
 		// Detail button click.
-		$('.sf-range-detail-btn').on('click', function (e) {
+		$('.fynd-sf-range-detail-btn').on('click', function (e) {
 			e.preventDefault();
 			var rangePrefix = $(this).data('range');
 			if (rangePrefix) {
@@ -245,7 +245,7 @@
 		});
 
 		// Close modal.
-		$('#sf-range-modal-close').on('click', function () {
+		$('#fynd-sf-range-modal-close').on('click', function () {
 			$modal.fadeOut(200);
 		});
 

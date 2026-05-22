@@ -31,7 +31,6 @@ class CSP {
 	public static function validate_csp_source( $value ) {
 		// CSP quoted keywords.
 		$csp_keywords = [
-			"'self'",
 			"'unsafe-inline'",
 			"'unsafe-eval'",
 			"'none'",

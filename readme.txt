@@ -2,7 +2,7 @@
 Contributors: codeplusdev, ugurbicer
 Tags: firewall, security, anti-spam, ssl, xml-rpc
 Requires at least: 4.9
-Tested up to: 6.9
+Tested up to: 7.0
 Stable tag: 1.5.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -68,7 +68,7 @@ This feature lets you change your administrator's username (e.g., the default 'a
 This feature lets you change your login page URL name.
 Be aware that if your site uses SSL/HTTPS, ensure your overall SSL configuration is correct and all resources load securely after any URL changes to avoid potential issues.
 
-= Firewall =
+= Active Guard =
 
 * Filter Bad Requests
 The plugin helps secure your site against various attacks such as XSS, CSRF, and Code Injections.
