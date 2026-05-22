@@ -2,8 +2,9 @@
 /**
  * LoginLog Class
  *
- * Handles the failed login attempts log page with
- * listing, reset (truncate), JSON export, import, and IP range analysis.
+ * Handles the security log page with listing, type-based filtering,
+ * reset (delete by type), JSON export, import, IP block toggle,
+ * and IP range analysis.
  *
  * @package securefusion
  */
@@ -31,6 +32,37 @@ class LoginLog {
 
 
 	/**
+	 * Get available log type options for the selector.
+	 *
+	 * @return array Associative array of type_value => label.
+	 */
+	private function get_log_type_options() {
+		return [
+			''                             => esc_html__( 'All Types', 'securefusion' ),
+			BruteForceDB::TYPE_FAILED_LOGIN => esc_html__( 'Failed Login', 'securefusion' ),
+			BruteForceDB::TYPE_BAD_REQUEST  => esc_html__( 'Bad Request', 'securefusion' ),
+			BruteForceDB::TYPE_BAD_COOKIE   => esc_html__( 'Bad Cookie', 'securefusion' ),
+			BruteForceDB::TYPE_BAD_BOT      => esc_html__( 'Bad Bot', 'securefusion' ),
+			BruteForceDB::TYPE_BAD_QUERY    => esc_html__( 'Bad Query', 'securefusion' ),
+			BruteForceDB::TYPE_BLOCKED      => esc_html__( 'Blocked', 'securefusion' ),
+		];
+	}
+
+
+	/**
+	 * Get display label for a log type.
+	 *
+	 * @param string $type Canonical log type.
+	 * @return string Human-readable label.
+	 */
+	private function get_log_type_label( $type ) {
+		$options = $this->get_log_type_options();
+		$type    = BruteForceDB::normalize_log_type( $type );
+		return isset( $options[ $type ] ) ? $options[ $type ] : ucfirst( str_replace( '_', ' ', $type ) );
+	}
+
+
+	/**
 	 * Register AJAX handlers.
 	 *
 	 * @return void
@@ -40,6 +72,7 @@ class LoginLog {
 		add_action( 'wp_ajax_securefusion_log_export', [ $this, 'ajax_export' ] );
 		add_action( 'wp_ajax_securefusion_log_import', [ $this, 'ajax_import' ] );
 		add_action( 'wp_ajax_securefusion_log_range_ips', [ $this, 'ajax_range_ips' ] );
+		add_action( 'wp_ajax_securefusion_toggle_ip_block', [ $this, 'ajax_toggle_ip_block' ] );
 	}
 
 
@@ -68,18 +101,22 @@ class LoginLog {
 			'securefusion-login-log-js',
 			'securefusionLog',
 			[
-				'ajaxUrl'       => admin_url( 'admin-ajax.php' ),
-				'nonce'         => wp_create_nonce( self::NONCE_ACTION ),
-				'confirmReset'  => esc_html__( 'WARNING: This action is irreversible! All failed login attempt data will be permanently deleted. Are you absolutely sure?', 'securefusion' ),
-				'confirmImport' => esc_html__( 'Importing data will add records to the existing table. Continue?', 'securefusion' ),
-				'resetSuccess'  => esc_html__( 'All data has been deleted successfully.', 'securefusion' ),
-				'exportEmpty'   => esc_html__( 'No data to export.', 'securefusion' ),
-				'importSuccess' => esc_html__( 'Import completed successfully.', 'securefusion' ),
-				'importError'   => esc_html__( 'Import failed. Please check the file format.', 'securefusion' ),
-				'invalidFile'   => esc_html__( 'Please select a valid JSON file.', 'securefusion' ),
-				'processing'    => esc_html__( 'Processing...', 'securefusion' ),
-				'copied'        => esc_html__( 'Copied to clipboard!', 'securefusion' ),
-				'copyFailed'    => esc_html__( 'Copy failed. Please select and copy manually.', 'securefusion' ),
+				'ajaxUrl'        => admin_url( 'admin-ajax.php' ),
+				'nonce'          => wp_create_nonce( self::NONCE_ACTION ),
+				'confirmReset'   => esc_html__( 'WARNING: This action is irreversible! Selected log data will be permanently deleted. Are you absolutely sure?', 'securefusion' ),
+				'confirmImport'  => esc_html__( 'Importing data will add records to the existing table. Continue?', 'securefusion' ),
+				'resetSuccess'   => esc_html__( 'Data has been deleted successfully.', 'securefusion' ),
+				'exportEmpty'    => esc_html__( 'No data to export.', 'securefusion' ),
+				'importSuccess'  => esc_html__( 'Import completed successfully.', 'securefusion' ),
+				'importError'    => esc_html__( 'Import failed. Please check the file format.', 'securefusion' ),
+				'invalidFile'    => esc_html__( 'Please select a valid JSON file.', 'securefusion' ),
+				'processing'     => esc_html__( 'Processing...', 'securefusion' ),
+				'copied'         => esc_html__( 'Copied to clipboard!', 'securefusion' ),
+				'copyFailed'     => esc_html__( 'Copy failed. Please select and copy manually.', 'securefusion' ),
+				'blockSuccess'   => esc_html__( 'IP has been blocked.', 'securefusion' ),
+				'unblockSuccess' => esc_html__( 'IP has been unblocked.', 'securefusion' ),
+				'blockFailed'    => esc_html__( 'IP block/unblock operation failed.', 'securefusion' ),
+				'confirmBlock'   => esc_html__( 'Are you sure you want to block this IP?', 'securefusion' ),
 			]
 		);
 	}
@@ -106,7 +143,7 @@ class LoginLog {
 
 
 	/**
-	 * AJAX: Reset (truncate) all log data.
+	 * AJAX: Reset (delete) log data by type or all.
 	 *
 	 * @return void
 	 */
@@ -115,11 +152,14 @@ class LoginLog {
 			return;
 		}
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Already verified above.
+		$log_type = isset( $_POST['log_type'] ) ? sanitize_text_field( wp_unslash( $_POST['log_type'] ) ) : '';
+
 		$db      = new BruteForceDB();
-		$success = $db->truncate_table();
+		$success = $db->delete_by_type( $log_type );
 
 		if ( $success ) {
-			wp_send_json_success( [ 'message' => esc_html__( 'All data has been deleted.', 'securefusion' ) ] );
+			wp_send_json_success( [ 'message' => esc_html__( 'Data has been deleted.', 'securefusion' ) ] );
 		} else {
 			wp_send_json_error( [ 'message' => esc_html__( 'Failed to delete data.', 'securefusion' ) ] );
 		}
@@ -127,7 +167,7 @@ class LoginLog {
 
 
 	/**
-	 * AJAX: Export all log data as JSON.
+	 * AJAX: Export log data as JSON (filtered by type).
 	 *
 	 * @return void
 	 */
@@ -136,22 +176,32 @@ class LoginLog {
 			return;
 		}
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Already verified above.
+		$log_type = isset( $_POST['log_type'] ) ? sanitize_text_field( wp_unslash( $_POST['log_type'] ) ) : '';
+
 		$db   = new BruteForceDB();
-		$rows = $db->get_all_rows_for_export();
+		$rows = $db->get_all_rows_for_export( $log_type );
 
 		$export = [];
 		foreach ( $rows as $row ) {
 			$export[] = [
-				'ip'           => $row->ip,
-				'attempts'     => (int) $row->attempts,
-				'last_attempt' => (int) $row->last_attempt,
+				'ip'             => $row->ip,
+				'attempts'       => (int) $row->attempts,
+				'last_attempt'   => (int) $row->last_attempt,
+				'log_type'       => $row->log_type ?? 'failed_login',
+				'user_agent'     => $row->user_agent ?? '',
+				'payload'        => $row->payload ?? '',
+				'is_blocked'     => (int) ( $row->is_blocked ?? 0 ),
+				'is_whitelisted' => (int) ( $row->is_whitelisted ?? 0 ),
 			];
 		}
+
+		$type_suffix = $log_type ? '-' . $log_type : '';
 
 		wp_send_json_success(
 			[
 				'data'     => $export,
-				'filename' => 'securefusion-login-log-' . gmdate( 'Y-m-d' ) . '.json',
+				'filename' => 'securefusion-log' . $type_suffix . '-' . gmdate( 'Y-m-d' ) . '.json',
 			]
 		);
 	}
@@ -227,6 +277,57 @@ class LoginLog {
 
 
 	/**
+	 * AJAX: Toggle IP block/unblock status.
+	 *
+	 * @return void
+	 */
+	public function ajax_toggle_ip_block() {
+		if ( ! $this->validate_ajax_request() ) {
+			return;
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Already verified above.
+		$ip     = isset( $_POST['ip'] ) ? sanitize_text_field( wp_unslash( $_POST['ip'] ) ) : '';
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Already verified above.
+		$action = isset( $_POST['block_action'] ) ? sanitize_text_field( wp_unslash( $_POST['block_action'] ) ) : '';
+
+		if ( empty( $ip ) || ! filter_var( $ip, FILTER_VALIDATE_IP ) ) {
+			wp_send_json_error( [ 'message' => esc_html__( 'Invalid IP address.', 'securefusion' ) ] );
+			return;
+		}
+
+		$db = new BruteForceDB();
+
+		if ( $action === 'block' ) {
+			if ( $db->is_ip_whitelisted( $ip ) ) {
+				wp_send_json_error( [ 'message' => esc_html__( 'This IP is whitelisted and cannot be blocked.', 'securefusion' ) ] );
+				return;
+			}
+
+			$success = $db->block_ip( $ip );
+
+			if ( $success ) {
+				wp_send_json_success( [
+					'message'    => esc_html__( 'IP has been blocked.', 'securefusion' ),
+					'new_status' => 'blocked',
+				] );
+			}
+		} elseif ( $action === 'unblock' ) {
+			$success = $db->unblock_ip( $ip );
+
+			if ( $success ) {
+				wp_send_json_success( [
+					'message'    => esc_html__( 'IP has been unblocked.', 'securefusion' ),
+					'new_status' => 'active',
+				] );
+			}
+		}
+
+		wp_send_json_error( [ 'message' => esc_html__( 'Operation failed.', 'securefusion' ) ] );
+	}
+
+
+	/**
 	 * Normalize the order parameter.
 	 *
 	 * The sanitize_key() function lowercases the value, so we must normalize to uppercase
@@ -241,7 +342,7 @@ class LoginLog {
 
 
 	/**
-	 * Render the login log page HTML.
+	 * Render the security log page HTML.
 	 *
 	 * @return void
 	 */
@@ -256,23 +357,30 @@ class LoginLog {
 		$order = isset( $_GET['order'] ) ? $this->normalize_order( sanitize_key( $_GET['order'] ) ) : 'DESC';
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only filter parameter.
 		$range_filter = isset( $_GET['range'] ) ? sanitize_text_field( wp_unslash( $_GET['range'] ) ) : '';
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only filter parameter.
+		$type_filter = isset( $_GET['log_type'] ) ? sanitize_text_field( wp_unslash( $_GET['log_type'] ) ) : '';
 
 		$offset      = ( $current_page - 1 ) * self::PER_PAGE;
-		$total_rows  = $range_filter ? $db->get_total_rows_by_range( $range_filter ) : $db->get_total_rows();
+		$total_rows  = $range_filter
+			? $db->get_total_rows_by_range( $range_filter, $type_filter )
+			: $db->get_total_rows( $type_filter );
 		$total_pages = (int) ceil( $total_rows / self::PER_PAGE );
 
 		if ( $range_filter ) {
-			$rows = $db->get_rows_by_range( $range_filter, self::PER_PAGE, $offset, $orderby, $order );
+			$rows = $db->get_rows_by_range( $range_filter, self::PER_PAGE, $offset, $orderby, $order, $type_filter );
 		} else {
-			$rows = $db->get_all_rows( self::PER_PAGE, $offset, $orderby, $order );
+			$rows = $db->get_all_rows( self::PER_PAGE, $offset, $orderby, $order, $type_filter );
 		}
 
 		$plugin_url = plugins_url( '/', SECUREFUSION_BASENAME );
 		$page_url   = admin_url( 'admin.php?page=securefusion-login-log' );
 
-		// Preserve range filter in sort/page URLs.
+		// Preserve filters in sort/page URLs.
 		if ( $range_filter ) {
 			$page_url = add_query_arg( 'range', $range_filter, $page_url );
+		}
+		if ( $type_filter ) {
+			$page_url = add_query_arg( 'log_type', $type_filter, $page_url );
 		}
 
 		$this->enqueue_assets();
@@ -285,13 +393,13 @@ class LoginLog {
 			 * outside our styled header component.
 			 */
 			?>
-			<h1 class="fynd-sf-sr-only"><?php esc_html_e( 'Failed Login Attempts', 'securefusion' ); ?></h1>
+			<h1 class="fynd-sf-sr-only"><?php esc_html_e( 'Security Log', 'securefusion' ); ?></h1>
 
 			<header class="fynd-sf-log-header">
 				<img src="<?php echo esc_url( $plugin_url ); ?>assets/icon.svg" alt="SecureFusion" class="fynd-sf-log-logo">
 				<div class="fynd-sf-log-header-text">
-					<h2 class="fynd-sf-log-title"><?php esc_html_e( 'Failed Login Attempts', 'securefusion' ); ?></h2>
-					<p class="fynd-sf-log-desc"><?php esc_html_e( 'Monitor and manage brute force login attempt records.', 'securefusion' ); ?></p>
+					<h2 class="fynd-sf-log-title"><?php esc_html_e( 'Security Log', 'securefusion' ); ?></h2>
+					<p class="fynd-sf-log-desc"><?php esc_html_e( 'Monitor and manage security events, blocked IPs, and attack records.', 'securefusion' ); ?></p>
 				</div>
 			</header>
 
@@ -322,9 +430,15 @@ class LoginLog {
 			</div>
 
 
-
 			<div class="fynd-sf-log-toolbar">
 				<div class="fynd-sf-toolbar-left">
+					<select id="fynd-sf-filter-log-type" class="fynd-sf-type-select">
+						<?php foreach ( $this->get_log_type_options() as $value => $label ) : ?>
+							<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $type_filter, $value ); ?>>
+								<?php echo esc_html( $label ); ?>
+							</option>
+						<?php endforeach; ?>
+					</select>
 					<button type="button" id="fynd-sf-log-export" class="fynd-sf-btn fynd-sf-btn-secondary">
 						<span class="dashicons dashicons-download"></span>
 						<?php esc_html_e( 'Export JSON', 'securefusion' ); ?>
@@ -338,7 +452,7 @@ class LoginLog {
 				<div class="fynd-sf-toolbar-right">
 					<button type="button" id="fynd-sf-log-reset" class="fynd-sf-btn fynd-sf-btn-danger">
 						<span class="dashicons dashicons-trash"></span>
-						<?php esc_html_e( 'Reset All Data', 'securefusion' ); ?>
+						<?php esc_html_e( 'Delete Data', 'securefusion' ); ?>
 					</button>
 				</div>
 			</div>
@@ -354,7 +468,7 @@ class LoginLog {
 							'<strong>' . esc_html( $range_filter ) . '.0/24</strong>'
 						);
 						?>
-						<a href="<?php echo esc_url( admin_url( 'admin.php?page=securefusion-login-log' ) ); ?>" class="fynd-sf-filter-clear-link">
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=securefusion-login-log' . ( $type_filter ? '&log_type=' . $type_filter : '' ) ) ); ?>" class="fynd-sf-filter-clear-link">
 							<?php esc_html_e( 'Show all', 'securefusion' ); ?>
 						</a>
 					</div>
@@ -367,6 +481,7 @@ class LoginLog {
 								<?php
 								$columns = [
 									'ip'           => esc_html__( 'IP Address', 'securefusion' ),
+									'log_type'     => esc_html__( 'Attack Type', 'securefusion' ),
 									'attempts'     => esc_html__( 'Attempts', 'securefusion' ),
 									'last_attempt' => esc_html__( 'Last Attempt', 'securefusion' ),
 								];
@@ -394,13 +509,42 @@ class LoginLog {
 										</a>
 									</th>
 								<?php endforeach; ?>
+								<th scope="col" class="manage-column column-status"><?php esc_html_e( 'Status', 'securefusion' ); ?></th>
+								<th scope="col" class="manage-column column-actions"><?php esc_html_e( 'Actions', 'securefusion' ); ?></th>
 							</tr>
 						</thead>
 						<tbody id="fynd-sf-log-tbody">
 							<?php foreach ( $rows as $row ) : ?>
-								<tr>
+								<?php
+								$is_blocked     = ! empty( $row->is_blocked );
+								$is_whitelisted = ! empty( $row->is_whitelisted );
+								$row_log_type   = isset( $row->log_type ) ? $row->log_type : 'failed_login';
+								$row_ua         = isset( $row->user_agent ) ? $row->user_agent : '';
+								$row_payload    = isset( $row->payload ) ? $row->payload : '';
+								?>
+								<tr data-ip="<?php echo esc_attr( $row->ip ); ?>">
 									<td class="column-ip">
 										<code><?php echo esc_html( $row->ip ); ?></code>
+										<?php if ( $row_ua ) : ?>
+											<div class="fynd-sf-meta-line" title="<?php echo esc_attr( $row_ua ); ?>">
+												<span class="dashicons dashicons-laptop"></span>
+												<span class="fynd-sf-meta-text"><?php echo esc_html( mb_substr( $row_ua, 0, 60 ) ); ?><?php echo strlen( $row_ua ) > 60 ? '…' : ''; ?></span>
+											</div>
+										<?php endif; ?>
+										<?php if ( $row_payload ) : ?>
+											<div class="fynd-sf-meta-line" title="<?php echo esc_attr( $row_payload ); ?>">
+												<span class="dashicons dashicons-editor-code"></span>
+												<span class="fynd-sf-meta-text"><?php echo esc_html( mb_substr( $row_payload, 0, 60 ) ); ?><?php echo strlen( $row_payload ) > 60 ? '…' : ''; ?></span>
+												<button type="button" class="fynd-sf-view-payload-btn" data-payload="<?php echo esc_attr( $row_payload ); ?>" title="<?php esc_attr_e( 'View Payload Details', 'securefusion' ); ?>">
+													<span class="dashicons dashicons-visibility"></span>
+												</button>
+											</div>
+										<?php endif; ?>
+									</td>
+									<td class="column-log_type">
+										<span class="fynd-sf-type-badge fynd-sf-type-<?php echo esc_attr( $row_log_type ); ?>">
+											<?php echo esc_html( $this->get_log_type_label( $row_log_type ) ); ?>
+										</span>
 									</td>
 									<td class="column-attempts">
 										<span class="fynd-sf-attempt-badge <?php echo (int) $row->attempts >= 10 ? 'fynd-sf-danger' : ( (int) $row->attempts >= 5 ? 'fynd-sf-warning' : 'fynd-sf-normal' ); ?>">
@@ -424,6 +568,32 @@ class LoginLog {
 											echo '—';
 										}
 										?>
+									</td>
+									<td class="column-status">
+										<?php if ( $is_whitelisted ) : ?>
+											<span class="fynd-sf-status-badge fynd-sf-status-whitelisted"><?php esc_html_e( 'Whitelisted', 'securefusion' ); ?></span>
+										<?php elseif ( $is_blocked ) : ?>
+											<span class="fynd-sf-status-badge fynd-sf-status-blocked"><?php esc_html_e( 'Blocked', 'securefusion' ); ?></span>
+										<?php else : ?>
+											<span class="fynd-sf-status-badge fynd-sf-status-active"><?php esc_html_e( 'Active', 'securefusion' ); ?></span>
+										<?php endif; ?>
+									</td>
+									<td class="column-actions">
+										<?php if ( $is_whitelisted ) : ?>
+											<span class="fynd-sf-action-protected" title="<?php esc_attr_e( 'Admin IP — Cannot be blocked', 'securefusion' ); ?>">
+												<span class="dashicons dashicons-shield-alt"></span>
+											</span>
+										<?php elseif ( $is_blocked ) : ?>
+											<button type="button" class="fynd-sf-btn fynd-sf-btn-sm fynd-sf-btn-unblock" data-ip="<?php echo esc_attr( $row->ip ); ?>" data-action="unblock">
+												<span class="dashicons dashicons-unlock"></span>
+												<?php esc_html_e( 'Unblock', 'securefusion' ); ?>
+											</button>
+										<?php else : ?>
+											<button type="button" class="fynd-sf-btn fynd-sf-btn-sm fynd-sf-btn-block" data-ip="<?php echo esc_attr( $row->ip ); ?>" data-action="block">
+												<span class="dashicons dashicons-lock"></span>
+												<?php esc_html_e( 'Block', 'securefusion' ); ?>
+											</button>
+										<?php endif; ?>
 									</td>
 								</tr>
 							<?php endforeach; ?>
@@ -479,14 +649,36 @@ class LoginLog {
 					<div class="fynd-sf-log-empty">
 						<span class="dashicons dashicons-shield-alt"></span>
 						<p>
-							<?php if ( $range_filter ) : ?>
-								<?php esc_html_e( 'No records found for this IP range.', 'securefusion' ); ?>
+							<?php if ( $range_filter || $type_filter ) : ?>
+								<?php esc_html_e( 'No records found for the current filter.', 'securefusion' ); ?>
 							<?php else : ?>
-								<?php esc_html_e( 'No failed login attempts recorded yet. Your site is clean!', 'securefusion' ); ?>
+								<?php esc_html_e( 'No security events recorded yet. Your site is clean!', 'securefusion' ); ?>
 							<?php endif; ?>
 						</p>
 					</div>
 				<?php endif; ?>
+			</div>
+
+			<!-- Payload Details Modal -->
+			<div id="fynd-sf-payload-modal" class="fynd-sf-modal" style="display: none;">
+				<div class="fynd-sf-modal-content">
+					<div class="fynd-sf-modal-header">
+						<h3><?php esc_html_e( 'Payload Details', 'securefusion' ); ?></h3>
+						<button type="button" class="fynd-sf-modal-close">&times;</button>
+					</div>
+					<div class="fynd-sf-modal-body">
+						<textarea id="fynd-sf-payload-text" readonly class="fynd-sf-modal-textarea"></textarea>
+					</div>
+					<div class="fynd-sf-modal-footer">
+						<button type="button" id="fynd-sf-copy-payload-modal-btn" class="fynd-sf-btn fynd-sf-btn-primary">
+							<span class="dashicons dashicons-admin-page"></span>
+							<?php esc_html_e( 'Copy Payload', 'securefusion' ); ?>
+						</button>
+						<button type="button" class="fynd-sf-modal-close-btn fynd-sf-btn fynd-sf-btn-secondary">
+							<?php esc_html_e( 'Close', 'securefusion' ); ?>
+						</button>
+					</div>
+				</div>
 			</div>
 		</div>
 		<?php

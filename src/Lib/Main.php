@@ -85,6 +85,7 @@ class Main {
 			'http_headers'                  => '1',
 			'cookie_patterns'               => '',
 			'request_patterns'              => '',
+			'max_payload_size'              => '4096',
 
 			'enable_csp_style'              => '0',
 			'enable_csp_script'             => '0',
@@ -152,9 +153,59 @@ class Main {
 		$login_log = new Sources\LoginLog();
 		$login_log->register_ajax();
 
+		// ADMIN IP WHITELIST on successful login.
+		add_action( 'wp_login', array( $this, 'whitelist_admin_ip_on_login' ), 10, 2 );
+
 		// CRON JOB FOR IP CLEANUP.
 		add_action( 'securefusion_cleanup_ips_cron', array( $this, 'cron_cleanup_old_ips' ) );
+
+		// MIGRATION & UPDATE DETECTOR.
+		add_action( 'plugins_loaded', array( $this, 'maybe_update_plugin' ), 5 );
 	}
+
+	/**
+	 * Whitelist admin IP on successful login.
+	 *
+	 * @param string   $user_login Username.
+	 * @param \WP_User $user       User object.
+	 * @return void
+	 */
+	public function whitelist_admin_ip_on_login( $user_login, $user ) {
+		if ( ! $user instanceof \WP_User || ! $user->has_cap( 'manage_options' ) ) {
+			return;
+		}
+
+		// Inline IP detection (same logic as WPCommon::get_client_ip but accessible here).
+		$server_var = wp_unslash( $_SERVER );
+		$ipaddress  = '';
+
+		if ( isset( $server_var['HTTP_CLIENT_IP'] ) ) {
+			$ipaddress = $server_var['HTTP_CLIENT_IP'];
+		} elseif ( isset( $server_var['HTTP_X_FORWARDED_FOR'] ) ) {
+			$ipaddress = $server_var['HTTP_X_FORWARDED_FOR'];
+		} elseif ( isset( $server_var['HTTP_X_FORWARDED'] ) ) {
+			$ipaddress = $server_var['HTTP_X_FORWARDED'];
+		} elseif ( isset( $server_var['HTTP_FORWARDED_FOR'] ) ) {
+			$ipaddress = $server_var['HTTP_FORWARDED_FOR'];
+		} elseif ( isset( $server_var['HTTP_FORWARDED'] ) ) {
+			$ipaddress = $server_var['HTTP_FORWARDED'];
+		} elseif ( isset( $server_var['REMOTE_ADDR'] ) ) {
+			$ipaddress = $server_var['REMOTE_ADDR'];
+		}
+
+		if ( strpos( $ipaddress, ',' ) !== false ) {
+			$ipaddress = explode( ',', $ipaddress );
+			$ipaddress = $ipaddress[0] ?? false;
+		}
+
+		$ip = filter_var( $ipaddress, FILTER_VALIDATE_IP );
+
+		if ( $ip ) {
+			$brute_force_db = new BruteForceDB();
+			$brute_force_db->whitelist_ip( $ip );
+		}
+	}
+
 
 	/**
 	 * Cron callback to clean up old IP records.
@@ -196,9 +247,38 @@ class Main {
 		$brute_force_db = new BruteForceDB();
 		$brute_force_db->maybe_migrate_old_table();
 		$brute_force_db->create_table();
+		$brute_force_db->migrate_existing_rows_to_failed_login();
+
+		update_option( 'securefusion_db_version', SECUREFUSION_VERSION );
 
 		if ( ! wp_next_scheduled( 'securefusion_cleanup_ips_cron' ) ) {
 			wp_schedule_event( time(), 'daily', 'securefusion_cleanup_ips_cron' );
+		}
+	}
+
+
+	/**
+	 * Run updates if the plugin version has changed.
+	 *
+	 * Runs on 'plugins_loaded' hook.
+	 *
+	 * @return void
+	 */
+	public function maybe_update_plugin() {
+		$installed_version = get_option( 'securefusion_db_version' );
+		if ( $installed_version !== SECUREFUSION_VERSION ) {
+			// Merge default settings to ensure new options exist.
+			$settings = get_option( 'securefusion_settings', array() );
+			$settings = array_merge( $this->default_settings, $settings );
+			update_option( 'securefusion_settings', $settings );
+
+			// Run database schema updates.
+			$brute_force_db = new BruteForceDB();
+			$brute_force_db->maybe_migrate_old_table();
+			$brute_force_db->create_table();
+			$brute_force_db->migrate_existing_rows_to_failed_login();
+
+			update_option( 'securefusion_db_version', SECUREFUSION_VERSION );
 		}
 	}
 

@@ -1,7 +1,8 @@
 /**
  * Login Log Page Scripts
  *
- * Handles reset, export, import, and IP range detail/copy AJAX actions.
+ * Handles type filter, reset, export, import, IP block/unblock,
+ * and IP range detail/copy AJAX actions.
  *
  * @package securefusion
  */
@@ -10,6 +11,15 @@
 
 (function ($) {
 	'use strict';
+
+	/**
+	 * Get the currently selected log type from the filter dropdown.
+	 *
+	 * @return {string} The selected log type value (empty string for 'all').
+	 */
+	function getSelectedLogType() {
+		return $('#fynd-sf-filter-log-type').val() || '';
+	}
 
 	/**
 	 * Show a dismissible notice.
@@ -62,7 +72,23 @@
 
 	$(document).ready(function () {
 
-		// Reset handler with double confirmation.
+		// ===== Type Filter Change =====
+		$('#fynd-sf-filter-log-type').on('change', function () {
+			var selectedType = $(this).val();
+			var url = new URL(window.location.href);
+
+			if (selectedType) {
+				url.searchParams.set('log_type', selectedType);
+			} else {
+				url.searchParams.delete('log_type');
+			}
+
+			// Reset to page 1 on filter change.
+			url.searchParams.set('paged', '1');
+			window.location.href = url.toString();
+		});
+
+		// ===== Reset handler with double confirmation =====
 		$('#fynd-sf-log-reset').on('click', function () {
 			if (!window.confirm(securefusionLog.confirmReset)) {
 				return;
@@ -81,7 +107,8 @@
 
 			$.post(securefusionLog.ajaxUrl, {
 				action: 'securefusion_log_reset',
-				nonce: securefusionLog.nonce
+				nonce: securefusionLog.nonce,
+				log_type: getSelectedLogType()
 			})
 			.done(function (response) {
 				if (response.success) {
@@ -101,13 +128,14 @@
 			});
 		});
 
-		// Export handler.
+		// ===== Export handler =====
 		$('#fynd-sf-log-export').on('click', function () {
 			setProcessing(true);
 
 			$.post(securefusionLog.ajaxUrl, {
 				action: 'securefusion_log_export',
-				nonce: securefusionLog.nonce
+				nonce: securefusionLog.nonce,
+				log_type: getSelectedLogType()
 			})
 			.done(function (response) {
 				if (response.success) {
@@ -131,7 +159,7 @@
 			});
 		});
 
-		// Import handler.
+		// ===== Import handler =====
 		$('#fynd-sf-log-import-file').on('change', function (e) {
 			var file = e.target.files[0];
 
@@ -189,6 +217,42 @@
 
 			reader.readAsText(file);
 			$(this).val('');
+		});
+
+
+		// ===== IP Block/Unblock Handler =====
+		$(document).on('click', '.fynd-sf-btn-block, .fynd-sf-btn-unblock', function () {
+			var $btn       = $(this);
+			var ip         = $btn.data('ip');
+			var blockAction = $btn.data('action');
+
+			if (blockAction === 'block' && !window.confirm(securefusionLog.confirmBlock)) {
+				return;
+			}
+
+			$btn.prop('disabled', true).addClass('fynd-sf-processing');
+
+			$.post(securefusionLog.ajaxUrl, {
+				action: 'securefusion_toggle_ip_block',
+				nonce: securefusionLog.nonce,
+				ip: ip,
+				block_action: blockAction
+			})
+			.done(function (response) {
+				if (response.success) {
+					showNotice(response.data.message, 'success');
+					setTimeout(function () {
+						window.location.reload();
+					}, 1000);
+				} else {
+					showNotice(response.data.message, 'error');
+					$btn.prop('disabled', false).removeClass('fynd-sf-processing');
+				}
+			})
+			.fail(function () {
+				showNotice(securefusionLog.blockFailed, 'error');
+				$btn.prop('disabled', false).removeClass('fynd-sf-processing');
+			});
 		});
 
 
@@ -306,5 +370,80 @@
 				}, 3000);
 			}
 		}
+
+		// ===== Payload Detail Modal =====
+		var $payloadModal      = $('#fynd-sf-payload-modal');
+		var $payloadTextarea   = $('#fynd-sf-payload-text');
+		var $copyPayloadBtn    = $('#fynd-sf-copy-payload-modal-btn');
+
+		// View Payload Details button click
+		$(document).on('click', '.fynd-sf-view-payload-btn', function (e) {
+			e.preventDefault();
+			var payload = $(this).data('payload') || '';
+			$payloadTextarea.val(payload);
+			$payloadModal.fadeIn(200);
+		});
+
+		// Close payload modal
+		$payloadModal.on('click', '.fynd-sf-modal-close, .fynd-sf-modal-close-btn', function () {
+			$payloadModal.fadeOut(200);
+		});
+
+		// Close payload modal on backdrop click
+		$payloadModal.on('click', function (e) {
+			if (e.target === this) {
+				$payloadModal.fadeOut(200);
+			}
+		});
+
+		// Close payload modal on Escape key
+		$(document).on('keydown', function (e) {
+			if (e.key === 'Escape' && $payloadModal.is(':visible')) {
+				$payloadModal.fadeOut(200);
+			}
+		});
+
+		// Copy payload to clipboard
+		$copyPayloadBtn.on('click', function () {
+			var text = $payloadTextarea.val();
+			if (!text) {
+				return;
+			}
+
+			var $btn = $(this);
+			var originalHTML = $btn.html();
+
+			if (navigator.clipboard && navigator.clipboard.writeText) {
+				navigator.clipboard.writeText(text).then(function () {
+					showCopySuccess($btn, originalHTML);
+				}).catch(function () {
+					fallbackCopyPayload($btn, originalHTML);
+				});
+			} else {
+				fallbackCopyPayload($btn, originalHTML);
+			}
+		});
+
+		function showCopySuccess($btn, originalHTML) {
+			$btn.html('<span class="dashicons dashicons-yes"></span> ' + securefusionLog.copied);
+			setTimeout(function () {
+				$btn.html(originalHTML);
+			}, 2000);
+		}
+
+		function fallbackCopyPayload($btn, originalHTML) {
+			$payloadTextarea[0].select();
+			$payloadTextarea[0].setSelectionRange(0, 99999);
+			try {
+				document.execCommand('copy');
+				showCopySuccess($btn, originalHTML);
+			} catch (err) {
+				$btn.html('<span class="dashicons dashicons-no"></span> ' + securefusionLog.copyFailed);
+				setTimeout(function () {
+					$btn.html(originalHTML);
+				}, 2000);
+			}
+		}
 	});
 })(jQuery);
+

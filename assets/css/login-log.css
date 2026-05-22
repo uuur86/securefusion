@@ -313,6 +313,30 @@
 	flex-wrap: wrap;
 }
 
+/* Type selector */
+.fynd-sf-login-log .fynd-sf-type-select {
+	padding: 6px 32px 6px 12px;
+	border: 1px solid #8c8f94;
+	border-radius: 4px;
+	background: #fff;
+	font-size: 13px;
+	color: #1d2327;
+	min-width: 160px;
+	cursor: pointer;
+	appearance: none;
+	-webkit-appearance: none;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath fill='%23646970' d='M5 6l5 5 5-5 2 1-7 7-7-7z'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: right 8px center;
+	background-size: 16px;
+}
+
+.fynd-sf-login-log .fynd-sf-type-select:focus {
+	border-color: #01b9ba;
+	box-shadow: 0 0 0 1px #01b9ba;
+	outline: none;
+}
+
 /* Global button styles helper for alignment */
 
 
@@ -377,6 +401,73 @@
 	color: #1d2327;
 }
 
+/* Meta lines (User Agent, Payload under IP) */
+.fynd-sf-login-log .fynd-sf-meta-line {
+	display: flex;
+	align-items: flex-start;
+	gap: 4px;
+	margin-top: 6px;
+	font-size: 11px;
+	color: #888;
+	line-height: 1.4;
+}
+
+.fynd-sf-login-log .fynd-sf-meta-line .dashicons {
+	font-size: 13px;
+	width: 13px;
+	height: 13px;
+	color: #a7aaad;
+	flex-shrink: 0;
+	margin-top: 1px;
+}
+
+.fynd-sf-login-log .fynd-sf-meta-text {
+	word-break: break-all;
+	max-width: 300px;
+}
+
+/* Attack type badges */
+.fynd-sf-login-log .fynd-sf-type-badge {
+	display: inline-block;
+	padding: 3px 10px;
+	border-radius: 12px;
+	font-size: 11px;
+	font-weight: 600;
+	text-align: center;
+	line-height: 1.5;
+	white-space: nowrap;
+}
+
+.fynd-sf-login-log .fynd-sf-type-badge.fynd-sf-type-failed_login {
+	background: #fff3cd;
+	color: #856404;
+}
+
+.fynd-sf-login-log .fynd-sf-type-badge.fynd-sf-type-bad_request {
+	background: #fcf0f1;
+	color: #dc3545;
+}
+
+.fynd-sf-login-log .fynd-sf-type-badge.fynd-sf-type-bad_cookie {
+	background: #fce4ec;
+	color: #c62828;
+}
+
+.fynd-sf-login-log .fynd-sf-type-badge.fynd-sf-type-bad_bot {
+	background: #e8eaf6;
+	color: #283593;
+}
+
+.fynd-sf-login-log .fynd-sf-type-badge.fynd-sf-type-bad_query {
+	background: #fbe9e7;
+	color: #bf360c;
+}
+
+.fynd-sf-login-log .fynd-sf-type-badge.fynd-sf-type-blocked {
+	background: #f3e5f5;
+	color: #6a1b9a;
+}
+
 /* Attempt badges */
 .fynd-sf-login-log .fynd-sf-attempt-badge {
 	display: inline-block;
@@ -402,6 +493,82 @@
 .fynd-sf-login-log .fynd-sf-attempt-badge.fynd-sf-danger {
 	background: #fcf0f1;
 	color: #dc3545;
+}
+
+/* Status badges */
+.fynd-sf-login-log .fynd-sf-status-badge {
+	display: inline-block;
+	padding: 3px 10px;
+	border-radius: 12px;
+	font-size: 11px;
+	font-weight: 600;
+	text-align: center;
+	line-height: 1.5;
+	white-space: nowrap;
+}
+
+.fynd-sf-login-log .fynd-sf-status-badge.fynd-sf-status-active {
+	background: #ecf7ed;
+	color: #00a32a;
+}
+
+.fynd-sf-login-log .fynd-sf-status-badge.fynd-sf-status-blocked {
+	background: #fcf0f1;
+	color: #dc3545;
+}
+
+.fynd-sf-login-log .fynd-sf-status-badge.fynd-sf-status-whitelisted {
+	background: #e8f5e9;
+	color: #1b5e20;
+}
+
+/* Action buttons */
+.fynd-sf-login-log .fynd-sf-btn-sm {
+	padding: 3px 10px !important;
+	font-size: 12px !important;
+	line-height: 1.5;
+	min-height: auto;
+}
+
+.fynd-sf-login-log .fynd-sf-btn-sm .dashicons {
+	font-size: 14px;
+	width: 14px;
+	height: 14px;
+	vertical-align: text-top;
+	margin-right: 2px;
+}
+
+.fynd-sf-login-log .fynd-sf-btn-block {
+	background: #fcf0f1;
+	color: #dc3545;
+	border: 1px solid #dc3545;
+}
+
+.fynd-sf-login-log .fynd-sf-btn-block:hover {
+	background: #dc3545;
+	color: #fff;
+}
+
+.fynd-sf-login-log .fynd-sf-btn-unblock {
+	background: #ecf7ed;
+	color: #00a32a;
+	border: 1px solid #00a32a;
+}
+
+.fynd-sf-login-log .fynd-sf-btn-unblock:hover {
+	background: #00a32a;
+	color: #fff;
+}
+
+.fynd-sf-login-log .fynd-sf-action-protected {
+	color: #1b5e20;
+	cursor: default;
+}
+
+.fynd-sf-login-log .fynd-sf-action-protected .dashicons {
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
 }
 
 .fynd-sf-login-log .fynd-sf-time-ago {
@@ -497,4 +664,153 @@
 		width: 95%;
 		max-height: 90vh;
 	}
+
+	.fynd-sf-login-log .fynd-sf-meta-text {
+		max-width: 180px;
+	}
+
+	.fynd-sf-login-log .fynd-sf-type-select {
+		min-width: 100%;
+	}
 }
+
+/* View payload button */
+.fynd-sf-login-log .fynd-sf-view-payload-btn {
+	background: none;
+	border: none;
+	padding: 0;
+	margin-left: 6px;
+	color: #01b9ba;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	transition: color 0.2s, transform 0.1s;
+	vertical-align: middle;
+}
+
+.fynd-sf-login-log .fynd-sf-view-payload-btn:hover {
+	color: #018585;
+	transform: scale(1.15);
+}
+
+.fynd-sf-login-log .fynd-sf-view-payload-btn:active {
+	transform: scale(0.95);
+}
+
+.fynd-sf-login-log .fynd-sf-view-payload-btn .dashicons {
+	font-size: 14px;
+	width: 14px;
+	height: 14px;
+}
+
+/* Payload Details Modal */
+.fynd-sf-modal {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 100100;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(0, 0, 0, 0.45);
+	-webkit-backdrop-filter: blur(4px);
+	backdrop-filter: blur(4px);
+	transition: opacity 0.2s ease-in-out;
+}
+
+.fynd-sf-modal-content {
+	background: #fff;
+	border-radius: 8px;
+	box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+	width: 90%;
+	max-width: 600px;
+	max-height: 80vh;
+	display: flex;
+	flex-direction: column;
+	border-left: 4px solid #01b9ba;
+	animation: fyndSfModalFadeIn 0.3s ease;
+}
+
+@keyframes fyndSfModalFadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(-20px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.fynd-sf-modal-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 16px 20px;
+	border-bottom: 1px solid #e0e0e0;
+}
+
+.fynd-sf-modal-header h3 {
+	margin: 0;
+	font-size: 16px;
+	color: #1d2327;
+	font-weight: 600;
+}
+
+.fynd-sf-modal-close {
+	background: none;
+	border: none;
+	font-size: 24px;
+	line-height: 1;
+	color: #9ca3af;
+	cursor: pointer;
+	padding: 0;
+	transition: color 0.2s;
+}
+
+.fynd-sf-modal-close:hover {
+	color: #4b5563;
+}
+
+.fynd-sf-modal-body {
+	padding: 20px;
+	overflow: auto;
+}
+
+.fynd-sf-modal-textarea {
+	width: 100%;
+	height: 250px;
+	font-family: monospace;
+	font-size: 12px;
+	line-height: 1.5;
+	padding: 12px;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	background: #f9f9f9;
+	resize: none;
+	box-sizing: border-box;
+}
+
+.fynd-sf-modal-footer {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 12px;
+	padding: 12px 20px;
+	border-top: 1px solid #e0e0e0;
+	background: #f9fafb;
+	border-bottom-left-radius: 8px;
+	border-bottom-right-radius: 8px;
+}
+
+.fynd-sf-modal-footer .fynd-sf-btn .dashicons {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+	vertical-align: text-top;
+	margin-right: 4px;
+}
+

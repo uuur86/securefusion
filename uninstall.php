@@ -78,6 +78,7 @@ function securefusion_uninstall_site_data() {
 	// ──────────────────────────────────────────────
 	$tables_to_drop = [
 		$wpdb->prefix . 'securefusion_brute_force_table',
+		$wpdb->prefix . 'securefusion_ip_rules',
 		$wpdb->prefix . 'secuplug_brute_force_table',
 	];
 

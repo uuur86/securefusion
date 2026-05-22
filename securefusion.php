@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! defined( 'SECUREFUSION_VERSION' ) ) {
-	define( 'SECUREFUSION_VERSION', '1.4.6' );
+	define( 'SECUREFUSION_VERSION', '1.4.9' );
 }
 
 if ( ! defined( 'SECUREFUSION_PATH' ) ) {

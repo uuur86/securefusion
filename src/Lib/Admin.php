@@ -750,7 +750,15 @@ class Admin {
 							],
 						],
 					],
+					[
+						'type'   => 'text_input',
+						'name'   => 'max_payload_size',
+						'label'  => esc_html__( 'Max Payload Size (Bytes)', 'securefusion' ),
+						'before' => '',
+						'after'  => esc_html__( ' bytes', 'securefusion' ) . '<span class="field-tip"> ' . esc_html__( 'Maximum allowed request payload size (excluding file uploads). IPs exceeding this limit will be permanently blocked. Set 0 to disable. Default: 4096.', 'securefusion' ) . '</span>',
+					],
 				],
+
 			],
 			[
 				// Section info.

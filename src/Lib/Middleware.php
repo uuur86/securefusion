@@ -40,9 +40,25 @@ class Middleware {
 			include ABSPATH . '/wp-includes/pluggable.php';
 		}
 
+		// Get client IP early for blocking checks.
+		$ip = $this->get_client_ip();
+
+		// Block check: deny blocked IPs before any processing.
+		if ( $ip && $this->brute_force_db->is_ip_blocked( $ip ) ) {
+			status_header( 403 );
+			exit( 'Access Denied' );
+		}
+
 		if ( \current_user_can( 'manage_options' ) ) {
+			// Automatically whitelist admin IPs.
+			if ( $ip ) {
+				$this->brute_force_db->whitelist_ip( $ip );
+			}
 			return;
 		}
+
+		// Payload size limit check (excluding multipart/form-data uploads).
+		$this->check_payload_size_limit( $ip );
 
 		if ( $this->get_settings( 'filter_bad_requests' ) ) {
 			$this->filter_bad_requests();
@@ -60,6 +76,58 @@ class Middleware {
 					$this->disable_rest_api_manually();
 				}
 			}
+		}
+	}
+
+
+	/**
+	 * Check payload size limit and block IP if exceeded.
+	 *
+	 * Skips multipart/form-data requests (file uploads) to avoid
+	 * interfering with legitimate upload operations.
+	 *
+	 * @param string|false $ip Client IP address.
+	 * @return void
+	 */
+	private function check_payload_size_limit( $ip ) {
+		if ( ! $ip ) {
+			return;
+		}
+
+		$max_payload_size = (int) $this->get_settings( 'max_payload_size' );
+
+		if ( $max_payload_size <= 0 ) {
+			return;
+		}
+
+		// Skip multipart uploads entirely.
+		$content_type = isset( $_SERVER['CONTENT_TYPE'] ) ? sanitize_text_field( wp_unslash( $_SERVER['CONTENT_TYPE'] ) ) : '';
+
+		if ( stripos( $content_type, 'multipart/form-data' ) !== false ) {
+			return;
+		}
+
+		// Calculate total payload: query string + request body.
+		$query_string_size = isset( $_SERVER['QUERY_STRING'] ) ? strlen( $_SERVER['QUERY_STRING'] ) : 0;
+		$body_size         = isset( $_SERVER['CONTENT_LENGTH'] ) ? (int) $_SERVER['CONTENT_LENGTH'] : 0;
+		$total_size        = $query_string_size + $body_size;
+
+		if ( $total_size > $max_payload_size ) {
+			$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
+			$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? sanitize_url( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
+			$payload_info = sprintf( 'Size: %d bytes (limit: %d) | URI: %s', $total_size, $max_payload_size, $request_uri );
+
+			$this->brute_force_db->block_ip( $ip );
+			$this->brute_force_db->log_attempt_with_details( $ip, BruteForceDB::TYPE_BAD_REQUEST, $user_agent, $payload_info );
+
+			wp_die(
+				esc_html__( 'SecureFusion: Request payload exceeds the allowed limit. Your IP has been blocked.', 'securefusion' ),
+				esc_html__( 'Payload Too Large', 'securefusion' ),
+				[
+					'response'  => 403,
+					'back_link' => false,
+				]
+			);
 		}
 	}
 
@@ -114,6 +182,13 @@ class Middleware {
 			$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
 
 			if ( preg_match( "/{$bad_bots}/i", $user_agent ) ) {
+				// Log the bad bot event with details.
+				$ip = $this->get_client_ip();
+				if ( $ip ) {
+					$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? sanitize_url( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
+					$this->brute_force_db->log_attempt_with_details( $ip, BruteForceDB::TYPE_BAD_BOT, $user_agent, $request_uri );
+				}
+
 				status_header( 403 );
 				exit( 'Access Denied' );
 			}
@@ -281,6 +356,14 @@ class Middleware {
 		if ( ! empty( $_COOKIE ) ) {
 			if ( ! empty( $cookie_pattern ) ) {
 				if ( $this->bad_request_control( $_COOKIE, $cookie_pattern ) ) {
+					// Log bad cookie with details.
+					$ip = $this->get_client_ip();
+					if ( $ip ) {
+						$user_agent  = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
+						$cookie_data = http_build_query( $_COOKIE );
+						$this->brute_force_db->log_attempt_with_details( $ip, BruteForceDB::TYPE_BAD_COOKIE, $user_agent, $cookie_data );
+					}
+
 					wp_die(
 						esc_html__( 'SecureFusion Firewall has been denied this cookie request.', 'securefusion' ),
 						esc_html__( 'Cookie Failure', 'securefusion' ),
@@ -337,6 +420,15 @@ class Middleware {
 		}
 
 		if ( $this->bad_request_control( $input, $request_pattern ) ) {
+			// Log bad request with details.
+			$ip = $this->get_client_ip();
+			if ( $ip ) {
+				$user_agent  = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
+				$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? sanitize_url( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
+				$payload     = is_array( $input ) ? http_build_query( $input ) : $input;
+				$this->brute_force_db->log_attempt_with_details( $ip, BruteForceDB::TYPE_BAD_REQUEST, $user_agent, $request_uri . ' | ' . $payload );
+			}
+
 			// Comments.
 			if ( $pagenow === 'wp-comments-post.php' ) {
 				wp_die(
@@ -365,6 +457,14 @@ class Middleware {
 
 		// WP Query security.
 		if ( $this->bad_request_control( $wp->query_vars, $request_pattern ) ) {
+			// Log bad query with details.
+			$ip = $this->get_client_ip();
+			if ( $ip ) {
+				$user_agent  = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
+				$payload     = http_build_query( $wp->query_vars );
+				$this->brute_force_db->log_attempt_with_details( $ip, BruteForceDB::TYPE_BAD_QUERY, $user_agent, $payload );
+			}
+
 			wp_die(
 				esc_html__( 'SecureFusion Firewall has been denied this WP Queries.', 'securefusion' ),
 				esc_html__( 'WP Query Failure', 'securefusion' ),
@@ -454,15 +554,22 @@ class Middleware {
 			return $user;
 		}
 
-		$row = $this->brute_force_db->get_row_by_ip( $ip );
-
-		if ( $row ) {
-			// If IP exists, increment attempts and update last_attempt.
-			$this->brute_force_db->increment_attempts( $ip, $row->attempts );
-		} else {
-			// If IP does not exist, insert a new row.
-			$this->brute_force_db->insert_attempt( $ip );
+		// Log with full details (IP, UA, payload).
+		$user_agent  = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
+		$username_attempted = '';
+		if ( $user instanceof \WP_User ) {
+			$username_attempted = $user->user_login;
+		} elseif ( is_string( $user ) ) {
+			$username_attempted = $user;
 		}
+
+		// Simply call log_attempt_with_details, which handles failed_login increment/insert automatically.
+		$this->brute_force_db->log_attempt_with_details(
+			$ip,
+			BruteForceDB::TYPE_FAILED_LOGIN,
+			$user_agent,
+			'Username: ' . $username_attempted
+		);
 
 		// Return the original result.
 		return $user;
