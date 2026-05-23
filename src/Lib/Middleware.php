@@ -534,45 +534,45 @@ class Middleware {
 
 
 	/**
-	 * Track authenticate user.
+	 * Track failed login attempts.
 	 *
-	 * @param \WP_User $user     User.
-	 * @param string   $password Password.
+	 * Fired on 'wp_login_failed' action.
 	 *
-	 * @return \WP_User User.
+	 * @param string $username Username attempted.
+	 * @param \WP_Error|null $error Optional. Error object.
+	 * @return void
 	 */
-	public function track_authenticate_user( $user, $password ) {
-		// check if the login attempt was not successful.
-		if ( $user instanceof \WP_User && wp_check_password( $password, $user->user_pass, $user->ID ) ) {
-			return $user;
-		}
-
-		// get client IP.
+	public function track_login_failed( $username, $error = null ) {
 		$ip = $this->get_client_ip();
 
 		if ( ! $ip ) {
-			return $user;
+			return;
 		}
 
 		// Log with full details (IP, UA, payload).
-		$user_agent  = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
-		$username_attempted = '';
-		if ( $user instanceof \WP_User ) {
-			$username_attempted = $user->user_login;
-		} elseif ( is_string( $user ) ) {
-			$username_attempted = $user;
+		$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
+
+		// Construct payload: username and sanitized POST data excluding passwords
+		$post_data = wp_unslash( $_POST );
+		if ( isset( $post_data['pwd'] ) ) {
+			$post_data['pwd'] = '******';
+		}
+		if ( isset( $post_data['password'] ) ) {
+			$post_data['password'] = '******';
 		}
 
-		// Simply call log_attempt_with_details, which handles failed_login increment/insert automatically.
+		// Serialize payload safely
+		$payload = 'Username: ' . sanitize_text_field( $username );
+		if ( ! empty( $post_data ) && is_array( $post_data ) ) {
+			$payload .= ' | POST: ' . http_build_query( $post_data );
+		}
+
 		$this->brute_force_db->log_attempt_with_details(
 			$ip,
 			BruteForceDB::TYPE_FAILED_LOGIN,
 			$user_agent,
-			'Username: ' . $username_attempted
+			$payload
 		);
-
-		// Return the original result.
-		return $user;
 	}
 
 	/**
@@ -590,8 +590,6 @@ class Middleware {
 			return $username;
 		}
 
-		$row = $this->brute_force_db->get_row_by_ip( $ip );
-
 		$ip_time_limit  = $this->get_settings( 'ip_time_limit' );
 		$ip_login_limit = $this->get_settings( 'ip_login_limit' );
 
@@ -599,23 +597,19 @@ class Middleware {
 			return $username;
 		}
 
-		$ip_time_limit *= HOUR_IN_SECONDS;
+		$window_seconds = $ip_time_limit * HOUR_IN_SECONDS;
+		$attempts       = $this->brute_force_db->get_failed_login_attempts_in_window( $ip, $window_seconds );
 
-		if ( $row ) {
-			$current_time    = time();
-			$time_difference = $current_time - $row->last_attempt;
-
-			// Failed login attempts.
-			if ( $time_difference <= $ip_time_limit && $row->attempts >= $ip_login_limit ) {
-				wp_die(
-					esc_html__( '<strong>ERROR</strong>: You have reached the login attempts limit.', 'securefusion' ),
-					esc_html__( 'Too many failed login attempts', 'securefusion' ),
-					[
-						'response'  => 403,
-						'back_link' => true,
-					]
-				);
-			}
+		// Failed login attempts.
+		if ( $attempts >= $ip_login_limit ) {
+			wp_die(
+				esc_html__( '<strong>ERROR</strong>: You have reached the login attempts limit.', 'securefusion' ),
+				esc_html__( 'Too many failed login attempts', 'securefusion' ),
+				[
+					'response'  => 403,
+					'back_link' => true,
+				]
+			);
 		}
 
 		return $username;

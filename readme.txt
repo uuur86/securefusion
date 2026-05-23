@@ -41,6 +41,23 @@ SecureFusion helps you enforce strict Content Security Policies (CSP), hide stan
 
 For complete information, please visit our website [the SecureFusion website](https://fyndsoft.com/securefusion).
 
+== Credits ==
+
+This plugin bundles and/or utilizes the following third-party libraries:
+
+* **Chart.js** (v4.5.1)
+  * License: MIT
+  * License URI: https://github.com/chartjs/Chart.js/blob/master/LICENSE.md
+  * Source: https://www.chartjs.org
+
+* **persist-admin-notices-dismissal**
+  * License: GPLv3
+  * Source: https://github.com/collizo4sky/persist-admin-notices-dismissal
+
+* **wasp**
+  * License: GPLv3
+  * Source: https://github.com/uuur86/wasp
+
 == Installation ==
 
 1. Download and unzip the plugin into your WordPress plugins directory (usually `/wp-content/plugins/`).

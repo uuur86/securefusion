@@ -171,14 +171,25 @@ class BruteForceDB {
 			return $cached;
 		}
 
-		// Table name is safe: constructed from $wpdb->prefix (internal WP value) + a hardcoded string literal.
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Table name is safe: constructed from $wpdb->prefix (internal WP value) + a hardcoded string literal.
-		$row = $this->wpdb->get_row(
-			/* phpcs:ignore */
-			$this->wpdb->prepare( "SELECT ip, attempts, last_attempt FROM {$this->table_name} WHERE ip = %s AND log_type = %s LIMIT 1", $ip, self::TYPE_FAILED_LOGIN )
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		$data = $this->wpdb->get_row(
+			$this->wpdb->prepare(
+				"SELECT COUNT(*) as attempts, MAX(last_attempt) as last_attempt FROM {$this->table_name} WHERE ip = %s AND log_type = %s",
+				$ip,
+				self::TYPE_FAILED_LOGIN
+			)
 		);
 
-		// Cache even null results to prevent repeated DB hits for unknown IPs.
+		if ( ! $data || ! $data->last_attempt ) {
+			$row = null;
+		} else {
+			$row = (object) [
+				'ip'           => $ip,
+				'attempts'     => (int) $data->attempts,
+				'last_attempt' => (int) $data->last_attempt,
+			];
+		}
+
 		wp_cache_set( $cache_key, $row, self::CACHE_GROUP, self::CACHE_TTL );
 
 		return $row;
@@ -186,30 +197,38 @@ class BruteForceDB {
 
 
 	/**
+	 * Get failed login attempts in a specific time window.
+	 *
+	 * @param string $ip             Client IP.
+	 * @param int    $window_seconds Time window in seconds.
+	 * @return int Number of failed login attempts.
+	 */
+	public function get_failed_login_attempts_in_window( $ip, $window_seconds ) {
+		$cutoff = time() - absint( $window_seconds );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		$attempts = $this->wpdb->get_var(
+			$this->wpdb->prepare(
+				"SELECT COUNT(*) FROM {$this->table_name} WHERE ip = %s AND log_type = %s AND last_attempt >= %d",
+				$ip,
+				self::TYPE_FAILED_LOGIN,
+				$cutoff
+			)
+		);
+		return (int) $attempts;
+	}
+
+
+	/**
 	 * Increment the attempt count for an existing IP and update the last_attempt timestamp.
 	 *
-	 * Invalidates the relevant object cache entries after the write.
+	 * Now just inserts a new attempt to keep them as separate records.
 	 *
 	 * @param string $ip       The IP address to update.
-	 * @param int    $attempts The current attempt count (will be incremented by 1).
-	 * @return int|false The number of rows updated, or false on error.
+	 * @param int    $attempts The current attempt count (ignored).
+	 * @return int|false The number of rows inserted, or false on error.
 	 */
 	public function increment_attempts( $ip, $attempts ) {
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
-		$result = $this->wpdb->update(
-			$this->table_name,
-			array(
-				'attempts'     => $attempts + 1,
-				'last_attempt' => time(),
-			),
-			array( 'ip' => $ip, 'log_type' => self::TYPE_FAILED_LOGIN ),
-			array( '%d', '%d' ),
-			array( '%s', '%s' )
-		);
-
-		$this->invalidate_cache_for_ip( $ip );
-
-		return $result;
+		return $this->insert_attempt( $ip );
 	}
 
 
@@ -854,6 +873,7 @@ class BruteForceDB {
 		\wp_cache_delete( 'securefusion_bf_unique_ips', self::CACHE_GROUP );
 		\wp_cache_delete( 'securefusion_bf_total_rows', self::CACHE_GROUP );
 		\wp_cache_delete( 'securefusion_bf_total_ip_ranges', self::CACHE_GROUP );
+		\wp_cache_delete( 'securefusion_bf_blocked_rules', self::CACHE_GROUP );
 	}
 
 
@@ -958,29 +978,20 @@ class BruteForceDB {
 		$user_agent = mb_substr( sanitize_text_field( $user_agent ), 0, self::MAX_USER_AGENT_LENGTH );
 		$payload    = mb_substr( $payload, 0, self::MAX_PAYLOAD_LENGTH );
 
-		if ( $log_type === self::TYPE_FAILED_LOGIN ) {
-			$row = $this->get_row_by_ip( $ip );
-			if ( $row ) {
-				$result = $this->increment_attempts( $ip, (int) $row->attempts );
-			} else {
-				$result = $this->insert_attempt( $ip );
-			}
-		} else {
-			// Always insert a new row for other types to preserve payload
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
-			$result = $this->wpdb->insert(
-				$this->table_name,
-				array(
-					'ip'           => $ip,
-					'attempts'     => 1,
-					'last_attempt' => time(),
-					'log_type'     => $log_type,
-					'user_agent'   => $user_agent,
-					'payload'      => $payload,
-				),
-				array( '%s', '%d', '%d', '%s', '%s', '%s' )
-			);
-		}
+		// Always insert a new row to preserve payload/username/browser details
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		$result = $this->wpdb->insert(
+			$this->table_name,
+			array(
+				'ip'           => $ip,
+				'attempts'     => 1,
+				'last_attempt' => time(),
+				'log_type'     => $log_type,
+				'user_agent'   => $user_agent,
+				'payload'      => $payload,
+			),
+			array( '%s', '%d', '%d', '%s', '%s', '%s' )
+		);
 
 		$this->invalidate_cache_for_ip( $ip );
 
@@ -1063,31 +1074,117 @@ class BruteForceDB {
 
 
 	/**
-	 * Check if an IP address is currently blocked.
+	 * Delete any IP rule (blocked or whitelisted).
+	 *
+	 * @param string $ip The IP or CIDR range.
+	 * @return bool Whether the operation succeeded.
+	 */
+	public function delete_ip_rule( $ip ) {
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		$result = $this->wpdb->delete(
+			$this->ip_rules_table,
+			array( 'ip' => $ip ),
+			array( '%s' )
+		);
+
+		$this->invalidate_cache_for_ip( $ip );
+		\wp_cache_delete( 'securefusion_bf_blocked_' . md5( $ip ), self::CACHE_GROUP );
+		\wp_cache_delete( 'securefusion_bf_whitelisted_' . md5( $ip ), self::CACHE_GROUP );
+
+		return $result !== false;
+	}
+
+
+	/**
+	 * Get all blocked IP and range rules.
+	 *
+	 * Uses caching to avoid repeated DB queries on every request.
+	 *
+	 * @return array Array of IP/Range strings.
+	 */
+	public function get_blocked_rules() {
+		$cache_key = 'securefusion_bf_blocked_rules';
+		$cached    = \wp_cache_get( $cache_key, self::CACHE_GROUP );
+
+		if ( false !== $cached ) {
+			return $cached;
+		}
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		$rules = $this->wpdb->get_col(
+			$this->wpdb->prepare(
+				"SELECT ip FROM {$this->ip_rules_table} WHERE rule_type = %s",
+				'blocked'
+			)
+		);
+
+		if ( ! is_array( $rules ) ) {
+			$rules = [];
+		}
+
+		\wp_cache_set( $cache_key, $rules, self::CACHE_GROUP, self::CACHE_TTL );
+
+		return $rules;
+	}
+
+
+	/**
+	 * Check if an IP address is within a CIDR range or matches exactly.
+	 *
+	 * @param string $ip    Client IP address.
+	 * @param string $range IP address or CIDR range (e.g. 192.168.1.0/24).
+	 * @return bool True if IP is in range.
+	 */
+	public function ip_in_range( $ip, $range ) {
+		if ( strpos( $range, '/' ) === false ) {
+			return $ip === $range;
+		}
+
+		list( $subnet, $bits ) = explode( '/', $range );
+		$ip_dec     = ip2long( $ip );
+		$subnet_dec = ip2long( $subnet );
+
+		if ( false === $ip_dec || false === $subnet_dec ) {
+			return false;
+		}
+
+		$bits = (int) $bits;
+		if ( $bits < 0 || $bits > 32 ) {
+			return false;
+		}
+
+		$mask = ~ ( ( 1 << ( 32 - $bits ) ) - 1 );
+
+		return ( $ip_dec & $mask ) === ( $subnet_dec & $mask );
+	}
+
+
+	/**
+	 * Check if a specific CIDR range is directly blocked in rules.
+	 *
+	 * @param string $cidr CIDR range (e.g. 192.168.1.0/24).
+	 * @return bool True if directly blocked.
+	 */
+	public function is_range_blocked( $cidr ) {
+		$blocked_rules = $this->get_blocked_rules();
+		return in_array( $cidr, $blocked_rules, true );
+	}
+
+
+	/**
+	 * Check if an IP address is currently blocked (either directly or via range).
 	 *
 	 * @param string $ip The IP address to check.
 	 * @return bool True if blocked.
 	 */
 	public function is_ip_blocked( $ip ) {
-		$cache_key = 'securefusion_bf_blocked_' . md5( $ip );
-		$cached    = \wp_cache_get( $cache_key, self::CACHE_GROUP );
-
-		if ( false !== $cached ) {
-			return (bool) $cached;
+		$blocked_rules = $this->get_blocked_rules();
+		foreach ( $blocked_rules as $rule ) {
+			if ( $this->ip_in_range( $ip, $rule ) ) {
+				return true;
+			}
 		}
-
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
-		$rule_type = $this->wpdb->get_var(
-			$this->wpdb->prepare(
-				"SELECT rule_type FROM {$this->ip_rules_table} WHERE ip = %s LIMIT 1",
-				$ip
-			)
-		);
-
-		$result = ( $rule_type === 'blocked' );
-		\wp_cache_set( $cache_key, $result ? 1 : 0, self::CACHE_GROUP, self::CACHE_TTL );
-
-		return $result;
+		return false;
 	}
 
 
@@ -1201,5 +1298,105 @@ class BruteForceDB {
 		$this->invalidate_all_cache();
 
 		return $result !== false;
+	}
+
+
+	/**
+	 * Get paginated IP rules.
+	 *
+	 * @param int    $per_page Number of rules per page.
+	 * @param int    $offset   Offset for pagination.
+	 * @param string $orderby  Column to order by (whitelisted).
+	 * @param string $order    ASC or DESC.
+	 * @return array Array of rule objects.
+	 */
+	public function get_all_rules( $per_page = 20, $offset = 0, $orderby = 'created_at', $order = 'DESC' ) {
+		$allowed_columns = [ 'id', 'ip', 'rule_type', 'created_at' ];
+		$orderby         = in_array( $orderby, $allowed_columns, true ) ? $orderby : 'created_at';
+		$order           = strtoupper( $order ) === 'ASC' ? 'ASC' : 'DESC';
+		$per_page        = absint( $per_page );
+		$offset          = absint( $offset );
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		return $this->wpdb->get_results(
+			$this->wpdb->prepare(
+				"SELECT id, ip, rule_type, created_at FROM {$this->ip_rules_table} ORDER BY {$orderby} {$order} LIMIT %d OFFSET %d",
+				$per_page,
+				$offset
+			)
+		);
+	}
+
+
+	/**
+	 * Get total count of rules in the table.
+	 *
+	 * @return int Total rule count.
+	 */
+	public function get_total_rules_count() {
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		return (int) $this->wpdb->get_var( "SELECT COUNT(*) FROM {$this->ip_rules_table}" );
+	}
+
+
+	/**
+	 * Get daily security log counts grouped by log type for the last 30 days.
+	 *
+	 * @param int $days Number of days to look back. Default 30.
+	 * @return array Array of objects with log_type, date_str, and count.
+	 */
+	public function get_daily_attempts_stats( $days = 30 ) {
+		$time_limit = time() - ( $days * DAY_IN_SECONDS );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$results = $this->wpdb->get_results(
+			$this->wpdb->prepare(
+				"SELECT log_type, YEAR(FROM_UNIXTIME(last_attempt)) as yr, MONTH(FROM_UNIXTIME(last_attempt)) as mo, DAY(FROM_UNIXTIME(last_attempt)) as dy, COUNT(*) as count 
+				 FROM `{$this->table_name}` 
+				 WHERE last_attempt >= %d 
+				 GROUP BY log_type, YEAR(FROM_UNIXTIME(last_attempt)), MONTH(FROM_UNIXTIME(last_attempt)), DAY(FROM_UNIXTIME(last_attempt))
+				 ORDER BY yr ASC, mo ASC, dy ASC",
+				$time_limit
+			)
+		);
+
+		// Format to YYYY-MM-DD.
+		if ( is_array( $results ) ) {
+			foreach ( $results as $row ) {
+				$row->date_str = sprintf( '%04d-%02d-%02d', $row->yr, $row->mo, $row->dy );
+			}
+		}
+
+		return $results;
+	}
+
+
+	/**
+	 * Get monthly security log counts grouped by log type for the last 12 months.
+	 *
+	 * @param int $months Number of months to look back. Default 12.
+	 * @return array Array of objects with log_type, month_str, and count.
+	 */
+	public function get_monthly_attempts_stats( $months = 12 ) {
+		$time_limit = time() - ( $months * 30 * DAY_IN_SECONDS );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$results = $this->wpdb->get_results(
+			$this->wpdb->prepare(
+				"SELECT log_type, YEAR(FROM_UNIXTIME(last_attempt)) as yr, MONTH(FROM_UNIXTIME(last_attempt)) as mo, COUNT(*) as count 
+				 FROM `{$this->table_name}` 
+				 WHERE last_attempt >= %d 
+				 GROUP BY log_type, YEAR(FROM_UNIXTIME(last_attempt)), MONTH(FROM_UNIXTIME(last_attempt))
+				 ORDER BY yr ASC, mo ASC",
+				$time_limit
+			)
+		);
+
+		// Format to YYYY-MM.
+		if ( is_array( $results ) ) {
+			foreach ( $results as $row ) {
+				$row->month_str = sprintf( '%04d-%02d', $row->yr, $row->mo );
+			}
+		}
+
+		return $results;
 	}
 }

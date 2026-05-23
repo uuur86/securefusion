@@ -120,13 +120,22 @@ class Admin {
 			array( $this, 'get_settings_html' )
 		);
 
-		$this->menu_pages['login_log'] = \add_submenu_page(
+		$this->menu_pages['security_log'] = \add_submenu_page(
 			'securefusion',
-			esc_html__( 'Login Log', 'securefusion' ),
-			esc_html__( 'Login Log', 'securefusion' ),
+			esc_html__( 'Security Log', 'securefusion' ),
+			esc_html__( 'Security Log', 'securefusion' ),
 			'manage_options',
-			'securefusion-login-log',
-			array( $this, 'get_login_log_html' )
+			'securefusion-security-log',
+			array( $this, 'get_security_log_html' )
+		);
+
+		$this->menu_pages['ip_rules'] = \add_submenu_page(
+			'securefusion',
+			esc_html__( 'IP Rules', 'securefusion' ),
+			esc_html__( 'IP Rules', 'securefusion' ),
+			'manage_options',
+			'securefusion-ip-rules',
+			array( $this, 'get_ip_rules_html' )
 		);
 
 		$this->menu_pages['ip_ranges'] = \add_submenu_page(
@@ -203,6 +212,27 @@ class Admin {
 				</div>
 			</header>
 
+			<section class="fynd-sf-charts-section">
+				<div class="fynd-sf-chart-container">
+					<div class="fynd-sf-chart-header">
+						<h3><?php esc_html_e( 'Daily Security Events (Last 30 Days)', 'securefusion' ); ?></h3>
+						<span class="fynd-sf-chart-badge"><?php esc_html_e( 'Real-time', 'securefusion' ); ?></span>
+					</div>
+					<div class="fynd-sf-chart-body">
+						<canvas id="fynd-sf-daily-chart"></canvas>
+					</div>
+				</div>
+				<div class="fynd-sf-chart-container">
+					<div class="fynd-sf-chart-header">
+						<h3><?php esc_html_e( 'Monthly Security Events (Last 12 Months)', 'securefusion' ); ?></h3>
+						<span class="fynd-sf-chart-badge"><?php esc_html_e( 'Overview', 'securefusion' ); ?></span>
+					</div>
+					<div class="fynd-sf-chart-body">
+						<canvas id="fynd-sf-monthly-chart"></canvas>
+					</div>
+				</div>
+			</section>
+
 			<section class="dashboard-overview">
 				<div class="dashboard-item <?php echo esc_attr( $security_pass ? 'fynd-sf-status-enabled' : 'fynd-sf-status-disabled' ); ?>">
 					<h2><?php esc_html_e( 'Security Status', 'securefusion' ); ?></h2>
@@ -252,9 +282,9 @@ class Admin {
 					?>
 					</p>
 					<p style="margin-top: 15px; margin-bottom: 15px;">
-						<a href="<?php echo esc_url( admin_url( 'admin.php?page=securefusion-login-log' ) ); ?>" class="fynd-sf-btn fynd-sf-btn-secondary">
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=securefusion-security-log' ) ); ?>" class="fynd-sf-btn fynd-sf-btn-secondary">
 							<span class="dashicons dashicons-list-view"></span>
-							<?php esc_html_e( 'View Login Log', 'securefusion' ); ?>
+							<?php esc_html_e( 'View Security Log', 'securefusion' ); ?>
 						</a>
 					</p>
 					<?php if ( $security_pass ) : ?>
@@ -360,15 +390,28 @@ class Admin {
 
 
 	/**
-	 * Get login log HTML.
+	 * Get security log HTML.
 	 *
-	 * Delegates rendering to the LoginLog class.
+	 * Delegates rendering to the SecurityLog class.
 	 *
 	 * @return void
 	 */
-	public function get_login_log_html() {
-		$log = new LoginLog();
+	public function get_security_log_html() {
+		$log = new SecurityLog();
 		$log->render();
+	}
+
+
+	/**
+	 * Get IP rules HTML.
+	 *
+	 * Delegates rendering to the IPRules class.
+	 *
+	 * @return void
+	 */
+	public function get_ip_rules_html() {
+		$rules = new IPRules();
+		$rules->render();
 	}
 
 
@@ -1195,6 +1238,100 @@ class Admin {
 	public function admin_theme_styles() {
 		\wp_enqueue_style( 'securefusion-admin-theme-main-css', \plugins_url( 'assets/css/admin.css', SECUREFUSION_BASENAME ), array(), SECUREFUSION_VERSION );
 		\wp_enqueue_script( 'securefusion-admin-js', \plugins_url( 'assets/js/admin.js', SECUREFUSION_BASENAME ), array(), SECUREFUSION_VERSION, true );
+
+		if ( isset( $_GET['page'] ) && 'securefusion' === $_GET['page'] ) {
+			\wp_enqueue_script( 'securefusion-chartjs', \plugins_url( 'assets/lib/chartjs/chart.umd.min.js', SECUREFUSION_BASENAME ), array(), SECUREFUSION_VERSION, true );
+			\wp_enqueue_script( 'securefusion-dashboard-js', \plugins_url( 'assets/js/dashboard.js', SECUREFUSION_BASENAME ), array( 'securefusion-chartjs' ), SECUREFUSION_VERSION, true );
+
+			$chart_data = $this->get_dashboard_chart_data();
+			\wp_localize_script( 'securefusion-dashboard-js', 'securefusionChartData', $chart_data );
+		}
+	}
+
+
+	/**
+	 * Prepare the security log statistics for Chart.js rendering.
+	 *
+	 * @return array Multi-dimensional array of chart data.
+	 */
+	protected function get_dashboard_chart_data() {
+		$db = new BruteForceDB();
+
+		// 1. Daily Stats (Last 30 days)
+		$daily_raw    = $db->get_daily_attempts_stats( 30 );
+		$daily_labels = array();
+		for ( $i = 29; $i >= 0; $i-- ) {
+			$timestamp      = time() - ( $i * DAY_IN_SECONDS );
+			$daily_labels[] = function_exists( 'wp_date' ) ? wp_date( 'Y-m-d', $timestamp ) : gmdate( 'Y-m-d', $timestamp );
+		}
+
+		// Initialize datasets for each type.
+		$types = array(
+			BruteForceDB::TYPE_FAILED_LOGIN,
+			BruteForceDB::TYPE_BAD_REQUEST,
+			BruteForceDB::TYPE_BAD_COOKIE,
+			BruteForceDB::TYPE_BAD_BOT,
+			BruteForceDB::TYPE_BAD_QUERY,
+			BruteForceDB::TYPE_BLOCKED,
+		);
+
+		$daily_data = array();
+		foreach ( $types as $type ) {
+			$daily_data[ $type ] = array_fill( 0, 30, 0 );
+		}
+
+		if ( is_array( $daily_raw ) ) {
+			foreach ( $daily_raw as $row ) {
+				$label_index = array_search( $row->date_str, $daily_labels, true );
+				if ( false !== $label_index && isset( $daily_data[ $row->log_type ] ) ) {
+					$daily_data[ $row->log_type ][ $label_index ] = (int) $row->count;
+				}
+			}
+		}
+
+		// 2. Monthly Stats (Last 12 months)
+		$monthly_raw    = $db->get_monthly_attempts_stats( 12 );
+		$monthly_labels = array();
+		for ( $i = 11; $i >= 0; $i-- ) {
+			$timestamp        = strtotime( gmdate( 'Y-m-01' ) . " -{$i} months" );
+			$monthly_labels[] = function_exists( 'wp_date' ) ? wp_date( 'Y-m', $timestamp ) : gmdate( 'Y-m', $timestamp );
+		}
+
+		$monthly_data = array();
+		foreach ( $types as $type ) {
+			$monthly_data[ $type ] = array_fill( 0, 12, 0 );
+		}
+
+		if ( is_array( $monthly_raw ) ) {
+			foreach ( $monthly_raw as $row ) {
+				$label_index = array_search( $row->month_str, $monthly_labels, true );
+				if ( false !== $label_index && isset( $monthly_data[ $row->log_type ] ) ) {
+					$monthly_data[ $row->log_type ][ $label_index ] = (int) $row->count;
+				}
+			}
+		}
+
+		// Human readable labels for types.
+		$type_labels = array(
+			BruteForceDB::TYPE_FAILED_LOGIN => __( 'Failed Login', 'securefusion' ),
+			BruteForceDB::TYPE_BAD_REQUEST  => __( 'Bad Request', 'securefusion' ),
+			BruteForceDB::TYPE_BAD_COOKIE   => __( 'Bad Cookie', 'securefusion' ),
+			BruteForceDB::TYPE_BAD_BOT      => __( 'Bad Bot', 'securefusion' ),
+			BruteForceDB::TYPE_BAD_QUERY    => __( 'Bad Query', 'securefusion' ),
+			BruteForceDB::TYPE_BLOCKED      => __( 'Blocked Request', 'securefusion' ),
+		);
+
+		return array(
+			'daily'       => array(
+				'labels'   => $daily_labels,
+				'datasets' => $daily_data,
+			),
+			'monthly'     => array(
+				'labels'   => $monthly_labels,
+				'datasets' => $monthly_data,
+			),
+			'type_labels' => $type_labels,
+		);
 	}
 
 

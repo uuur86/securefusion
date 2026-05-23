@@ -444,6 +444,92 @@
 				}, 2000);
 			}
 		}
+
+		// ===== IP Rules page logic =====
+		if (typeof securefusionRules !== 'undefined') {
+			// ===== IP Rules Form Submission =====
+			$('#fynd-sf-add-rule-form').on('submit', function (e) {
+				e.preventDefault();
+				var $form = $(this);
+				var $submitBtn = $form.find('button[type="submit"]');
+				var ip = $('#fynd-sf-rule-ip').val();
+				var ruleType = $('#fynd-sf-rule-type').val();
+
+				if (!ip) {
+					return;
+				}
+
+				$submitBtn.prop('disabled', true).addClass('fynd-sf-processing');
+
+				$.post(securefusionRules.ajaxUrl, {
+					action: 'securefusion_add_ip_rule',
+					nonce: securefusionRules.nonce,
+					ip: ip,
+					rule_type: ruleType
+				})
+				.done(function (response) {
+					if (response.success) {
+						showRulesNotice(securefusionRules.addSuccess, 'success');
+						setTimeout(function () {
+							window.location.reload();
+						}, 1000);
+					} else {
+						showRulesNotice(response.data.message || securefusionRules.addFailed, 'error');
+						$submitBtn.prop('disabled', false).removeClass('fynd-sf-processing');
+					}
+				})
+				.fail(function () {
+					showRulesNotice(securefusionRules.addFailed, 'error');
+					$submitBtn.prop('disabled', false).removeClass('fynd-sf-processing');
+				});
+			});
+
+			// ===== IP Rules Deletion =====
+			$(document).on('click', '.fynd-sf-remove-rule-btn', function () {
+				var $btn = $(this);
+				var ip = $btn.data('ip');
+
+				if (!window.confirm(securefusionRules.confirmDelete)) {
+					return;
+				}
+
+				$btn.prop('disabled', true).addClass('fynd-sf-processing');
+
+				$.post(securefusionRules.ajaxUrl, {
+					action: 'securefusion_delete_ip_rule',
+					nonce: securefusionRules.nonce,
+					ip: ip
+				})
+				.done(function (response) {
+					if (response.success) {
+						showRulesNotice(securefusionRules.deleteSuccess, 'success');
+						setTimeout(function () {
+							window.location.reload();
+						}, 1000);
+					} else {
+						showRulesNotice(response.data.message || securefusionRules.deleteFailed, 'error');
+						$btn.prop('disabled', false).removeClass('fynd-sf-processing');
+					}
+				})
+				.fail(function () {
+					showRulesNotice(securefusionRules.deleteFailed, 'error');
+					$btn.prop('disabled', false).removeClass('fynd-sf-processing');
+				});
+			});
+
+			function showRulesNotice(message, type) {
+				var $notice = $('#fynd-sf-rules-notice');
+				$notice
+					.removeClass('fynd-sf-notice-success fynd-sf-notice-error fynd-sf-notice-info')
+					.addClass('fynd-sf-notice-' + type)
+					.text(message)
+					.fadeIn(200);
+
+				setTimeout(function () {
+					$notice.fadeOut(300);
+				}, 5000);
+			}
+		}
 	});
 })(jQuery);
 

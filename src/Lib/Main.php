@@ -145,13 +145,17 @@ class Main {
 		// MIDDLEWARE.
 		add_action( 'plugin_loaded', array( $this->middleware, 'init' ) );
 		add_action( 'init', array( $this->middleware, 'filter_bad_requests' ), 10 );
-		add_filter( 'wp_authenticate_user', array( $this->middleware, 'track_authenticate_user' ), 30, 2 );
+		add_action( 'wp_login_failed', array( $this->middleware, 'track_login_failed' ), 10, 2 );
 		add_action( 'wp_authenticate', array( $this->middleware, 'track_limit_login_attempts' ), 10, 2 );
 		add_action( 'init', array( $this->middleware, 'headers' ), 9 );
 
-		// LOGIN LOG — AJAX handlers.
-		$login_log = new Sources\LoginLog();
-		$login_log->register_ajax();
+		// SECURITY LOG — AJAX handlers.
+		$security_log = new Sources\SecurityLog();
+		$security_log->register_ajax();
+
+		// IP RULES — AJAX handlers.
+		$ip_rules = new Sources\IPRules();
+		$ip_rules->register_ajax();
 
 		// ADMIN IP WHITELIST on successful login.
 		add_action( 'wp_login', array( $this, 'whitelist_admin_ip_on_login' ), 10, 2 );

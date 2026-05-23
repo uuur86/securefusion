@@ -34,38 +34,42 @@ class IPRanges {
 	 * @return void
 	 */
 	public function enqueue_assets() {
-		// Reusing some of the login-log styles and adding specific ones if needed.
+		// Reusing some of the security-log styles.
 		wp_enqueue_style(
-			'securefusion-login-log-css',
-			plugins_url( 'assets/css/login-log.css', SECUREFUSION_BASENAME ),
+			'securefusion-security-log-css',
+			plugins_url( 'assets/css/security-log.css', SECUREFUSION_BASENAME ),
 			[],
 			SECUREFUSION_VERSION
 		);
 
 		wp_enqueue_script(
-			'securefusion-login-log-js',
-			plugins_url( 'assets/js/login-log.js', SECUREFUSION_BASENAME ),
+			'securefusion-security-log-js',
+			plugins_url( 'assets/js/security-log.js', SECUREFUSION_BASENAME ),
 			[ 'jquery' ],
 			SECUREFUSION_VERSION,
 			true
 		);
 
 		wp_localize_script(
-			'securefusion-login-log-js',
+			'securefusion-security-log-js',
 			'securefusionLog',
 			[
-				'ajaxUrl'       => admin_url( 'admin-ajax.php' ),
-				'nonce'         => wp_create_nonce( \SecureFusion\Lib\LoginLog::NONCE_ACTION ),
-				'confirmReset'  => esc_html__( 'WARNING: This action is irreversible! All failed login attempt data will be permanently deleted. Are you absolutely sure?', 'securefusion' ),
-				'confirmImport' => esc_html__( 'Importing data will add records to the existing table. Continue?', 'securefusion' ),
-				'resetSuccess'  => esc_html__( 'All data has been deleted successfully.', 'securefusion' ),
-				'exportEmpty'   => esc_html__( 'No data to export.', 'securefusion' ),
-				'importSuccess' => esc_html__( 'Import completed successfully.', 'securefusion' ),
-				'importError'   => esc_html__( 'Import failed. Please check the file format.', 'securefusion' ),
-				'invalidFile'   => esc_html__( 'Please select a valid JSON file.', 'securefusion' ),
-				'processing'    => esc_html__( 'Processing...', 'securefusion' ),
-				'copied'        => esc_html__( 'Copied to clipboard!', 'securefusion' ),
-				'copyFailed'    => esc_html__( 'Copy failed. Please select and copy manually.', 'securefusion' ),
+				'ajaxUrl'        => admin_url( 'admin-ajax.php' ),
+				'nonce'          => wp_create_nonce( \SecureFusion\Lib\SecurityLog::NONCE_ACTION ),
+				'confirmReset'   => esc_html__( 'WARNING: This action is irreversible! All failed login attempt data will be permanently deleted. Are you absolutely sure?', 'securefusion' ),
+				'confirmImport'  => esc_html__( 'Importing data will add records to the existing table. Continue?', 'securefusion' ),
+				'resetSuccess'   => esc_html__( 'All data has been deleted successfully.', 'securefusion' ),
+				'exportEmpty'    => esc_html__( 'No data to export.', 'securefusion' ),
+				'importSuccess'  => esc_html__( 'Import completed successfully.', 'securefusion' ),
+				'importError'    => esc_html__( 'Import failed. Please check the file format.', 'securefusion' ),
+				'invalidFile'    => esc_html__( 'Please select a valid JSON file.', 'securefusion' ),
+				'processing'     => esc_html__( 'Processing...', 'securefusion' ),
+				'copied'         => esc_html__( 'Copied to clipboard!', 'securefusion' ),
+				'copyFailed'     => esc_html__( 'Copy failed. Please select and copy manually.', 'securefusion' ),
+				'blockSuccess'   => esc_html__( 'IP range has been blocked.', 'securefusion' ),
+				'unblockSuccess' => esc_html__( 'IP range has been unblocked.', 'securefusion' ),
+				'blockFailed'    => esc_html__( 'IP range block/unblock operation failed.', 'securefusion' ),
+				'confirmBlock'   => esc_html__( 'Are you sure you want to block this IP range?', 'securefusion' ),
 			]
 		);
 	}
@@ -186,17 +190,18 @@ class IPRanges {
 						<tbody>
 							<?php foreach ( $rows as $row ) : ?>
 								<?php
+								$cidr = $this->calculate_cidr( $row->range_prefix, $row->min_last_octet, $row->max_last_octet );
+								$is_range_blocked = $db->is_range_blocked( $cidr );
 								$range_url = add_query_arg(
 									[
 										'range' => $row->range_prefix,
 										'paged' => 1,
 									],
-									admin_url( 'admin.php?page=securefusion-login-log' )
+									admin_url( 'admin.php?page=securefusion-security-log' )
 								);
 								?>
 								<tr>
 									<td class="column-range_prefix column-ip">
-										<?php $cidr = $this->calculate_cidr( $row->range_prefix, $row->min_last_octet, $row->max_last_octet ); ?>
 										<strong><code><?php echo esc_html( $cidr ); ?></code></strong>
 									</td>
 									<td class="column-ip_count column-attempts">
@@ -219,6 +224,17 @@ class IPRanges {
 												<span class="dashicons dashicons-visibility"></span>
 												<?php esc_html_e( 'View IPs', 'securefusion' ); ?>
 											</button>
+											<?php if ( $is_range_blocked ) : ?>
+												<button type="button" class="fynd-sf-btn fynd-sf-btn-unblock" data-ip="<?php echo esc_attr( $cidr ); ?>" data-action="unblock">
+													<span class="dashicons dashicons-unlock"></span>
+													<?php esc_html_e( 'Unblock Range', 'securefusion' ); ?>
+												</button>
+											<?php else : ?>
+												<button type="button" class="fynd-sf-btn fynd-sf-btn-block" data-ip="<?php echo esc_attr( $cidr ); ?>" data-action="block">
+													<span class="dashicons dashicons-lock"></span>
+													<?php esc_html_e( 'Block Range', 'securefusion' ); ?>
+												</button>
+											<?php endif; ?>
 										</div>
 									</td>
 								</tr>

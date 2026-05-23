@@ -1,6 +1,6 @@
 <?php
 /**
- * LoginLog Class
+ * SecurityLog Class
  *
  * Handles the security log page with listing, type-based filtering,
  * reset (delete by type), JSON export, import, IP block toggle,
@@ -12,9 +12,9 @@
 namespace SecureFusion\Lib;
 
 /**
- * LoginLog functionality class.
+ * SecurityLog functionality class.
  */
-class LoginLog {
+class SecurityLog {
 
 	/**
 	 * Nonce action for AJAX operations.
@@ -38,7 +38,7 @@ class LoginLog {
 	 */
 	private function get_log_type_options() {
 		return [
-			''                             => esc_html__( 'All Types', 'securefusion' ),
+			''                              => esc_html__( 'All Types', 'securefusion' ),
 			BruteForceDB::TYPE_FAILED_LOGIN => esc_html__( 'Failed Login', 'securefusion' ),
 			BruteForceDB::TYPE_BAD_REQUEST  => esc_html__( 'Bad Request', 'securefusion' ),
 			BruteForceDB::TYPE_BAD_COOKIE   => esc_html__( 'Bad Cookie', 'securefusion' ),
@@ -83,22 +83,22 @@ class LoginLog {
 	 */
 	public function enqueue_assets() {
 		wp_enqueue_style(
-			'securefusion-login-log-css',
-			plugins_url( 'assets/css/login-log.css', SECUREFUSION_BASENAME ),
+			'securefusion-security-log-css',
+			plugins_url( 'assets/css/security-log.css', SECUREFUSION_BASENAME ),
 			[],
 			SECUREFUSION_VERSION
 		);
 
 		wp_enqueue_script(
-			'securefusion-login-log-js',
-			plugins_url( 'assets/js/login-log.js', SECUREFUSION_BASENAME ),
+			'securefusion-security-log-js',
+			plugins_url( 'assets/js/security-log.js', SECUREFUSION_BASENAME ),
 			[ 'jquery' ],
 			SECUREFUSION_VERSION,
 			true
 		);
 
 		wp_localize_script(
-			'securefusion-login-log-js',
+			'securefusion-security-log-js',
 			'securefusionLog',
 			[
 				'ajaxUrl'        => admin_url( 'admin-ajax.php' ),
@@ -287,12 +287,21 @@ class LoginLog {
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Already verified above.
-		$ip     = isset( $_POST['ip'] ) ? sanitize_text_field( wp_unslash( $_POST['ip'] ) ) : '';
+		$ip = isset( $_POST['ip'] ) ? sanitize_text_field( wp_unslash( $_POST['ip'] ) ) : '';
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Already verified above.
 		$action = isset( $_POST['block_action'] ) ? sanitize_text_field( wp_unslash( $_POST['block_action'] ) ) : '';
 
-		if ( empty( $ip ) || ! filter_var( $ip, FILTER_VALIDATE_IP ) ) {
-			wp_send_json_error( [ 'message' => esc_html__( 'Invalid IP address.', 'securefusion' ) ] );
+		$is_valid_ip   = filter_var( $ip, FILTER_VALIDATE_IP );
+		$is_valid_cidr = false;
+		if ( ! $is_valid_ip && preg_match( '/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}$/', $ip ) ) {
+			list( $subnet, $mask ) = explode( '/', $ip );
+			if ( filter_var( $subnet, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 ) && $mask >= 0 && $mask <= 32 ) {
+				$is_valid_cidr = true;
+			}
+		}
+
+		if ( ! $is_valid_ip && ! $is_valid_cidr ) {
+			wp_send_json_error( [ 'message' => esc_html__( 'Invalid IP address or range.', 'securefusion' ) ] );
 			return;
 		}
 
@@ -307,19 +316,23 @@ class LoginLog {
 			$success = $db->block_ip( $ip );
 
 			if ( $success ) {
-				wp_send_json_success( [
-					'message'    => esc_html__( 'IP has been blocked.', 'securefusion' ),
-					'new_status' => 'blocked',
-				] );
+				wp_send_json_success(
+					[
+						'message'    => esc_html__( 'IP has been blocked.', 'securefusion' ),
+						'new_status' => 'blocked',
+					]
+				);
 			}
 		} elseif ( $action === 'unblock' ) {
 			$success = $db->unblock_ip( $ip );
 
 			if ( $success ) {
-				wp_send_json_success( [
-					'message'    => esc_html__( 'IP has been unblocked.', 'securefusion' ),
-					'new_status' => 'active',
-				] );
+				wp_send_json_success(
+					[
+						'message'    => esc_html__( 'IP has been unblocked.', 'securefusion' ),
+						'new_status' => 'active',
+					]
+				);
 			}
 		}
 
@@ -373,7 +386,7 @@ class LoginLog {
 		}
 
 		$plugin_url = plugins_url( '/', SECUREFUSION_BASENAME );
-		$page_url   = admin_url( 'admin.php?page=securefusion-login-log' );
+		$page_url   = admin_url( 'admin.php?page=securefusion-security-log' );
 
 		// Preserve filters in sort/page URLs.
 		if ( $range_filter ) {
@@ -468,7 +481,7 @@ class LoginLog {
 							'<strong>' . esc_html( $range_filter ) . '.0/24</strong>'
 						);
 						?>
-						<a href="<?php echo esc_url( admin_url( 'admin.php?page=securefusion-login-log' . ( $type_filter ? '&log_type=' . $type_filter : '' ) ) ); ?>" class="fynd-sf-filter-clear-link">
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=securefusion-security-log' . ( $type_filter ? '&log_type=' . $type_filter : '' ) ) ); ?>" class="fynd-sf-filter-clear-link">
 							<?php esc_html_e( 'Show all', 'securefusion' ); ?>
 						</a>
 					</div>
