@@ -202,6 +202,14 @@ class Admin {
 
 		?>
 		<div class="wrap fynd-sf-dashboard">
+
+			<?php
+			/*
+			 * WordPress injects admin_notices after the first <h1> inside .wrap.
+			 * We place a screen-reader-only <h1> here so WP notices render
+			 * outside our styled header component.
+			 */
+			?>
 			<h1 class="fynd-sf-sr-only"><?php esc_html_e( 'SecureFusion Dashboard', 'securefusion' ); ?></h1>
 
 			<header class="fynd-sf-log-header">
@@ -235,63 +243,107 @@ class Admin {
 
 			<section class="dashboard-overview">
 				<div class="dashboard-item fynd-sf-security-status-card <?php echo esc_attr( $security_pass ? 'fynd-sf-status-enabled' : 'fynd-sf-status-disabled' ); ?>">
-					<h2><?php esc_html_e( 'Security Status', 'securefusion' ); ?></h2>
+					<div class="fynd-sf-card-header-row">
+						<h2><?php esc_html_e( 'Security Status', 'securefusion' ); ?></h2>
+						
+						<div class="fynd-sf-system-badges">
+							<div class="fynd-sf-system-badge">
+								<span class="dashicons dashicons-wordpress"></span>
+								<span>WordPress: <strong><?php echo esc_html( $wp_version ); ?></strong></span>
+								<?php if ( version_compare( $wp_version, '6.7.0', '<' ) ) : ?>
+									<span class="fynd-sf-badge-warning" title="<?php esc_attr_e( 'Vulnerable version', 'securefusion' ); ?>">!</span>
+								<?php endif; ?>
+							</div>
+							<div class="fynd-sf-system-badge">
+								<span class="dashicons dashicons-admin-settings"></span>
+								<span>PHP: <strong><?php echo esc_html( phpversion() ); ?></strong></span>
+								<?php if ( version_compare( phpversion(), '8.2.0', '<' ) ) : ?>
+									<span class="fynd-sf-badge-warning" title="<?php esc_attr_e( 'Outdated version', 'securefusion' ); ?>">!</span>
+								<?php endif; ?>
+							</div>
+						</div>
+					</div>
 
-					<p>
-					<?php
-					esc_html_e( 'WordPress Version:', 'securefusion' );
-					echo ' ' . esc_html( $wp_version );
-					?>
-					</p>
+					<div class="fynd-sf-metrics-grid">
+						<div class="fynd-sf-metric-widget fynd-sf-metric-total">
+							<span class="dashicons dashicons-shield"></span>
+							<div class="fynd-sf-metric-info">
+								<span class="fynd-sf-metric-value"><?php echo (int) $total_attempts; ?></span>
+								<span class="fynd-sf-metric-label"><?php esc_html_e( 'Total Attacks', 'securefusion' ); ?></span>
+							</div>
+						</div>
+						<div class="fynd-sf-metric-widget fynd-sf-metric-failed-login">
+							<span class="dashicons dashicons-lock"></span>
+							<div class="fynd-sf-metric-info">
+								<span class="fynd-sf-metric-value"><?php echo (int) $brute_force_db->get_total_attempts_by_type( 'failed_login' ); ?></span>
+								<span class="fynd-sf-metric-label"><?php esc_html_e( 'Failed Logins', 'securefusion' ); ?></span>
+							</div>
+						</div>
+						<div class="fynd-sf-metric-widget fynd-sf-metric-bad-request">
+							<span class="dashicons dashicons-warning"></span>
+							<div class="fynd-sf-metric-info">
+								<span class="fynd-sf-metric-value"><?php echo (int) $brute_force_db->get_total_attempts_by_type( 'bad_request' ); ?></span>
+								<span class="fynd-sf-metric-label"><?php esc_html_e( 'Bad Requests', 'securefusion' ); ?></span>
+							</div>
+						</div>
+						<div class="fynd-sf-metric-widget fynd-sf-metric-bad-cookie">
+							<span class="dashicons dashicons-excerpt-view"></span>
+							<div class="fynd-sf-metric-info">
+								<span class="fynd-sf-metric-value"><?php echo (int) $brute_force_db->get_total_attempts_by_type( 'bad_cookie' ); ?></span>
+								<span class="fynd-sf-metric-label"><?php esc_html_e( 'Bad Cookies', 'securefusion' ); ?></span>
+							</div>
+						</div>
+						<div class="fynd-sf-metric-widget fynd-sf-metric-bad-bot">
+							<span class="dashicons dashicons-networking"></span>
+							<div class="fynd-sf-metric-info">
+								<span class="fynd-sf-metric-value"><?php echo (int) $brute_force_db->get_total_attempts_by_type( 'bad_bot' ); ?></span>
+								<span class="fynd-sf-metric-label"><?php esc_html_e( 'Bad Bots', 'securefusion' ); ?></span>
+							</div>
+						</div>
+						<div class="fynd-sf-metric-widget fynd-sf-metric-bad-query">
+							<span class="dashicons dashicons-search"></span>
+							<div class="fynd-sf-metric-info">
+								<span class="fynd-sf-metric-value"><?php echo (int) $brute_force_db->get_total_attempts_by_type( 'bad_query' ); ?></span>
+								<span class="fynd-sf-metric-label"><?php esc_html_e( 'Bad Queries', 'securefusion' ); ?></span>
+							</div>
+						</div>
+						<div class="fynd-sf-metric-widget fynd-sf-metric-unique-ips">
+							<span class="dashicons dashicons-admin-site-alt3"></span>
+							<div class="fynd-sf-metric-info">
+								<span class="fynd-sf-metric-value"><?php echo (int) $unique_ips_count; ?></span>
+								<span class="fynd-sf-metric-label"><?php esc_html_e( 'Unique IPs', 'securefusion' ); ?></span>
+							</div>
+						</div>
+					</div>
 
-					<?php
-					if ( version_compare( $wp_version, '6.7.0', '<' ) ) :
-						$security_pass = false;
-						?>
-						<span class="status disabled">
-							<?php esc_html_e( 'Your WordPress version has security vulnerabilities.', 'securefusion' ); ?>
-						</span>
+					<?php if ( ! $security_pass ) : ?>
+						<div class="fynd-sf-status-alert fynd-sf-status-alert-danger">
+							<span class="dashicons dashicons-dismiss"></span>
+							<div class="fynd-sf-alert-content">
+								<strong><?php esc_html_e( 'System Security Warnings:', 'securefusion' ); ?></strong>
+								<ul style="margin: 4px 0 0 16px; padding: 0;">
+									<?php if ( version_compare( $wp_version, '6.7.0', '<' ) ) : ?>
+										<li><?php esc_html_e( 'Your WordPress version has security vulnerabilities. Please update WordPress.', 'securefusion' ); ?></li>
+									<?php endif; ?>
+									<?php if ( version_compare( phpversion(), '8.2.0', '<' ) ) : ?>
+										<li><?php esc_html_e( 'Your PHP version has security vulnerabilities. Please upgrade PHP.', 'securefusion' ); ?></li>
+									<?php endif; ?>
+								</ul>
+							</div>
+						</div>
+					<?php else : ?>
+						<div class="fynd-sf-status-alert fynd-sf-status-alert-success">
+							<span class="dashicons dashicons-yes-alt"></span>
+							<span class="fynd-sf-alert-text"><?php esc_html_e( 'Everything is running smoothly. No security issues have been detected.', 'securefusion' ); ?></span>
+						</div>
 					<?php endif; ?>
 
-					<p>
-					<?php
-					esc_html_e( 'PHP Version:', 'securefusion' );
-					echo ' ' . esc_html( phpversion() );
-					?>
-					</p>
-
-					<?php
-					if ( version_compare( phpversion(), '8.2.0', '<' ) ) :
-						$security_pass = false;
-						?>
-						<span class="status disabled">
-							<?php esc_html_e( 'Your PHP version has security vulnerabilities.', 'securefusion' ); ?>
-						</span>
-					<?php endif; ?>
-
-					<p>
-					<?php
-					esc_html_e( 'Failed login attempts:', 'securefusion' );
-					echo ' ' . (int) $total_attempts;
-					?>
-					</p>
-					<p>
-					<?php
-					esc_html_e( 'IPs of Failed Attempts:', 'securefusion' );
-					echo ' ' . (int) $unique_ips_count;
-					?>
-					</p>
-					<p style="margin-top: 15px; margin-bottom: 15px;">
-						<a href="<?php echo esc_url( admin_url( 'admin.php?page=securefusion-security-log' ) ); ?>" class="fynd-sf-btn fynd-sf-btn-secondary">
+					<div class="fynd-sf-card-actions">
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=securefusion-security-log' ) ); ?>" class="fynd-sf-btn fynd-sf-btn-primary">
 							<span class="dashicons dashicons-list-view"></span>
 							<?php esc_html_e( 'View Security Log', 'securefusion' ); ?>
 						</a>
-					</p>
-					<?php if ( $security_pass ) : ?>
-						<span class="status enabled">
-							<?php esc_html_e( 'Everything is running smoothly. No security issues have been detected.', 'securefusion' ); ?>
-						</span>
-					<?php endif; ?>
+					</div>
 				</div>
 				<?php
 				$settings_link = \add_query_arg(
@@ -471,6 +523,14 @@ class Admin {
 
 		?>
 		<div class="wrap fynd-sf-settings">
+
+			<?php
+			/*
+			 * WordPress injects admin_notices after the first <h1> inside .wrap.
+			 * We place a screen-reader-only <h1> here so WP notices render
+			 * outside our styled header component.
+			 */
+			?>
 			<h1 class="fynd-sf-sr-only"><?php esc_html_e( 'SecureFusion Security Settings', 'securefusion' ); ?></h1>
 
 			<header class="fynd-sf-log-header">
@@ -536,7 +596,7 @@ class Admin {
 						</div>
 						<div class="tab-content hidden" id="fynd-sf-ssl">
 							<?php $this->settings_page->run_section( 'ssl_settings' ); ?>
-							<div class="notice notice-error">
+							<div class="fynd-sf-tab-notice fynd-sf-tab-notice-error">
 								<p><?php echo wp_kses_post( $ssl_error ); ?></p>
 							</div>
 						</div>
@@ -548,7 +608,7 @@ class Admin {
 						</div>
 						<div class="tab-content hidden" id="fynd-sf-advanced">
 							<?php $this->settings_page->run_section( 'advanced_settings' ); ?>
-							<div class="notice notice-error">
+							<div class="fynd-sf-tab-notice fynd-sf-tab-notice-error">
 								<p>
 									<?php esc_html_e( "If you don't have experience in cybersecurity or regular expressions, do not modify these areas.", 'securefusion' ); ?>
 								</p>
@@ -574,39 +634,41 @@ class Admin {
 	 * @return void
 	 */
 	public function welcome_notice() {
-		$settings = $this->get_settings();
-
-		if ( ! empty( $settings ) ) {
-			return;
-		}
-
 		if ( ! \PAnD::is_admin_notice_active( 'do-securefusion-settings-forever' ) ) {
 			return;
 		}
 
 		$settings_menu = $this->admin_link . '?page=securefusion-settings';
 		?>
-		<div data-dismissible="do-securefusion-settings-forever" class="welcome-panel notice is-dismissible">
+		<div data-dismissible="do-securefusion-settings-forever" class="welcome-panel notice is-dismissible fynd-sf-welcome-notice">
 			<div class="welcome-panel-content">
 				<h2>
 					<?php esc_html_e( 'Welcome to SecureFusion', 'securefusion' ); ?>
 				</h2>
 				<p class="about-description">
 					<?php
-						printf(
-							/* translators: %s: Plugin Settings URL */
-							esc_html__(
-								'Thank you for installing SecureFusion! Check out <a href="%s">the Plugin Settings</a>',
-								'securefusion'
+						echo wp_kses(
+							sprintf(
+								/* translators: %s: Plugin Settings URL */
+								__(
+									'Thank you for installing SecureFusion! Check out <a href="%s">the Plugin Settings</a>',
+									'securefusion'
+								),
+								esc_url( $settings_menu )
 							),
-							esc_url( $settings_menu )
+							[
+								'a' => [
+									'href' => [],
+								],
+							]
 						);
 					?>
 				</p>
 				<div class="welcome-panel-column-container">
 					<div class="welcome-panel-column">
 						<p>
-							<a href="<?php echo esc_url( $settings_menu ); ?>" class="fynd-sf-btn fynd-sf-btn-primary fynd-sf-btn-large">
+							<a href="<?php echo esc_url( $settings_menu ); ?>" class="button button-primary button-large fynd-sf-btn fynd-sf-btn-primary fynd-sf-btn-large">
+								<span class="dashicons dashicons-admin-settings"></span>
 								<?php esc_html_e( 'Get started', 'securefusion' ); ?>
 							</a>
 						</p>

@@ -420,17 +420,52 @@ class SecurityLog {
 
 			<div class="fynd-sf-log-stats">
 				<div class="fynd-sf-stat-card">
-					<span class="fynd-sf-stat-icon dashicons dashicons-warning"></span>
+					<span class="fynd-sf-stat-icon dashicons dashicons-shield"></span>
 					<div class="fynd-sf-stat-data">
 						<span class="fynd-sf-stat-value"><?php echo (int) $db->get_total_attempts(); ?></span>
-						<span class="fynd-sf-stat-label"><?php esc_html_e( 'Total Failed Attempts', 'securefusion' ); ?></span>
+						<span class="fynd-sf-stat-label"><?php esc_html_e( 'Total Attacks', 'securefusion' ); ?></span>
+					</div>
+				</div>
+				<div class="fynd-sf-stat-card">
+					<span class="fynd-sf-stat-icon dashicons dashicons-lock"></span>
+					<div class="fynd-sf-stat-data">
+						<span class="fynd-sf-stat-value"><?php echo (int) $db->get_total_attempts_by_type( 'failed_login' ); ?></span>
+						<span class="fynd-sf-stat-label"><?php esc_html_e( 'Failed Logins', 'securefusion' ); ?></span>
+					</div>
+				</div>
+				<div class="fynd-sf-stat-card">
+					<span class="fynd-sf-stat-icon dashicons dashicons-warning"></span>
+					<div class="fynd-sf-stat-data">
+						<span class="fynd-sf-stat-value"><?php echo (int) $db->get_total_attempts_by_type( 'bad_request' ); ?></span>
+						<span class="fynd-sf-stat-label"><?php esc_html_e( 'Bad Requests', 'securefusion' ); ?></span>
+					</div>
+				</div>
+				<div class="fynd-sf-stat-card">
+					<span class="fynd-sf-stat-icon dashicons dashicons-excerpt-view"></span>
+					<div class="fynd-sf-stat-data">
+						<span class="fynd-sf-stat-value"><?php echo (int) $db->get_total_attempts_by_type( 'bad_cookie' ); ?></span>
+						<span class="fynd-sf-stat-label"><?php esc_html_e( 'Bad Cookies', 'securefusion' ); ?></span>
+					</div>
+				</div>
+				<div class="fynd-sf-stat-card">
+					<span class="fynd-sf-stat-icon dashicons dashicons-networking"></span>
+					<div class="fynd-sf-stat-data">
+						<span class="fynd-sf-stat-value"><?php echo (int) $db->get_total_attempts_by_type( 'bad_bot' ); ?></span>
+						<span class="fynd-sf-stat-label"><?php esc_html_e( 'Bad Bots', 'securefusion' ); ?></span>
+					</div>
+				</div>
+				<div class="fynd-sf-stat-card">
+					<span class="fynd-sf-stat-icon dashicons dashicons-search"></span>
+					<div class="fynd-sf-stat-data">
+						<span class="fynd-sf-stat-value"><?php echo (int) $db->get_total_attempts_by_type( 'bad_query' ); ?></span>
+						<span class="fynd-sf-stat-label"><?php esc_html_e( 'Bad Queries', 'securefusion' ); ?></span>
 					</div>
 				</div>
 				<div class="fynd-sf-stat-card">
 					<span class="fynd-sf-stat-icon dashicons dashicons-admin-site-alt3"></span>
 					<div class="fynd-sf-stat-data">
 						<span class="fynd-sf-stat-value"><?php echo (int) $db->get_unique_ips_count(); ?></span>
-						<span class="fynd-sf-stat-label"><?php esc_html_e( 'Unique IP Addresses', 'securefusion' ); ?></span>
+						<span class="fynd-sf-stat-label"><?php esc_html_e( 'Unique IPs', 'securefusion' ); ?></span>
 					</div>
 				</div>
 				<div class="fynd-sf-stat-card">

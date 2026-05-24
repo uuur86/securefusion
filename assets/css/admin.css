@@ -7,12 +7,25 @@
  * @package securefusion
  */
 
-.primary-color {
+.fynd-sf-primary-color {
     color: #ff6600;
 }
 
-.secondary-color {
+.fynd-sf-secondary-color {
     color: #01b9ba;
+}
+
+/* Screen-reader only title */
+.fynd-sf-sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
 }
 
 /* ---------------------------------------------------------
@@ -267,6 +280,268 @@
 
 .fynd-sf-dashboard .dashboard-item.fynd-sf-status-disabled {
     border-left: 4px solid #dc3545;
+}
+
+/* Premium Security Status Card Dashboard Styling */
+.fynd-sf-dashboard .fynd-sf-security-status-card {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.fynd-sf-dashboard .fynd-sf-card-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 14px;
+}
+
+.fynd-sf-dashboard .fynd-sf-card-header-row h2 {
+    margin: 0;
+}
+
+.fynd-sf-dashboard .fynd-sf-system-badges {
+    display: flex;
+    gap: 12px;
+}
+
+.fynd-sf-dashboard .fynd-sf-system-badge {
+    display: flex;
+    align-items: center;
+    background: #f1f5f9;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    color: #475569;
+    gap: 6px;
+    font-weight: 500;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+}
+
+.fynd-sf-dashboard .fynd-sf-system-badge .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: #01b9ba;
+}
+
+.fynd-sf-dashboard .fynd-sf-badge-warning {
+    background: #ef4444;
+    color: #fff;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    font-size: 9px;
+    line-height: 14px;
+    text-align: center;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.fynd-sf-dashboard .fynd-sf-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 16px;
+    margin: 4px 0;
+}
+
+.fynd-sf-dashboard .fynd-sf-metric-widget {
+    display: flex;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 14px 18px;
+    border-radius: 8px;
+    gap: 12px;
+    align-items: center;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.fynd-sf-dashboard .fynd-sf-metric-widget:hover {
+    border-color: #cbd5e1;
+    background: #f1f5f9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.fynd-sf-dashboard .fynd-sf-metric-widget .dashicons {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+    transition: transform 0.2s ease;
+}
+
+.fynd-sf-dashboard .fynd-sf-metric-widget:hover .dashicons {
+    transform: scale(1.1);
+}
+
+/* Individual Metric Color Themes */
+/* Total Attacks: Teal */
+.fynd-sf-dashboard .fynd-sf-metric-widget.fynd-sf-metric-total {
+    background: #f0fdfa;
+    border-color: #ccfbf1;
+}
+.fynd-sf-dashboard .fynd-sf-metric-widget.fynd-sf-metric-total:hover {
+    background: #ecfdf5;
+    border-color: #99f6e4;
+    box-shadow: 0 4px 12px rgba(13, 148, 136, 0.08);
+}
+.fynd-sf-dashboard .fynd-sf-metric-widget.fynd-sf-metric-total .dashicons {
+    color: #0d9488;
+}
+
+/* Failed Logins: Rose Red */
+.fynd-sf-dashboard .fynd-sf-metric-widget.fynd-sf-metric-failed-login {
+    background: #fff5f5;
+    border-color: #ffe3e3;
+}
+.fynd-sf-dashboard .fynd-sf-metric-widget.fynd-sf-metric-failed-login:hover {
+    background: #fff0f0;
+    border-color: #ffc9c9;
+    box-shadow: 0 4px 12px rgba(244, 63, 94, 0.08);
+}
+.fynd-sf-dashboard .fynd-sf-metric-widget.fynd-sf-metric-failed-login .dashicons {
+    color: #f43f5e;
+}
+
+/* Bad Requests: Orange/Amber */
+.fynd-sf-dashboard .fynd-sf-metric-widget.fynd-sf-metric-bad-request {
+    background: #fffbeb;
+    border-color: #fef3c7;
+}
+.fynd-sf-dashboard .fynd-sf-metric-widget.fynd-sf-metric-bad-request:hover {
+    background: #fff8e1;
+    border-color: #fde68a;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.08);
+}
+.fynd-sf-dashboard .fynd-sf-metric-widget.fynd-sf-metric-bad-request .dashicons {
+    color: #d97706;
+}
+
+/* Bad Cookies: Violet/Purple */
+.fynd-sf-dashboard .fynd-sf-metric-widget.fynd-sf-metric-bad-cookie {
+    background: #faf5ff;
+    border-color: #f3e8ff;
+}
+.fynd-sf-dashboard .fynd-sf-metric-widget.fynd-sf-metric-bad-cookie:hover {
+    background: #f3e8ff;
+    border-color: #e9d5ff;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.08);
+}
+.fynd-sf-dashboard .fynd-sf-metric-widget.fynd-sf-metric-bad-cookie .dashicons {
+    color: #8b5cf6;
+}
+
+/* Bad Bots: Cyan/Blue */
+.fynd-sf-dashboard .fynd-sf-metric-widget.fynd-sf-metric-bad-bot {
+    background: #f0f9ff;
+    border-color: #e0f2fe;
+}
+.fynd-sf-dashboard .fynd-sf-metric-widget.fynd-sf-metric-bad-bot:hover {
+    background: #e0f2fe;
+    border-color: #bae6fd;
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.08);
+}
+.fynd-sf-dashboard .fynd-sf-metric-widget.fynd-sf-metric-bad-bot .dashicons {
+    color: #0284c7;
+}
+
+/* Bad Queries: Magenta/Pink */
+.fynd-sf-dashboard .fynd-sf-metric-widget.fynd-sf-metric-bad-query {
+    background: #fdf2f8;
+    border-color: #fce7f3;
+}
+.fynd-sf-dashboard .fynd-sf-metric-widget.fynd-sf-metric-bad-query:hover {
+    background: #fbcfe8;
+    border-color: #f9a8d4;
+    box-shadow: 0 4px 12px rgba(236, 72, 153, 0.08);
+}
+.fynd-sf-dashboard .fynd-sf-metric-widget.fynd-sf-metric-bad-query .dashicons {
+    color: #db2777;
+}
+
+/* Unique IPs: Emerald Green */
+.fynd-sf-dashboard .fynd-sf-metric-widget.fynd-sf-metric-unique-ips {
+    background: #f0fdf4;
+    border-color: #dcfce7;
+}
+.fynd-sf-dashboard .fynd-sf-metric-widget.fynd-sf-metric-unique-ips:hover {
+    background: #e8fdf0;
+    border-color: #bbf7d0;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.08);
+}
+.fynd-sf-dashboard .fynd-sf-metric-widget.fynd-sf-metric-unique-ips .dashicons {
+    color: #16a34a;
+}
+
+.fynd-sf-dashboard .fynd-sf-metric-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.fynd-sf-dashboard .fynd-sf-metric-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1e293b;
+    line-height: 1.1;
+}
+
+.fynd-sf-dashboard .fynd-sf-metric-label {
+    font-size: 10px;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.fynd-sf-dashboard .fynd-sf-status-alert {
+    display: flex;
+    padding: 14px 18px;
+    border-radius: 8px;
+    gap: 10px;
+    align-items: center;
+    box-sizing: border-box;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.fynd-sf-dashboard .fynd-sf-status-alert-success {
+    background: #ecfdf5;
+    border-left: 4px solid #10b981;
+    color: #065f46;
+}
+
+.fynd-sf-dashboard .fynd-sf-status-alert-success .dashicons {
+    color: #10b981;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+}
+
+.fynd-sf-dashboard .fynd-sf-status-alert-danger {
+    background: #fef2f2;
+    border-left: 4px solid #ef4444;
+    color: #991b1b;
+    align-items: flex-start;
+}
+
+.fynd-sf-dashboard .fynd-sf-status-alert-danger .dashicons {
+    color: #ef4444;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    margin-top: 1px;
+}
+
+.fynd-sf-dashboard .fynd-sf-card-actions {
+    display: flex;
+    justify-content: flex-start;
+    border-top: 1px solid #f1f5f9;
+    padding-top: 14px;
 }
 
 .fynd-sf-dashboard .dashboard-item.fynd-sf-status-neutral {
@@ -782,6 +1057,10 @@
     cursor: pointer;
 }
 
+.fynd-sf-login-log .fynd-sf-hidden-file {
+    display: none !important;
+}
+
 .fynd-sf-login-log .fynd-sf-import-label > span {
     vertical-align: middle;
     line-height: 1;
@@ -930,4 +1209,118 @@
     .fynd-sf-charts-section {
         grid-template-columns: 1fr;
     }
+}
+
+/* Custom Tab Notices to prevent WordPress JS from moving them to the top of the wrap */
+.fynd-sf-settings .fynd-sf-tab-notice {
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-left-width: 4px;
+    box-shadow: 0 1px 1px rgb(0 0 0 / 4%);
+    margin: 15px 0;
+    padding: 1px 12px;
+}
+.fynd-sf-settings .fynd-sf-tab-notice.fynd-sf-tab-notice-error {
+    border-left-color: #d63638;
+    background-color: #fcf0f1;
+}
+.fynd-sf-settings .fynd-sf-tab-notice p {
+    margin: 0.5em 0;
+    padding: 2px;
+}
+
+/* Premium Welcome Notice Banner */
+.welcome-panel.fynd-sf-welcome-notice {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.15) !important;
+    border-radius: 8px !important;
+    color: #f8fafc !important;
+    padding: 24px 30px !important;
+    position: relative;
+    overflow: hidden;
+    margin: 20px 20px 20px 0 !important;
+}
+
+.welcome-panel.fynd-sf-welcome-notice::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(1, 185, 186, 0.12) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.welcome-panel.fynd-sf-welcome-notice h2 {
+    color: #ffffff !important;
+    font-size: 24px !important;
+    font-weight: 700 !important;
+    margin-top: 0 !important;
+    margin-bottom: 8px !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.welcome-panel.fynd-sf-welcome-notice p.about-description {
+    color: #cbd5e1 !important;
+    font-size: 14px !important;
+    margin-bottom: 20px !important;
+    max-width: 650px;
+    line-height: 1.6 !important;
+}
+
+.welcome-panel.fynd-sf-welcome-notice p.about-description a {
+    color: #01b9ba !important;
+    text-decoration: none !important;
+    font-weight: 600 !important;
+    border-bottom: 1px dashed #01b9ba;
+    transition: all 0.2s ease;
+}
+
+.welcome-panel.fynd-sf-welcome-notice p.about-description a:hover {
+    color: #00f0f0 !important;
+    border-bottom-style: solid;
+}
+
+.welcome-panel.fynd-sf-welcome-notice .fynd-sf-btn-primary {
+    background: linear-gradient(135deg, #01b9ba 0%, #00999a 100%) !important;
+    border: none !important;
+    color: #fff !important;
+    padding: 10px 22px !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    border-radius: 6px !important;
+    box-shadow: 0 4px 12px rgba(1, 185, 186, 0.3) !important;
+    transition: all 0.2s ease !important;
+    cursor: pointer !important;
+    text-decoration: none !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: auto !important;
+}
+
+.welcome-panel.fynd-sf-welcome-notice .fynd-sf-btn-primary:hover {
+    background: linear-gradient(135deg, #02c9ca 0%, #00aaaa 100%) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 16px rgba(1, 185, 186, 0.45) !important;
+}
+
+/* Style WP's native notice close/dismiss button on our dark background */
+.welcome-panel.fynd-sf-welcome-notice .notice-dismiss {
+    color: #94a3b8 !important;
+    text-decoration: none !important;
+    padding: 16px !important;
+    transition: color 0.15s ease;
+}
+
+.welcome-panel.fynd-sf-welcome-notice .notice-dismiss::before {
+    color: #94a3b8 !important;
+    font-size: 20px;
+}
+
+.welcome-panel.fynd-sf-welcome-notice .notice-dismiss:hover,
+.welcome-panel.fynd-sf-welcome-notice .notice-dismiss:hover::before {
+    color: #ffffff !important;
 }

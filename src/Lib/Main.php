@@ -8,12 +8,15 @@
 namespace SecureFusion\Lib;
 
 use SecureFusion\Lib as Sources;
+use SecureFusion\Lib\Traits\WPCommon;
 
 
 /**
  * Main functionality class.
  */
 class Main {
+
+	use WPCommon;
 
 	/**
 	 * Protected variables
@@ -164,7 +167,9 @@ class Main {
 		add_action( 'securefusion_cleanup_ips_cron', array( $this, 'cron_cleanup_old_ips' ) );
 
 		// MIGRATION & UPDATE DETECTOR.
-		add_action( 'plugins_loaded', array( $this, 'maybe_update_plugin' ), 5 );
+		// Run update migrations synchronously during plugin load to prevent race conditions
+		// with Middleware::init() which runs early on 'plugin_loaded' and queries the database.
+		$this->maybe_update_plugin();
 	}
 
 	/**
@@ -179,30 +184,7 @@ class Main {
 			return;
 		}
 
-		// Inline IP detection (same logic as WPCommon::get_client_ip but accessible here).
-		$server_var = wp_unslash( $_SERVER );
-		$ipaddress  = '';
-
-		if ( isset( $server_var['HTTP_CLIENT_IP'] ) ) {
-			$ipaddress = $server_var['HTTP_CLIENT_IP'];
-		} elseif ( isset( $server_var['HTTP_X_FORWARDED_FOR'] ) ) {
-			$ipaddress = $server_var['HTTP_X_FORWARDED_FOR'];
-		} elseif ( isset( $server_var['HTTP_X_FORWARDED'] ) ) {
-			$ipaddress = $server_var['HTTP_X_FORWARDED'];
-		} elseif ( isset( $server_var['HTTP_FORWARDED_FOR'] ) ) {
-			$ipaddress = $server_var['HTTP_FORWARDED_FOR'];
-		} elseif ( isset( $server_var['HTTP_FORWARDED'] ) ) {
-			$ipaddress = $server_var['HTTP_FORWARDED'];
-		} elseif ( isset( $server_var['REMOTE_ADDR'] ) ) {
-			$ipaddress = $server_var['REMOTE_ADDR'];
-		}
-
-		if ( strpos( $ipaddress, ',' ) !== false ) {
-			$ipaddress = explode( ',', $ipaddress );
-			$ipaddress = $ipaddress[0] ?? false;
-		}
-
-		$ip = filter_var( $ipaddress, FILTER_VALIDATE_IP );
+		$ip = $this->get_client_ip();
 
 		if ( $ip ) {
 			$brute_force_db = new BruteForceDB();
@@ -251,6 +233,7 @@ class Main {
 		$brute_force_db = new BruteForceDB();
 		$brute_force_db->maybe_migrate_old_table();
 		$brute_force_db->create_table();
+		$brute_force_db->maybe_add_database_indexes();
 		$brute_force_db->migrate_existing_rows_to_failed_login();
 
 		update_option( 'securefusion_db_version', SECUREFUSION_VERSION );
@@ -264,7 +247,7 @@ class Main {
 	/**
 	 * Run updates if the plugin version has changed.
 	 *
-	 * Runs on 'plugins_loaded' hook.
+	 * Runs synchronously during plugin load.
 	 *
 	 * @return void
 	 */
@@ -280,6 +263,7 @@ class Main {
 			$brute_force_db = new BruteForceDB();
 			$brute_force_db->maybe_migrate_old_table();
 			$brute_force_db->create_table();
+			$brute_force_db->maybe_add_database_indexes();
 			$brute_force_db->migrate_existing_rows_to_failed_login();
 
 			update_option( 'securefusion_db_version', SECUREFUSION_VERSION );

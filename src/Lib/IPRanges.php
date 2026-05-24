@@ -127,6 +127,13 @@ class IPRanges {
 		$this->enqueue_assets();
 		?>
 		<div class="wrap fynd-sf-login-log fynd-sf-ip-ranges">
+			<?php
+			/*
+			 * WordPress injects admin_notices after the first <h1> inside .wrap.
+			 * We place a screen-reader-only <h1> here so WP notices render
+			 * outside our styled header component.
+			 */
+			?>
 			<h1 class="fynd-sf-sr-only"><?php esc_html_e( 'IP Ranges', 'securefusion' ); ?></h1>
 
 			<header class="fynd-sf-log-header">

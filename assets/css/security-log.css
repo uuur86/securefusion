@@ -4,19 +4,6 @@
  * @package securefusion
  */
 
-/* Screen-reader only title (for WP notice injection) */
-.fynd-sf-login-log .fynd-sf-sr-only {
-	position: absolute;
-	width: 1px;
-	height: 1px;
-	padding: 0;
-	margin: -1px;
-	overflow: hidden;
-	clip: rect(0, 0, 0, 0);
-	white-space: nowrap;
-	border: 0;
-}
-
 /* Header */
 .fynd-sf-login-log .fynd-sf-log-header {
 	display: flex;
@@ -836,4 +823,8 @@
 
 .fynd-sf-form-group-submit {
 	display: inline-flex;
+}
+
+.fynd-sf-login-log .fynd-sf-hidden-file {
+	display: none !important;
 }

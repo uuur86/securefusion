@@ -22,11 +22,21 @@ class SSLControl {
 	 * Initialize SSL control.
 	 */
 	public function init() {
+		if ( ! is_admin() && $this->get_settings( 'enable_https' ) !== 'https' ) {
+			return;
+		}
+
 		$new_base_url = $this->do_ssl( site_url() );
 
-		// Check SSL Support.
-		if ( $this->ssl_available( $new_base_url ) === false ) {
-			return;
+		if ( is_admin() ) {
+			if ( $this->ssl_available( $new_base_url ) === false ) {
+				return;
+			}
+		} else {
+			$cert_data = \get_transient( 'securefusion_ssl_cert_data' );
+			if ( $cert_data === 'not-valid' ) {
+				return;
+			}
 		}
 
 		// If SSL is enabled.
@@ -147,7 +157,7 @@ class SSLControl {
 			return true;
 		}
 
-		if ( isset( $server_var['HTTP_X_FORWARDED_SSL'] ) || strpos( $server_var['HTTP_X_FORWARDED_SSL'], 'on' ) !== false || strpos( $server_var['HTTP_X_FORWARDED_SSL'], '1' ) !== false ) {
+		if ( isset( $server_var['HTTP_X_FORWARDED_SSL'] ) && ( strpos( $server_var['HTTP_X_FORWARDED_SSL'], 'on' ) !== false || strpos( $server_var['HTTP_X_FORWARDED_SSL'], '1' ) !== false ) ) {
 			return true;
 		}
 

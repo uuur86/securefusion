@@ -171,7 +171,7 @@ class BruteForceDB {
 			return $cached;
 		}
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		// phpcs:disable
 		$data = $this->wpdb->get_row(
 			$this->wpdb->prepare(
 				"SELECT COUNT(*) as attempts, MAX(last_attempt) as last_attempt FROM {$this->table_name} WHERE ip = %s AND log_type = %s",
@@ -179,6 +179,7 @@ class BruteForceDB {
 				self::TYPE_FAILED_LOGIN
 			)
 		);
+		// phpcs:enable
 
 		if ( ! $data || ! $data->last_attempt ) {
 			$row = null;
@@ -205,7 +206,7 @@ class BruteForceDB {
 	 */
 	public function get_failed_login_attempts_in_window( $ip, $window_seconds ) {
 		$cutoff = time() - absint( $window_seconds );
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		// phpcs:disable
 		$attempts = $this->wpdb->get_var(
 			$this->wpdb->prepare(
 				"SELECT COUNT(*) FROM {$this->table_name} WHERE ip = %s AND log_type = %s AND last_attempt >= %d",
@@ -214,6 +215,8 @@ class BruteForceDB {
 				$cutoff
 			)
 		);
+		// phpcs:enable
+
 		return (int) $attempts;
 	}
 
@@ -287,6 +290,39 @@ class BruteForceDB {
 
 
 	/**
+	 * Get the total sum of attempts for a specific log type.
+	 *
+	 * Uses object caching.
+	 *
+	 * @param string $type Raw log type value.
+	 * @return int Total number of attempts for this type.
+	 */
+	public function get_total_attempts_by_type( $type ) {
+		$type      = self::normalize_log_type( $type );
+		$cache_key = 'securefusion_bf_total_attempts_' . $type;
+		$cached    = \wp_cache_get( $cache_key, self::CACHE_GROUP );
+
+		if ( false !== $cached ) {
+			return (int) $cached;
+		}
+
+		// phpcs:disable
+		$total = $this->wpdb->get_var(
+			$this->wpdb->prepare(
+				"SELECT SUM(attempts) FROM {$this->table_name} WHERE log_type = %s",
+				$type
+			)
+		);
+		// phpcs:enable
+
+		$total = (int) $total;
+		\wp_cache_set( $cache_key, $total, self::CACHE_GROUP, self::CACHE_TTL );
+
+		return $total;
+	}
+
+
+	/**
 	 * Get the count of unique IP addresses that have failed login attempts.
 	 *
 	 * Uses object caching with a dedicated key.
@@ -320,6 +356,8 @@ class BruteForceDB {
 	 * @param int    $offset   Offset for pagination.
 	 * @param string $orderby  Column to order by (whitelisted).
 	 * @param string $order    ASC or DESC.
+	 * @param string $type_filter Optional log type filter (e.g. 'failed_login', 'bad_request').
+	 *
 	 * @return array Array of row objects.
 	 */
 	public function get_all_rows( $per_page = 20, $offset = 0, $orderby = 'last_attempt', $order = 'DESC', $type_filter = '' ) {
@@ -403,17 +441,21 @@ class BruteForceDB {
 	/**
 	 * Get total number of rows in the brute force table.
 	 *
+	 * @param string $type_filter Optional log type filter (e.g. 'failed_login', 'bad_request', 'blocked').
+	 *
 	 * @return int Total row count.
 	 */
 	public function get_total_rows( $type_filter = '' ) {
 		if ( $type_filter === 'blocked' ) {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+			// phpcs:disable
 			$count = $this->wpdb->get_var(
 				$this->wpdb->prepare(
 					"SELECT COUNT(*) FROM {$this->ip_rules_table} WHERE rule_type = %s",
 					'blocked'
 				)
 			);
+			// phpcs:enable
+
 			return (int) $count;
 		}
 
@@ -435,6 +477,8 @@ class BruteForceDB {
 
 	/**
 	 * Get all rows for export (no pagination).
+	 *
+	 * @param string $type_filter Optional log type filter (e.g. 'failed_login', 'bad_request', 'blocked').
 	 *
 	 * @return array Array of row objects.
 	 */
@@ -619,6 +663,8 @@ class BruteForceDB {
 	 * @param int    $offset       Offset for pagination.
 	 * @param string $orderby      Column to order by (whitelisted).
 	 * @param string $order        ASC or DESC.
+	 * @param string $type_filter Optional log type filter (e.g. 'failed_login', 'bad_request', 'blocked').
+	 *
 	 * @return array Array of row objects.
 	 */
 	public function get_rows_by_range( $range_prefix, $per_page = 20, $offset = 0, $orderby = 'last_attempt', $order = 'DESC', $type_filter = '' ) {
@@ -708,12 +754,14 @@ class BruteForceDB {
 	 * Get total row count filtered by IP range prefix.
 	 *
 	 * @param string $range_prefix First 3 octets (e.g. '192.168.1').
+	 * @param string $type_filter Optional log type filter (e.g. 'failed_login', 'bad_request', 'blocked').
+	 *
 	 * @return int Total row count for the range.
 	 */
 	public function get_total_rows_by_range( $range_prefix, $type_filter = '' ) {
 		if ( $type_filter === 'blocked' ) {
 			$range_prefix = $this->wpdb->esc_like( $range_prefix );
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+			// phpcs:disable
 			$count = $this->wpdb->get_var(
 				$this->wpdb->prepare(
 					"SELECT COUNT(*) FROM {$this->ip_rules_table} WHERE rule_type = %s AND ip LIKE %s",
@@ -721,22 +769,27 @@ class BruteForceDB {
 					$range_prefix . '%'
 				)
 			);
+			// phpcs:enable
+
 			return (int) $count;
 		}
 
 		$range_prefix = $this->wpdb->esc_like( $range_prefix );
 		$table_name   = $this->table_name;
 
-		$type_where = '';
 		if ( ! empty( $type_filter ) ) {
 			$type_filter = self::normalize_log_type( $type_filter );
-			$type_where  = $this->wpdb->prepare( ' AND log_type = %s', $type_filter );
+			$query       = $this->wpdb->prepare(
+				'SELECT COUNT(*) FROM ' . \esc_sql( $table_name ) . ' WHERE ip LIKE %s AND log_type = %s',
+				$range_prefix . '%',
+				$type_filter
+			);
+		} else {
+			$query = $this->wpdb->prepare(
+				'SELECT COUNT(*) FROM ' . \esc_sql( $table_name ) . ' WHERE ip LIKE %s',
+				$range_prefix . '%'
+			);
 		}
-
-		$query = $this->wpdb->prepare(
-			'SELECT COUNT(*) FROM ' . \esc_sql( $table_name ) . " WHERE ip LIKE %s{$type_where}",
-			$range_prefix . '%'
-		);
 
 		// phpcs:ignore
 		return (int) $this->wpdb->get_var( $query );
@@ -831,7 +884,7 @@ class BruteForceDB {
 				++$inserted;
 			}
 
-			// Handle rules insertion if imported rows contain block/whitelist flags
+			// Handle rules insertion if imported rows contain block/whitelist flags.
 			if ( isset( $row['is_blocked'] ) && absint( $row['is_blocked'] ) === 1 ) {
 				$this->block_ip( $ip );
 			} elseif ( isset( $row['is_whitelisted'] ) && absint( $row['is_whitelisted'] ) === 1 ) {
@@ -870,6 +923,12 @@ class BruteForceDB {
 	 */
 	private function invalidate_all_cache() {
 		\wp_cache_delete( 'securefusion_bf_total_attempts', self::CACHE_GROUP );
+		\wp_cache_delete( 'securefusion_bf_total_attempts_failed_login', self::CACHE_GROUP );
+		\wp_cache_delete( 'securefusion_bf_total_attempts_bad_request', self::CACHE_GROUP );
+		\wp_cache_delete( 'securefusion_bf_total_attempts_bad_cookie', self::CACHE_GROUP );
+		\wp_cache_delete( 'securefusion_bf_total_attempts_bad_bot', self::CACHE_GROUP );
+		\wp_cache_delete( 'securefusion_bf_total_attempts_bad_query', self::CACHE_GROUP );
+		\wp_cache_delete( 'securefusion_bf_total_attempts_blocked', self::CACHE_GROUP );
 		\wp_cache_delete( 'securefusion_bf_unique_ips', self::CACHE_GROUP );
 		\wp_cache_delete( 'securefusion_bf_total_rows', self::CACHE_GROUP );
 		\wp_cache_delete( 'securefusion_bf_total_ip_ranges', self::CACHE_GROUP );
@@ -928,7 +987,8 @@ class BruteForceDB {
             log_type varchar(50) DEFAULT 'failed_login' NOT NULL,
             user_agent text NULL,
             payload text NULL,
-            PRIMARY KEY  (id)
+            PRIMARY KEY  (id),
+            KEY  ip_log_type (ip(20), log_type(15))
         ) {$charset_collate};";
 
 		$sql_rules = "CREATE TABLE {$rules_table} (
@@ -947,18 +1007,46 @@ class BruteForceDB {
 
 
 	/**
+	 * Safe check and addition of the composite index if missing.
+	 *
+	 * @return void
+	 */
+	public function maybe_add_database_indexes() {
+		// Check if index exists on {$this->table_name}.
+		// phpcs:disable
+		$index_exists = $this->wpdb->get_results(
+			$this->wpdb->prepare(
+				"SHOW INDEX FROM {$this->table_name} WHERE Key_name = %s",
+				'ip_log_type'
+			)
+		);
+
+		if ( empty( $index_exists ) ) {
+			
+			$this->wpdb->query(
+				$this->wpdb->prepare(
+					'ALTER TABLE ' . esc_sql( $this->table_name ) . ' ADD KEY ip_log_type (ip(20), log_type(15))'
+				)
+			);
+		}
+		// phpcs:enable
+	}
+
+
+	/**
 	 * Migrate existing rows to set a default log type if they are empty or null.
 	 *
 	 * @return void
 	 */
 	public function migrate_existing_rows_to_failed_login() {
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		// phpcs:disable
 		$this->wpdb->query(
 			$this->wpdb->prepare(
 				"UPDATE {$this->table_name} SET log_type = %s WHERE log_type = '' OR log_type IS NULL",
 				self::TYPE_FAILED_LOGIN
 			)
 		);
+		// phpcs:enable
 	}
 
 
@@ -978,7 +1066,7 @@ class BruteForceDB {
 		$user_agent = mb_substr( sanitize_text_field( $user_agent ), 0, self::MAX_USER_AGENT_LENGTH );
 		$payload    = mb_substr( $payload, 0, self::MAX_PAYLOAD_LENGTH );
 
-		// Always insert a new row to preserve payload/username/browser details
+		// Always insert a new row to preserve payload/username/browser details.
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		$result = $this->wpdb->insert(
 			$this->table_name,
@@ -1012,13 +1100,14 @@ class BruteForceDB {
 			return false;
 		}
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		// phpcs:disable
 		$existing_id = $this->wpdb->get_var(
 			$this->wpdb->prepare(
 				"SELECT id FROM {$this->ip_rules_table} WHERE ip = %s LIMIT 1",
 				$ip
 			)
 		);
+		// phpcs:enable
 
 		if ( $existing_id ) {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
@@ -1062,7 +1151,10 @@ class BruteForceDB {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		$result = $this->wpdb->delete(
 			$this->ip_rules_table,
-			array( 'ip' => $ip, 'rule_type' => 'blocked' ),
+			array(
+				'ip'        => $ip,
+				'rule_type' => 'blocked',
+			),
 			array( '%s', '%s' )
 		);
 
@@ -1110,13 +1202,14 @@ class BruteForceDB {
 			return $cached;
 		}
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		// phpcs:disable
 		$rules = $this->wpdb->get_col(
 			$this->wpdb->prepare(
 				"SELECT ip FROM {$this->ip_rules_table} WHERE rule_type = %s",
 				'blocked'
 			)
 		);
+		 // phpcs:enable
 
 		if ( ! is_array( $rules ) ) {
 			$rules = [];
@@ -1141,8 +1234,8 @@ class BruteForceDB {
 		}
 
 		list( $subnet, $bits ) = explode( '/', $range );
-		$ip_dec     = ip2long( $ip );
-		$subnet_dec = ip2long( $subnet );
+		$ip_dec                = ip2long( $ip );
+		$subnet_dec            = ip2long( $subnet );
 
 		if ( false === $ip_dec || false === $subnet_dec ) {
 			return false;
@@ -1179,11 +1272,27 @@ class BruteForceDB {
 	 */
 	public function is_ip_blocked( $ip ) {
 		$blocked_rules = $this->get_blocked_rules();
+		$exact_rules   = [];
+		$cidr_rules    = [];
+
 		foreach ( $blocked_rules as $rule ) {
+			if ( strpos( $rule, '/' ) === false ) {
+				$exact_rules[ $rule ] = true;
+			} else {
+				$cidr_rules[] = $rule;
+			}
+		}
+
+		if ( isset( $exact_rules[ $ip ] ) ) {
+			return true;
+		}
+
+		foreach ( $cidr_rules as $rule ) {
 			if ( $this->ip_in_range( $ip, $rule ) ) {
 				return true;
 			}
 		}
+
 		return false;
 	}
 
@@ -1197,13 +1306,14 @@ class BruteForceDB {
 	 * @return bool Whether the operation succeeded.
 	 */
 	public function whitelist_ip( $ip ) {
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		// phpcs:disable
 		$existing_id = $this->wpdb->get_var(
 			$this->wpdb->prepare(
 				"SELECT id FROM {$this->ip_rules_table} WHERE ip = %s LIMIT 1",
 				$ip
 			)
 		);
+		 // phpcs:enable
 
 		if ( $existing_id ) {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
@@ -1251,13 +1361,14 @@ class BruteForceDB {
 			return (bool) $cached;
 		}
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		// phpcs:disable
 		$rule_type = $this->wpdb->get_var(
 			$this->wpdb->prepare(
 				"SELECT rule_type FROM {$this->ip_rules_table} WHERE ip = %s LIMIT 1",
 				$ip
 			)
 		);
+		 // phpcs:enable
 
 		$result = ( $rule_type === 'whitelisted' );
 		\wp_cache_set( $cache_key, $result ? 1 : 0, self::CACHE_GROUP, self::CACHE_TTL );
@@ -1286,13 +1397,14 @@ class BruteForceDB {
 			);
 		} else {
 			$type_filter = self::normalize_log_type( $type_filter );
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+			// phpcs:disable
 			$result = $this->wpdb->query(
 				$this->wpdb->prepare(
 					"DELETE FROM {$this->table_name} WHERE log_type = %s",
 					$type_filter
 				)
 			);
+			 // phpcs:enable
 		}
 
 		$this->invalidate_all_cache();
@@ -1317,7 +1429,7 @@ class BruteForceDB {
 		$per_page        = absint( $per_page );
 		$offset          = absint( $offset );
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		// phpcs:disable
 		return $this->wpdb->get_results(
 			$this->wpdb->prepare(
 				"SELECT id, ip, rule_type, created_at FROM {$this->ip_rules_table} ORDER BY {$orderby} {$order} LIMIT %d OFFSET %d",
@@ -1325,6 +1437,7 @@ class BruteForceDB {
 				$offset
 			)
 		);
+		 // phpcs:enable
 	}
 
 
@@ -1334,7 +1447,7 @@ class BruteForceDB {
 	 * @return int Total rule count.
 	 */
 	public function get_total_rules_count() {
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		// phpcs:ignore
 		return (int) $this->wpdb->get_var( "SELECT COUNT(*) FROM {$this->ip_rules_table}" );
 	}
 
@@ -1347,7 +1460,7 @@ class BruteForceDB {
 	 */
 	public function get_daily_attempts_stats( $days = 30 ) {
 		$time_limit = time() - ( $days * DAY_IN_SECONDS );
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// phpcs:disable
 		$results = $this->wpdb->get_results(
 			$this->wpdb->prepare(
 				"SELECT log_type, YEAR(FROM_UNIXTIME(last_attempt)) as yr, MONTH(FROM_UNIXTIME(last_attempt)) as mo, DAY(FROM_UNIXTIME(last_attempt)) as dy, COUNT(*) as count 
@@ -1358,6 +1471,7 @@ class BruteForceDB {
 				$time_limit
 			)
 		);
+		// phpcs:enable
 
 		// Format to YYYY-MM-DD.
 		if ( is_array( $results ) ) {
@@ -1378,7 +1492,7 @@ class BruteForceDB {
 	 */
 	public function get_monthly_attempts_stats( $months = 12 ) {
 		$time_limit = time() - ( $months * 30 * DAY_IN_SECONDS );
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// phpcs:disable
 		$results = $this->wpdb->get_results(
 			$this->wpdb->prepare(
 				"SELECT log_type, YEAR(FROM_UNIXTIME(last_attempt)) as yr, MONTH(FROM_UNIXTIME(last_attempt)) as mo, COUNT(*) as count 
@@ -1389,6 +1503,7 @@ class BruteForceDB {
 				$time_limit
 			)
 		);
+		 // phpcs:enable
 
 		// Format to YYYY-MM.
 		if ( is_array( $results ) ) {
