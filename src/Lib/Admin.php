@@ -208,7 +208,7 @@ class Admin {
 				<img src="<?php echo esc_url( $this->plugin_url ); ?>assets/icon.svg" alt="SecureFusion Logo" class="fynd-sf-log-logo">
 				<div class="fynd-sf-log-header-text">
 					<h2 class="fynd-sf-log-title"><?php esc_html_e( 'SecureFusion Dashboard', 'securefusion' ); ?></h2>
-					<p class="fynd-sf-log-desc"><?php esc_html_e( 'You could monitoring your WordPress security settings.', 'securefusion' ); ?></p>
+					<p class="fynd-sf-log-desc"><?php esc_html_e( 'You can monitor your WordPress security settings.', 'securefusion' ); ?></p>
 				</div>
 			</header>
 
@@ -234,7 +234,7 @@ class Admin {
 			</section>
 
 			<section class="dashboard-overview">
-				<div class="dashboard-item <?php echo esc_attr( $security_pass ? 'fynd-sf-status-enabled' : 'fynd-sf-status-disabled' ); ?>">
+				<div class="dashboard-item fynd-sf-security-status-card <?php echo esc_attr( $security_pass ? 'fynd-sf-status-enabled' : 'fynd-sf-status-disabled' ); ?>">
 					<h2><?php esc_html_e( 'Security Status', 'securefusion' ); ?></h2>
 
 					<p>
@@ -353,7 +353,7 @@ class Admin {
 					esc_html__( "It's not difficult to predict your Admin ID if it's set to `1`. Secure your site against simple SQL vulnerabilities.", 'securefusion' )
 				);
 				$this->add_status_box(
-					esc_html__( 'Forge HTTPS Admin', 'securefusion' ),
+					esc_html__( 'Force HTTPS Admin', 'securefusion' ),
 					$force_admin_https,
 					esc_html__( 'Redirects the admin page protocol from HTTP to HTTPS', 'securefusion' )
 				);
@@ -478,13 +478,13 @@ class Admin {
 				<div class="fynd-sf-log-header-text" style="flex-grow: 1;">
 					<h2 class="fynd-sf-log-title"><?php esc_html_e( 'SecureFusion Security Settings', 'securefusion' ); ?></h2>
 					<p class="fynd-sf-log-desc">
-						<?php esc_html_e( 'You could manage your WordPress security settings.', 'securefusion' ); ?>
+						<?php esc_html_e( 'You can manage your WordPress security settings.', 'securefusion' ); ?>
 						<span class="version-info" style="margin-left: 10px; color: #646970;">
 							<?php
 								/* translators: %s: Version number */
 								printf( esc_html__( 'Version %s - Check out.', 'securefusion' ), esc_html( SECUREFUSION_VERSION ) );
 							?>
-							<a href="https://codeplus.dev/securefusion/changelog" target="_blank" rel="noopener" style="color: #01b9ba; text-decoration: none; font-weight: 500;">
+							<a href="https://fyndsoft.com/securefusion/changelog" target="_blank" rel="noopener" style="color: #01b9ba; text-decoration: none; font-weight: 500;">
 								<?php esc_html_e( 'What\'s New', 'securefusion' ); ?>
 							</a>
 						</span>
@@ -633,7 +633,7 @@ class Admin {
 				// Section info.
 				'name'  => 'xmlrpc_settings',
 				'title' => esc_html__( 'XML-RPC SETTINGS', 'securefusion' ),
-				'desc'  => esc_html__( 'You can prevent to xmlrpc attacks.', 'securefusion' ),
+				'desc'  => esc_html__( 'You can prevent XML-RPC attacks.', 'securefusion' ),
 				// Form items.
 				'items' => [
 					[
@@ -1017,7 +1017,7 @@ class Admin {
 				// Section info.
 				'name'  => 'login_settings',
 				'title' => esc_html__( 'LOGIN SETTINGS - BE CAREFUL!', 'securefusion' ),
-				'desc'  => esc_html__( 'You can hide or secure your login page against the attackers. Please save your new login url before you change it.', 'securefusion' ),
+				'desc'  => esc_html__( 'You can hide or secure your login page against attackers. Please save your new login url before you change it.', 'securefusion' ),
 				// Form items.
 				'items' => [
 					[
@@ -1032,7 +1032,7 @@ class Admin {
 						'name'   => 'ip_login_limit',
 						'label'  => esc_html__( 'Max. Attempt Limit', 'securefusion' ),
 						'before' => '',
-						'after'  => esc_html__( ' time(s)', 'securefusion' ) . '<span class="field-tip"> ' . esc_html__( 'Maksimum Failed Login Attempt Limit', 'securefusion' ) . '</span>',
+						'after'  => esc_html__( ' time(s)', 'securefusion' ) . '<span class="field-tip"> ' . esc_html__( 'Maximum Failed Login Attempt Limit', 'securefusion' ) . '</span>',
 					],
 					[
 						'type'   => 'text_input',
@@ -1067,7 +1067,7 @@ class Admin {
 						'before' => 'Your current ID is ',
 						'after'  => ' for "' . $current_user->user_login . '". ' .
 							'<span class="field-tip">' .
-							'	We recommended to change this field for each user by one by' .
+							'	We recommend changing this field for each user one by one' .
 							'</span>',
 					],
 				],

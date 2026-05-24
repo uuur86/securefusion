@@ -133,6 +133,61 @@ class Middleware {
 
 
 	/**
+	 * Check requested path for malicious or sensitive files.
+	 *
+	 * Detects scanner bots probing for exposed configuration files,
+	 * shell scripts, backups, and backdoor PHP scripts. Only intercepts
+	 * requests already routed through WordPress (non-existent files on disk).
+	 * Does NOT modify .htaccess or interfere with server configuration.
+	 *
+	 * @return void
+	 */
+	private function check_malicious_path() {
+		$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? sanitize_url( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
+		$url_path    = wp_parse_url( $request_uri, PHP_URL_PATH );
+
+		if ( empty( $url_path ) ) {
+			return;
+		}
+
+		// Decode URL-encoded characters to prevent bypass via %2e (%2eenv → .env).
+		$url_path = urldecode( $url_path );
+
+		$malicious_path_patterns = [
+			// Exposed configuration and hidden files.
+			'\.(env|git|htaccess|htpasswd|gitignore|gitattributes|dockerignore|editorconfig|npmrc)(?:\.|$|\/|\?)',
+			// Shell scripts, SQL dumps, backups, CGI, executables.
+			'\.(sh|bash|sql|bak|log|cgi|exe|pl|py)$',
+			// WordPress config backups.
+			'wp-config\.(bak|old|txt|temp|tmp|zip)$',
+			// Common backup archives.
+			'backup\.(zip|tar|gz|sql|rar|bak)$',
+			// Known backdoor / webshell PHP filenames.
+			'(malicious-script|shell|webshell|c99|r57|cmd|backdoor|eval-stdin|wp-theme-check|alfashell|0x|01xa|adminer)\.php$',
+		];
+
+		$malicious_path_pattern = '#(' . implode( '|', $malicious_path_patterns ) . ')#siu';
+
+		if ( preg_match( $malicious_path_pattern, $url_path ) ) {
+			$ip = $this->get_client_ip();
+			if ( $ip ) {
+				$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
+				$this->brute_force_db->log_attempt_with_details( $ip, BruteForceDB::TYPE_BAD_REQUEST, $user_agent, $request_uri );
+			}
+
+			wp_die(
+				esc_html__( 'SecureFusion Firewall has denied access to this resource.', 'securefusion' ),
+				esc_html__( 'Access Denied', 'securefusion' ),
+				[
+					'response'  => 403,
+					'back_link' => false,
+				]
+			);
+		}
+	}
+
+
+	/**
 	 * Apply security headers.
 	 *
 	 * @return void
@@ -309,6 +364,11 @@ class Middleware {
 			return;
 		}
 
+		// Check requested path for malicious/sensitive files (e.g. .env, .sh, backdoor .php scripts).
+		// Only intercepts requests already routed through WordPress (non-existent files);
+		// does NOT modify .htaccess or interfere with files physically served by the web server.
+		$this->check_malicious_path();
+
 		// All HTTP Methods: GET / POST / PUT / HEAD / DELETE / PATCH / OPTIONS / CONNECT / TRACE.
 		$method = \in_array(
 			$_SERVER['REQUEST_METHOD'],
@@ -365,7 +425,7 @@ class Middleware {
 					}
 
 					wp_die(
-						esc_html__( 'SecureFusion Firewall has been denied this cookie request.', 'securefusion' ),
+						esc_html__( 'SecureFusion Firewall has denied this cookie request.', 'securefusion' ),
 						esc_html__( 'Cookie Failure', 'securefusion' ),
 						[
 							'response'  => 403,
@@ -432,7 +492,7 @@ class Middleware {
 			// Comments.
 			if ( $pagenow === 'wp-comments-post.php' ) {
 				wp_die(
-					esc_html__( 'SecureFusion Firewall has been denied this comment submission.', 'securefusion' ),
+					esc_html__( 'SecureFusion Firewall has denied this comment submission.', 'securefusion' ),
 					esc_html__( 'Comment Submission Failure', 'securefusion' ),
 					[
 						'response'  => 403,
@@ -442,7 +502,7 @@ class Middleware {
 			}
 
 			wp_die(
-				esc_html__( 'SecureFusion Firewall has been denied this request.', 'securefusion' ),
+				esc_html__( 'SecureFusion Firewall has denied this request.', 'securefusion' ),
 				esc_html__( 'Request Failure', 'securefusion' ),
 				[
 					'response'  => 403,
@@ -466,7 +526,7 @@ class Middleware {
 			}
 
 			wp_die(
-				esc_html__( 'SecureFusion Firewall has been denied this WP Queries.', 'securefusion' ),
+				esc_html__( 'SecureFusion Firewall has denied this WP Query.', 'securefusion' ),
 				esc_html__( 'WP Query Failure', 'securefusion' ),
 				[
 					'response'  => 403,

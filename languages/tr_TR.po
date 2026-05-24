@@ -5,7 +5,7 @@ msgstr ""
 "POT-Creation-Date: 2024-01-19 06:40+0300\n"
 "PO-Revision-Date: 2024-01-19 07:27+0300\n"
 "Last-Translator: \n"
-"Language-Team: contact@codeplus.dev\n"
+"Language-Team: contact@fyndsoft.com\n"
 "Language: tr_TR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -47,7 +47,7 @@ msgid "SecureFusion Settings"
 msgstr "SecureFusion Ayarları"
 
 #: src/Lib/Admin.php:148
-msgid "You could monitoring your WordPress security settings."
+msgid "You can monitor your WordPress security settings."
 msgstr "WordPress güvenlik ayarlarınızı izleyebilirsiniz."
 
 #: src/Lib/Admin.php:154
@@ -179,8 +179,8 @@ msgstr ""
 "Sitenizi basit SQL güvenlik açıklarına karşı koruyun."
 
 #: src/Lib/Admin.php:242
-msgid "Forge HTTPS Admin"
-msgstr "Forge HTTPS Yöneticisi"
+msgid "Force HTTPS Admin"
+msgstr "HTTPS Yönetici Sayfasını Zorla"
 
 #: src/Lib/Admin.php:244
 msgid "Redirects the admin page protocol from HTTP to HTTPS"
@@ -275,7 +275,7 @@ msgid "Additional Plugins"
 msgstr "Ek Eklentiler"
 
 #: src/Lib/Admin.php:328
-msgid "You could manage your WordPress security settings."
+msgid "You can manage your WordPress security settings."
 msgstr "WordPress güvenlik ayarlarınızı yönetebilirsiniz."
 
 #: src/Lib/Admin.php:337
@@ -334,7 +334,7 @@ msgid "XML-RPC SETTINGS"
 msgstr "XML-RPC AYARLARI"
 
 #: src/Lib/Admin.php:445
-msgid "You can prevent to xmlrpc attacks."
+msgid "You can prevent XML-RPC attacks."
 msgstr "Xmlrpc saldırılarını önleyebilirsiniz."
 
 #: src/Lib/Admin.php:451
@@ -439,7 +439,7 @@ msgstr "GIRIŞ AYARLARI - DIKKATLI OLUN!"
 
 #: src/Lib/Admin.php:602
 msgid ""
-"You can hide or secure your login page against the attackers. Please save "
+"You can hide or secure your login page against attackers. Please save "
 "your new login url before you change it."
 msgstr ""
 "Giriş sayfanızı saldırganlara karşı gizleyebilir veya güvenli hale "
@@ -466,7 +466,7 @@ msgid " time(s)"
 msgstr " defa"
 
 #: src/Lib/Admin.php:617
-msgid "Maksimum Failed Login Attempt Limit"
+msgid "Maximum Failed Login Attempt Limit"
 msgstr "Maksimum Başarısız Giriş Denemesi Sınırı"
 
 #: src/Lib/Admin.php:622
@@ -548,7 +548,7 @@ msgid "disabled"
 msgstr "devre dışı"
 
 #: src/Lib/Middleware.php:156
-msgid "SecureFusion Firewall has been denied this cookie request."
+msgid "SecureFusion Firewall has denied this cookie request."
 msgstr "SecureFusion Güvenlik Duvarı bu çerez isteğini reddetti."
 
 #: src/Lib/Middleware.php:157
@@ -556,15 +556,15 @@ msgid "Cookie Failure"
 msgstr "Kurabiye Arızası"
 
 #: src/Lib/Middleware.php:207
-msgid "SecureFusion Firewall has been denied this comment submission."
-msgstr "SecureFusion Güvenlik Duvarı'nın bu yorum gönderimi reddedildi."
+msgid "SecureFusion Firewall has denied this comment submission."
+msgstr "SecureFusion Güvenlik Duvarı bu yorum gönderimini reddetti."
 
 #: src/Lib/Middleware.php:208
 msgid "Comment Submission Failure"
 msgstr "Yorum Gönderme Hatası"
 
 #: src/Lib/Middleware.php:216
-msgid "SecureFusion Firewall has been denied this request."
+msgid "SecureFusion Firewall has denied this request."
 msgstr "SecureFusion Güvenlik Duvarı bu isteği reddetti."
 
 #: src/Lib/Middleware.php:217
@@ -572,8 +572,8 @@ msgid "Request Failure"
 msgstr "Talep Başarısızlığı"
 
 #: src/Lib/Middleware.php:230
-msgid "SecureFusion Firewall has been denied this WP Queries."
-msgstr "SecureFusion Güvenlik Duvarı bu WP Sorgularını reddetti."
+msgid "SecureFusion Firewall has denied this WP Query."
+msgstr "SecureFusion Güvenlik Duvarı bu WP Sorgusunu reddetti."
 
 #: src/Lib/Middleware.php:231
 msgid "WP Query Failure"
@@ -596,8 +596,8 @@ msgid "XMLRPC pingback disabled"
 msgstr "XMLRPC pingback devre dışı"
 
 #. Plugin URI of the plugin/theme
-msgid "https://codeplus.dev/securefusion"
-msgstr "https://codeplus.dev/securefusion"
+msgid "https://fyndsoft.com/securefusion"
+msgstr "https://fyndsoft.com/securefusion"
 
 #. Description of the plugin/theme
 msgid "SecureFusion is a lightweight, robust security plugin for WordPress."
@@ -605,8 +605,8 @@ msgstr ""
 "SecureFusion, WordPress için hafif ve sağlam bir güvenlik eklentisidir."
 
 #. Author of the plugin/theme
-msgid "codeplusdev <contact@codeplus.dev>"
-msgstr "codeplusdev <contact@codeplus.dev>"
+msgid "codeplusdev <contact@fyndsoft.com>"
+msgstr "codeplusdev <contact@fyndsoft.com>"
 
 #. Author URI of the plugin/theme
 msgid "https://profiles.wordpress.org/codeplusdev/"

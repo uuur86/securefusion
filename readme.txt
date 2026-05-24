@@ -73,7 +73,7 @@ This plugin bundles and/or utilizes the following third-party libraries:
 
 == Frequently Asked Questions ==
 
-If you have any question, you can post [a support request](https://wordpress.org/support/plugin/secuplug/)
+If you have any questions, you can post [a support request](https://wordpress.org/support/plugin/secuplug/)
 
 == Changelog ==
 = 1.5.0 =
@@ -93,7 +93,7 @@ If you have any question, you can post [a support request](https://wordpress.org
 = 1.4.2 =
 * Fixed: The issue that caused the 500 error in Apache 2.4 has been resolved. htaccess is no longer used.
 * Added: New CSP features
-* Updated: Header settings in the firewall properties are now supported for NGINX and LiteSpeed ​​servers.
+* Updated: Header settings in the firewall properties are now supported for NGINX and LiteSpeed servers.
 
 = 1.4.1 =
 * Tested on the latest WordPress version
@@ -120,10 +120,10 @@ If you have any question, you can post [a support request](https://wordpress.org
 
 = 1.3.5 =
 * Added: New firewall settings
-* Updated: Disable Rest API feature will disable only users service and main service any more. (Plugin issues are solved)
+* Updated: Disable Rest API feature will disable only the users service and the main service anymore. (Plugin issues are solved)
 
 = 1.3.4.1 =
-* incomplete and forgotten cookie security code that lead to problem has disabled
+* An incomplete and forgotten cookie security code that led to a problem has been disabled.
 
 = 1.3.4 =
 * Added new firewall features
@@ -135,8 +135,8 @@ If you have any question, you can post [a support request](https://wordpress.org
 * Fixed https and login page protect issues on admin-ajax.php
 
 = 1.3.1 =
-* Fixed an exceptional circumstance in the "hide admin login url" link.
-* Added no valid SSL certificate and get an SSL warning in the settings page
+* Fixed an exceptional case in the "hide admin login url" link.
+* Added warning for no valid SSL certificate on the settings page
 * Improved user experience for admin settings form
 
 = 1.3 =
@@ -152,9 +152,9 @@ If you have any question, you can post [a support request](https://wordpress.org
 * testing for version 1.2.11
 
 = 1.2.9 =
-* Fixed auto loading of fix ssl js file without enable it
+* Fixed auto loading of fix ssl js file without enabling it
 * Fixed SSL URL replacement and redirection
-* Added ssl enable and forge ssl options
+* Added ssl enable and force SSL options
 * Added self pingback disable feature
 * Visual enhancements
 
@@ -162,7 +162,7 @@ If you have any question, you can post [a support request](https://wordpress.org
 * Fixed some HTTPS issues in wp-admin and wp-login
 
 = 1.2.7 =
-* fixed infinity redirection
+* fixed infinite redirection
 
 = 1.2.6 =
 * fixed admin auth-fallback login screen issue

@@ -229,6 +229,10 @@
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+.fynd-sf-dashboard .dashboard-overview .fynd-sf-security-status-card {
+    grid-column: 1 / -1;
+}
+
 .fynd-sf-dashboard .dashboard-item:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);

@@ -1,11 +1,11 @@
 <?php
 /**
  * Plugin Name: SecureFusion
- * Plugin URI: https://codeplus.dev/securefusion
+ * Plugin URI: https://fyndsoft.com/securefusion
  * Description: SecureFusion is a lightweight, robust security plugin for WordPress.
  *  It gives you the ability to disable specific XML-RPC services, alter the login page address, and force SSL on pages.
  * Version: 1.5.0
- * Author: codeplusdev <contact@codeplus.dev>
+ * Author: codeplusdev <contact@fyndsoft.com>
  * Author URI: https://profiles.wordpress.org/codeplusdev/
  * License: GPL v3 or later
  * Text Domain : securefusion
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! defined( 'SECUREFUSION_VERSION' ) ) {
-	define( 'SECUREFUSION_VERSION', '1.4.12' );
+	define( 'SECUREFUSION_VERSION', '1.4.13' );
 }
 
 if ( ! defined( 'SECUREFUSION_PATH' ) ) {

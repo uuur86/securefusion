@@ -241,7 +241,7 @@ class Main {
 
 		}
 
-		// Override exists settings.
+		// Override existing settings.
 		$new_settings = array_merge( $this->default_settings, $new_settings );
 
 		// Update final settings.

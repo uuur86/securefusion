@@ -5,7 +5,7 @@ msgstr ""
 "POT-Creation-Date: 2024-01-19 06:40+0300\n"
 "PO-Revision-Date: 2024-01-19 07:31+0300\n"
 "Last-Translator: \n"
-"Language-Team: contact@codeplus.dev\n"
+"Language-Team: contact@fyndsoft.com\n"
 "Language: de_DE\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -47,7 +47,7 @@ msgid "SecureFusion Settings"
 msgstr "SecureFusion Einstellungen"
 
 #: src/Lib/Admin.php:148
-msgid "You could monitoring your WordPress security settings."
+msgid "You can monitor your WordPress security settings."
 msgstr "Sie könnten Ihre WordPress-Sicherheitseinstellungen überwachen."
 
 #: src/Lib/Admin.php:154
@@ -179,8 +179,8 @@ msgstr ""
 "ist. Schützen Sie Ihre Website gegen einfache SQL-Schwachstellen."
 
 #: src/Lib/Admin.php:242
-msgid "Forge HTTPS Admin"
-msgstr "Forge HTTPS Verwaltung"
+msgid "Force HTTPS Admin"
+msgstr "Force HTTPS Verwaltung"
 
 #: src/Lib/Admin.php:244
 msgid "Redirects the admin page protocol from HTTP to HTTPS"
@@ -273,7 +273,7 @@ msgid "Additional Plugins"
 msgstr "Zusätzliche Plugins"
 
 #: src/Lib/Admin.php:328
-msgid "You could manage your WordPress security settings."
+msgid "You can manage your WordPress security settings."
 msgstr "Sie können Ihre WordPress-Sicherheitseinstellungen verwalten."
 
 #: src/Lib/Admin.php:337
@@ -326,7 +326,7 @@ msgid "XML-RPC SETTINGS"
 msgstr "XML-RPC EINSTELLUNGEN"
 
 #: src/Lib/Admin.php:445
-msgid "You can prevent to xmlrpc attacks."
+msgid "You can prevent XML-RPC attacks."
 msgstr "Sie können Angriffe auf xmlrpc verhindern."
 
 #: src/Lib/Admin.php:451
@@ -423,7 +423,7 @@ msgstr "LOGIN-EINSTELLUNGEN - SEIEN SIE VORSICHTIG!"
 
 #: src/Lib/Admin.php:602
 msgid ""
-"You can hide or secure your login page against the attackers. Please save "
+"You can hide or secure your login page against attackers. Please save "
 "your new login url before you change it."
 msgstr ""
 "Sie können Ihre Anmeldeseite vor Angreifern verbergen oder sichern. Bitte "
@@ -450,7 +450,7 @@ msgid " time(s)"
 msgstr " zeit(en)"
 
 #: src/Lib/Admin.php:617
-msgid "Maksimum Failed Login Attempt Limit"
+msgid "Maximum Failed Login Attempt Limit"
 msgstr "Maksimum Fehlgeschlagene Anmeldeversuche Limit"
 
 #: src/Lib/Admin.php:622
@@ -533,7 +533,7 @@ msgid "disabled"
 msgstr "deaktiviert"
 
 #: src/Lib/Middleware.php:156
-msgid "SecureFusion Firewall has been denied this cookie request."
+msgid "SecureFusion Firewall has denied this cookie request."
 msgstr "SecureFusion Firewall wurde diese Cookie-Anfrage verweigert."
 
 #: src/Lib/Middleware.php:157
@@ -541,7 +541,7 @@ msgid "Cookie Failure"
 msgstr "Cookie-Ausfall"
 
 #: src/Lib/Middleware.php:207
-msgid "SecureFusion Firewall has been denied this comment submission."
+msgid "SecureFusion Firewall has denied this comment submission."
 msgstr ""
 "SecureFusion Firewall wurde die Einreichung dieses Kommentars verweigert."
 
@@ -550,7 +550,7 @@ msgid "Comment Submission Failure"
 msgstr "Kommentar Übertragungsfehler"
 
 #: src/Lib/Middleware.php:216
-msgid "SecureFusion Firewall has been denied this request."
+msgid "SecureFusion Firewall has denied this request."
 msgstr "SecureFusion Firewall wurde diese Anfrage verweigert."
 
 #: src/Lib/Middleware.php:217
@@ -558,7 +558,7 @@ msgid "Request Failure"
 msgstr "Anfrage Fehlschlag"
 
 #: src/Lib/Middleware.php:230
-msgid "SecureFusion Firewall has been denied this WP Queries."
+msgid "SecureFusion Firewall has denied this WP Query."
 msgstr "SecureFusion Firewall wurde diese WP-Abfrage verweigert."
 
 #: src/Lib/Middleware.php:231
@@ -583,8 +583,8 @@ msgid "XMLRPC pingback disabled"
 msgstr "XMLRPC-Pingback deaktiviert"
 
 #. Plugin URI of the plugin/theme
-msgid "https://codeplus.dev/securefusion"
-msgstr "https://codeplus.dev/securefusion"
+msgid "https://fyndsoft.com/securefusion"
+msgstr "https://fyndsoft.com/securefusion"
 
 #. Description of the plugin/theme
 msgid "SecureFusion is a lightweight, robust security plugin for WordPress."
@@ -593,8 +593,8 @@ msgstr ""
 "WordPress."
 
 #. Author of the plugin/theme
-msgid "codeplusdev <contact@codeplus.dev>"
-msgstr "codeplusdev <contact@codeplus.dev>"
+msgid "codeplusdev <contact@fyndsoft.com>"
+msgstr "codeplusdev <contact@fyndsoft.com>"
 
 #. Author URI of the plugin/theme
 msgid "https://profiles.wordpress.org/codeplusdev/"

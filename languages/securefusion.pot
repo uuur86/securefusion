@@ -5,7 +5,7 @@ msgstr ""
 "POT-Creation-Date: 2024-01-19 06:40+0300\n"
 "PO-Revision-Date: 2024-01-19 05:49+0300\n"
 "Last-Translator: \n"
-"Language-Team: contact@codeplus.dev\n"
+"Language-Team: contact@fyndsoft.com\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -48,7 +48,7 @@ msgid "SecureFusion Settings"
 msgstr ""
 
 #: src/Lib/Admin.php:148
-msgid "You could monitoring your WordPress security settings."
+msgid "You can monitor your WordPress security settings."
 msgstr ""
 
 #: src/Lib/Admin.php:154
@@ -167,7 +167,7 @@ msgid ""
 msgstr ""
 
 #: src/Lib/Admin.php:242
-msgid "Forge HTTPS Admin"
+msgid "Force HTTPS Admin"
 msgstr ""
 
 #: src/Lib/Admin.php:244
@@ -257,7 +257,7 @@ msgid "Additional Plugins"
 msgstr ""
 
 #: src/Lib/Admin.php:328
-msgid "You could manage your WordPress security settings."
+msgid "You can manage your WordPress security settings."
 msgstr ""
 
 #: src/Lib/Admin.php:337
@@ -306,7 +306,7 @@ msgid "XML-RPC SETTINGS"
 msgstr ""
 
 #: src/Lib/Admin.php:445
-msgid "You can prevent to xmlrpc attacks."
+msgid "You can prevent XML-RPC attacks."
 msgstr ""
 
 #: src/Lib/Admin.php:451
@@ -392,7 +392,7 @@ msgstr ""
 
 #: src/Lib/Admin.php:602
 msgid ""
-"You can hide or secure your login page against the attackers. Please save "
+"You can hide or secure your login page against attackers. Please save "
 "your new login url before you change it."
 msgstr ""
 
@@ -417,7 +417,7 @@ msgid " time(s)"
 msgstr ""
 
 #: src/Lib/Admin.php:617
-msgid "Maksimum Failed Login Attempt Limit"
+msgid "Maximum Failed Login Attempt Limit"
 msgstr ""
 
 #: src/Lib/Admin.php:622
@@ -497,7 +497,7 @@ msgid "disabled"
 msgstr ""
 
 #: src/Lib/Middleware.php:156
-msgid "SecureFusion Firewall has been denied this cookie request."
+msgid "SecureFusion Firewall has denied this cookie request."
 msgstr ""
 
 #: src/Lib/Middleware.php:157
@@ -505,7 +505,7 @@ msgid "Cookie Failure"
 msgstr ""
 
 #: src/Lib/Middleware.php:207
-msgid "SecureFusion Firewall has been denied this comment submission."
+msgid "SecureFusion Firewall has denied this comment submission."
 msgstr ""
 
 #: src/Lib/Middleware.php:208
@@ -513,7 +513,7 @@ msgid "Comment Submission Failure"
 msgstr ""
 
 #: src/Lib/Middleware.php:216
-msgid "SecureFusion Firewall has been denied this request."
+msgid "SecureFusion Firewall has denied this request."
 msgstr ""
 
 #: src/Lib/Middleware.php:217
@@ -521,7 +521,7 @@ msgid "Request Failure"
 msgstr ""
 
 #: src/Lib/Middleware.php:230
-msgid "SecureFusion Firewall has been denied this WP Queries."
+msgid "SecureFusion Firewall has denied this WP Query."
 msgstr ""
 
 #: src/Lib/Middleware.php:231
@@ -545,7 +545,7 @@ msgid "XMLRPC pingback disabled"
 msgstr ""
 
 #. Plugin URI of the plugin/theme
-msgid "https://codeplus.dev/securefusion"
+msgid "https://fyndsoft.com/securefusion"
 msgstr ""
 
 #. Description of the plugin/theme
@@ -553,7 +553,7 @@ msgid "SecureFusion is a lightweight, robust security plugin for WordPress."
 msgstr ""
 
 #. Author of the plugin/theme
-msgid "codeplusdev <contact@codeplus.dev>"
+msgid "codeplusdev <contact@fyndsoft.com>"
 msgstr ""
 
 #. Author URI of the plugin/theme

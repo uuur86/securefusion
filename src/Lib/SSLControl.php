@@ -29,7 +29,7 @@ class SSLControl {
 			return;
 		}
 
-		// If SSL Enables.
+		// If SSL is enabled.
 		if ( $this->get_settings( 'enable_https' ) === 'https' ) {
 			$this->force_ssl_redirect();
 
