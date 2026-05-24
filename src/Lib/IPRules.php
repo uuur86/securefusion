@@ -238,22 +238,22 @@ class IPRules {
 			<div id="fynd-sf-rules-notice" class="fynd-sf-log-notice" style="display:none;"></div>
 
 			<!-- Add New Rule Card -->
-			<div class="fynd-sf-card fynd-sf-rules-form-card" style="margin-top: 20px; padding: 20px; background: #fff; border-radius: 8px; border: 1px solid #e0e0e0; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
-				<h3 style="margin-top:0; margin-bottom:15px; font-weight:600; color:#333;"><?php esc_html_e( 'Add New Rule', 'securefusion' ); ?></h3>
-				<form id="fynd-sf-add-rule-form" style="display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-end;">
-					<div style="flex: 1; min-width: 250px;">
-						<label for="fynd-sf-rule-ip" style="display:block; margin-bottom:5px; font-weight:600; color:#666;"><?php esc_html_e( 'IP Address or Subnet (CIDR)', 'securefusion' ); ?></label>
-						<input type="text" id="fynd-sf-rule-ip" name="ip" required placeholder="e.g. 192.168.1.1 or 192.168.1.0/24" style="width:100%; height:40px; padding:8px 12px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;">
+			<div class="fynd-sf-card fynd-sf-rules-form-card">
+				<h3><?php esc_html_e( 'Add New Rule', 'securefusion' ); ?></h3>
+				<form id="fynd-sf-add-rule-form" class="fynd-sf-rules-form">
+					<div class="fynd-sf-form-group-ip">
+						<label for="fynd-sf-rule-ip"><?php esc_html_e( 'IP Address or Subnet (CIDR)', 'securefusion' ); ?></label>
+						<input type="text" id="fynd-sf-rule-ip" name="ip" required placeholder="e.g. 192.168.1.1 or 192.168.1.0/24">
 					</div>
-					<div style="width: 180px;">
-						<label for="fynd-sf-rule-type" style="display:block; margin-bottom:5px; font-weight:600; color:#666;"><?php esc_html_e( 'Rule Type', 'securefusion' ); ?></label>
-						<select id="fynd-sf-rule-type" name="rule_type" style="width:100%; height:40px; padding:8px 12px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;">
+					<div class="fynd-sf-form-group-type">
+						<label for="fynd-sf-rule-type"><?php esc_html_e( 'Rule Type', 'securefusion' ); ?></label>
+						<select id="fynd-sf-rule-type" name="rule_type">
 							<option value="blocked"><?php esc_html_e( 'Blocked', 'securefusion' ); ?></option>
 							<option value="whitelisted"><?php esc_html_e( 'Whitelisted', 'securefusion' ); ?></option>
 						</select>
 					</div>
-					<div>
-						<button type="submit" class="fynd-sf-btn fynd-sf-btn-primary" style="height:40px; display:inline-flex; align-items:center; justify-content:center; gap:8px;">
+					<div class="fynd-sf-form-group-submit">
+						<button type="submit" class="fynd-sf-btn fynd-sf-btn-primary">
 							<span class="dashicons dashicons-plus"></span>
 							<?php esc_html_e( 'Add Rule', 'securefusion' ); ?>
 						</button>
@@ -268,8 +268,8 @@ class IPRules {
 							<tr>
 								<?php
 								$columns = [
-									'ip'        => esc_html__( 'IP / Subnet (CIDR)', 'securefusion' ),
-									'rule_type' => esc_html__( 'Rule Type', 'securefusion' ),
+									'ip'         => esc_html__( 'IP / Subnet (CIDR)', 'securefusion' ),
+									'rule_type'  => esc_html__( 'Rule Type', 'securefusion' ),
 									'created_at' => esc_html__( 'Created At', 'securefusion' ),
 								];
 
@@ -333,7 +333,7 @@ class IPRules {
 									<td class="column-actions">
 										<button type="button" class="fynd-sf-btn fynd-sf-btn-sm fynd-sf-btn-danger fynd-sf-remove-rule-btn" data-ip="<?php echo esc_attr( $row->ip ); ?>">
 											<span class="dashicons dashicons-trash"></span>
-											<?php esc_html_e( 'Remove Rule', 'securefusion' ); ?>
+											<?php esc_html_e( 'Remove', 'securefusion' ); ?>
 										</button>
 									</td>
 								</tr>

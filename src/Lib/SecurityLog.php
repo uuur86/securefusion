@@ -676,16 +676,16 @@ class SecurityLog {
 			<div id="fynd-sf-payload-modal" class="fynd-sf-modal" style="display: none;">
 				<div class="fynd-sf-modal-content">
 					<div class="fynd-sf-modal-header">
-						<h3><?php esc_html_e( 'Payload Details', 'securefusion' ); ?></h3>
+						<h3 class="fynd-sf-modal-title"><?php esc_html_e( 'Payload Details', 'securefusion' ); ?></h3>
 						<button type="button" class="fynd-sf-modal-close">&times;</button>
 					</div>
 					<div class="fynd-sf-modal-body">
 						<textarea id="fynd-sf-payload-text" readonly class="fynd-sf-modal-textarea"></textarea>
 					</div>
 					<div class="fynd-sf-modal-footer">
-						<button type="button" id="fynd-sf-copy-payload-modal-btn" class="fynd-sf-btn fynd-sf-btn-primary">
-							<span class="dashicons dashicons-admin-page"></span>
-							<?php esc_html_e( 'Copy Payload', 'securefusion' ); ?>
+						<button type="button" class="fynd-sf-btn fynd-sf-btn-primary fynd-sf-modal-copy-btn">
+							<span class="dashicons dashicons-clipboard"></span>
+							<span class="fynd-sf-modal-copy-btn-text"><?php esc_html_e( 'Copy Payload', 'securefusion' ); ?></span>
 						</button>
 						<button type="button" class="fynd-sf-modal-close-btn fynd-sf-btn fynd-sf-btn-secondary">
 							<?php esc_html_e( 'Close', 'securefusion' ); ?>

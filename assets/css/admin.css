@@ -755,22 +755,6 @@
     font-size: 12px;
 }
 
-/* Modal Close Button */
-.fynd-sf-range-modal-close {
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-    color: #646970;
-    line-height: 1;
-    padding: 4px 8px;
-    border-radius: 4px;
-}
-
-.fynd-sf-range-modal-close:hover {
-    background: #f0f0f1;
-    color: #1d2327;
-}
 
 /* Active filter banner clear link */
 .fynd-sf-login-log .fynd-sf-filter-clear-link {

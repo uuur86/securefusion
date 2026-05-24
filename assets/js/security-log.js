@@ -256,24 +256,91 @@
 		});
 
 
-		// ===== IP Range Detail Modal =====
+		// ===== Unified Modal System =====
 
-		var $modal    = $('#fynd-sf-range-modal');
-		var $textarea = $('#fynd-sf-range-modal-textarea');
-		var $title    = $('#fynd-sf-range-modal-title');
-		var $copyBtn  = $('#fynd-sf-range-copy-btn');
-		var $copyStatus = $('#fynd-sf-range-copy-status');
+		// Close any modal when close elements are clicked
+		$(document).on('click', '.fynd-sf-modal-close, .fynd-sf-modal-close-btn', function () {
+			$(this).closest('.fynd-sf-modal').fadeOut(200);
+		});
 
-		/**
-		 * Open the range detail modal with IP list.
-		 *
-		 * @param {string} rangePrefix The /24 range prefix (e.g. '192.168.1').
-		 */
+		// Close modal on backdrop click
+		$(document).on('click', '.fynd-sf-modal', function (e) {
+			if (e.target === this) {
+				$(this).fadeOut(200);
+			}
+		});
+
+		// Close modal on Escape key
+		$(document).on('keydown', function (e) {
+			if (e.key === 'Escape') {
+				$('.fynd-sf-modal:visible').fadeOut(200);
+			}
+		});
+
+		// Universal copy button inside modals
+		$(document).on('click', '.fynd-sf-modal-copy-btn', function (e) {
+			e.preventDefault();
+			var $btn = $(this);
+			var $modal = $btn.closest('.fynd-sf-modal');
+			var $textarea = $modal.find('.fynd-sf-modal-textarea');
+			var text = $textarea.val();
+
+			if (!text) {
+				return;
+			}
+
+			var originalHTML = $btn.html();
+
+			if (navigator.clipboard && navigator.clipboard.writeText) {
+				navigator.clipboard.writeText(text).then(function () {
+					showCopySuccess($btn, originalHTML);
+				}).catch(function () {
+					fallbackCopyModalText($btn, $textarea, originalHTML);
+				});
+			} else {
+				fallbackCopyModalText($btn, $textarea, originalHTML);
+			}
+		});
+
+		function showCopySuccess($btn, originalHTML) {
+			$btn.html('<span class="dashicons dashicons-yes"></span> ' + securefusionLog.copied)
+				.addClass('fynd-sf-copy-success')
+				.prop('disabled', true);
+
+			setTimeout(function () {
+				$btn.html(originalHTML)
+					.removeClass('fynd-sf-copy-success')
+					.prop('disabled', false);
+			}, 2000);
+		}
+
+		function fallbackCopyModalText($btn, $textarea, originalHTML) {
+			$textarea[0].select();
+			$textarea[0].setSelectionRange(0, 99999);
+
+			try {
+				document.execCommand('copy');
+				showCopySuccess($btn, originalHTML);
+			} catch (err) {
+				$btn.html('<span class="dashicons dashicons-no"></span> ' + securefusionLog.copyFailed)
+					.prop('disabled', true);
+
+				setTimeout(function () {
+					$btn.html(originalHTML)
+						.prop('disabled', false);
+				}, 3000);
+			}
+		}
+
+		// ===== IP Range Detail Modal Loader =====
+		var $rangeModal    = $('#fynd-sf-range-modal');
+		var $rangeTextarea = $('#fynd-sf-range-modal-textarea');
+		var $rangeTitle    = $('#fynd-sf-range-modal-title');
+
 		function openRangeModal(rangePrefix) {
-			$title.text('Loading...');
-			$textarea.val('');
-			$copyStatus.text('');
-			$modal.fadeIn(200);
+			$rangeTitle.text('Loading...');
+			$rangeTextarea.val('');
+			$rangeModal.fadeIn(200);
 
 			$.post(securefusionLog.ajaxUrl, {
 				action: 'securefusion_log_range_ips',
@@ -282,20 +349,20 @@
 			})
 			.done(function (response) {
 				if (response.success) {
-					$title.text(response.data.title);
-					$textarea.val(response.data.ips.join('\n'));
+					$rangeTitle.text(response.data.title);
+					$rangeTextarea.val(response.data.ips.join('\n'));
 
 					// Auto-resize textarea to fit content (max 20 rows).
 					var lineCount = Math.min(response.data.ips.length, 20);
-					$textarea.attr('rows', Math.max(lineCount, 3));
+					$rangeTextarea.attr('rows', Math.max(lineCount, 3));
 				} else {
-					$title.text('Error');
-					$textarea.val(response.data.message);
+					$rangeTitle.text('Error');
+					$rangeTextarea.val(response.data.message);
 				}
 			})
 			.fail(function () {
-				$title.text('Error');
-				$textarea.val('Failed to load IP list.');
+				$rangeTitle.text('Error');
+				$rangeTextarea.val('Failed to load IP list.');
 			});
 		}
 
@@ -308,142 +375,19 @@
 			}
 		});
 
-		// Close modal.
-		$('#fynd-sf-range-modal-close').on('click', function () {
-			$modal.fadeOut(200);
+		// Open IP Range TXT List Modal
+		$(document).on('click', '#fynd-sf-open-txt-list-btn', function (e) {
+			e.preventDefault();
+			$('#fynd-sf-txt-list-modal').fadeIn(200);
 		});
-
-		// Close modal on backdrop click.
-		$modal.on('click', function (e) {
-			if (e.target === this) {
-				$modal.fadeOut(200);
-			}
-		});
-
-		// Close modal on Escape key.
-		$(document).on('keydown', function (e) {
-			if (e.key === 'Escape' && $modal.is(':visible')) {
-				$modal.fadeOut(200);
-			}
-		});
-
-		// Copy to clipboard.
-		$copyBtn.on('click', function () {
-			var text = $textarea.val();
-
-			if (!text) {
-				return;
-			}
-
-			// Modern Clipboard API with fallback.
-			if (navigator.clipboard && navigator.clipboard.writeText) {
-				navigator.clipboard.writeText(text).then(function () {
-					$copyStatus.text(securefusionLog.copied).fadeIn(100);
-					setTimeout(function () {
-						$copyStatus.fadeOut(300);
-					}, 2000);
-				}).catch(function () {
-					fallbackCopy();
-				});
-			} else {
-				fallbackCopy();
-			}
-		});
-
-		/**
-		 * Fallback copy: select textarea content for manual copy.
-		 */
-		function fallbackCopy() {
-			$textarea[0].select();
-			$textarea[0].setSelectionRange(0, 99999);
-
-			try {
-				document.execCommand('copy');
-				$copyStatus.text(securefusionLog.copied).fadeIn(100);
-				setTimeout(function () {
-					$copyStatus.fadeOut(300);
-				}, 2000);
-			} catch (err) {
-				$copyStatus.text(securefusionLog.copyFailed).fadeIn(100);
-				setTimeout(function () {
-					$copyStatus.fadeOut(300);
-				}, 3000);
-			}
-		}
-
-		// ===== Payload Detail Modal =====
-		var $payloadModal      = $('#fynd-sf-payload-modal');
-		var $payloadTextarea   = $('#fynd-sf-payload-text');
-		var $copyPayloadBtn    = $('#fynd-sf-copy-payload-modal-btn');
 
 		// View Payload Details button click
 		$(document).on('click', '.fynd-sf-view-payload-btn', function (e) {
 			e.preventDefault();
 			var payload = $(this).data('payload') || '';
-			$payloadTextarea.val(payload);
-			$payloadModal.fadeIn(200);
+			$('#fynd-sf-payload-text').val(payload);
+			$('#fynd-sf-payload-modal').fadeIn(200);
 		});
-
-		// Close payload modal
-		$payloadModal.on('click', '.fynd-sf-modal-close, .fynd-sf-modal-close-btn', function () {
-			$payloadModal.fadeOut(200);
-		});
-
-		// Close payload modal on backdrop click
-		$payloadModal.on('click', function (e) {
-			if (e.target === this) {
-				$payloadModal.fadeOut(200);
-			}
-		});
-
-		// Close payload modal on Escape key
-		$(document).on('keydown', function (e) {
-			if (e.key === 'Escape' && $payloadModal.is(':visible')) {
-				$payloadModal.fadeOut(200);
-			}
-		});
-
-		// Copy payload to clipboard
-		$copyPayloadBtn.on('click', function () {
-			var text = $payloadTextarea.val();
-			if (!text) {
-				return;
-			}
-
-			var $btn = $(this);
-			var originalHTML = $btn.html();
-
-			if (navigator.clipboard && navigator.clipboard.writeText) {
-				navigator.clipboard.writeText(text).then(function () {
-					showCopySuccess($btn, originalHTML);
-				}).catch(function () {
-					fallbackCopyPayload($btn, originalHTML);
-				});
-			} else {
-				fallbackCopyPayload($btn, originalHTML);
-			}
-		});
-
-		function showCopySuccess($btn, originalHTML) {
-			$btn.html('<span class="dashicons dashicons-yes"></span> ' + securefusionLog.copied);
-			setTimeout(function () {
-				$btn.html(originalHTML);
-			}, 2000);
-		}
-
-		function fallbackCopyPayload($btn, originalHTML) {
-			$payloadTextarea[0].select();
-			$payloadTextarea[0].setSelectionRange(0, 99999);
-			try {
-				document.execCommand('copy');
-				showCopySuccess($btn, originalHTML);
-			} catch (err) {
-				$btn.html('<span class="dashicons dashicons-no"></span> ' + securefusionLog.copyFailed);
-				setTimeout(function () {
-					$btn.html(originalHTML);
-				}, 2000);
-			}
-		}
 
 		// ===== IP Rules page logic =====
 		if (typeof securefusionRules !== 'undefined') {
