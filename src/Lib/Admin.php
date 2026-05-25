@@ -7,6 +7,10 @@
 
 namespace SecureFusion\Lib;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
+
 use WaspCreators\Wasp;
 use SecureFusion\Lib\Traits\WPCommon;
 
@@ -1049,6 +1053,13 @@ class Admin {
 					],
 					[
 						'type'   => 'text_input',
+						'name'   => 'ip_attempt_window',
+						'label'  => esc_html__( 'Attempt Tracking Window', 'secuplug' ),
+						'before' => '',
+						'after'  => esc_html__( ' minute(s)', 'secuplug' ) . '<span class="field-tip"> ' . esc_html__( 'Time frame to track failed login attempts', 'secuplug' ) . '</span>',
+					],
+					[
+						'type'   => 'text_input',
 						'name'   => 'ip_login_limit',
 						'label'  => esc_html__( 'Max. Attempt Limit', 'secuplug' ),
 						'before' => '',
@@ -1263,6 +1274,7 @@ class Admin {
 		\wp_enqueue_style( 'securefusion-admin-theme-main-css', \plugins_url( 'assets/css/admin.css', SECUREFUSION_BASENAME ), array(), SECUREFUSION_VERSION );
 		\wp_enqueue_script( 'securefusion-admin-js', \plugins_url( 'assets/js/admin.js', SECUREFUSION_BASENAME ), array(), SECUREFUSION_VERSION, true );
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Non-state-changing query parameter check.
 		if ( isset( $_GET['page'] ) && 'secuplug' === $_GET['page'] ) {
 			\wp_enqueue_script( 'securefusion-chartjs', \plugins_url( 'assets/lib/chartjs/chart.umd.min.js', SECUREFUSION_BASENAME ), array(), SECUREFUSION_VERSION, true );
 			\wp_enqueue_script( 'securefusion-dashboard-js', \plugins_url( 'assets/js/dashboard.js', SECUREFUSION_BASENAME ), array( 'securefusion-chartjs' ), SECUREFUSION_VERSION, true );
@@ -1430,7 +1442,7 @@ class Admin {
 		// Settings Page Form.
 		$this->settings_page = new Wasp(
 			'securefusion-settings',
-			'secuplug',
+			'securefusion',
 			'secuplug'
 		);
 

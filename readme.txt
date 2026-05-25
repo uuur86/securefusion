@@ -1,4 +1,4 @@
-=== SecureFusion WordPress Security Plugin by Fyndsoft ===
+=== SecureFusion - Security and Firewall by Fyndsoft ===
 Contributors: codeplusdev, ugurbicer
 Tags: firewall, security, anti-spam, ssl, xml-rpc
 Requires at least: 4.9
@@ -8,7 +8,7 @@ License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 Requires PHP: 7.4
 
-A high-performance, lightweight WordPress security suite. Protect your site from brute-force logins, DDoS pingbacks, bad request injections, and control Content Security Policies.
+Lightweight, high-performance security suite. Protects from brute-force logins, DDoS pingbacks, bad request injections, and manages CSP headers.
 
 == Description ==
 
@@ -67,29 +67,43 @@ This plugin bundles and/or utilizes the following third-party libraries:
   * License: GPLv3
   * Source: https://github.com/uuur86/wasp
 
+
 == Installation ==
 
 1. Download and unzip the plugin into your WordPress plugins directory (usually `/wp-content/plugins/`).
 2. Activate the plugin through the 'Plugins' menu in your WordPress Admin.
 3. Go to the Plugin's settings page and then it's up to you.
 
+
 == Screenshots ==
 
-1. The SecureFusion dashboard overview screen showing status cards for active modules.
-2. The Failed Login Attempts log showing active filters and toolbar actions.
+1. The SecureFusion dashboard overview screen showing status cards for active modules and graphs of security events.
+2. The Failed and Successful Login Attempts log showing active filters and toolbar actions.
 3. The IP Ranges management screen showing subnet CIDR blocks and the "View IPs" modal popup.
 4. The Security settings panel showing custom login URL configurations and CSP headers control.
+5. The WordPress Comments list integration allowing admins to block spam IPs and ranges directly.
+6. The IP Rules management screen for manually blocking or whitelisting specific IPs and CIDR ranges.
+
 
 == Frequently Asked Questions ==
 
 If you have any questions, you can post [a support request](https://wordpress.org/support/plugin/secuplug/)
 
+
 == Changelog ==
-= 1.5.0 =
+
+= 2.0.0 =
+* Added: Comments Block module to block spam IPs directly from the edit-comments.php screen.
+* Added: Support for bulk blocking spam comments and calculating CIDR subnets (IPv4 /24 and IPv6 /64).
+* Added: Successful Login tracking to the Security Log.
+* Added: Security log page with interactive filters, search, and CSV/JSON export.
+* Added: IP Range subnet grouping and manual IP/CIDR blocking rules.
+* Improved: Client IP detection with private/public IP checking to prevent IP spoofing.
+* Improved: Upgraded CSP configurations to use interactive tag-inputs with common presets (Google Fonts, Cloudflare, etc.).
+* Updated: Text Domain to secuplug to match the plugin slug.
 * Updated: Wasp library to v3.0.0
 * Added: Intrusion log table to track and list unauthorized access attempts
 * Added: New Content Security Policy (CSP) control fields
-* Improvement: Enhanced UI and usability for the CSP configuration section
 * Fixed: Issues related to missing CSP directives
 
 = 1.4.4 =

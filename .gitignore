@@ -1,6 +1,8 @@
 *.log
 .idea/
 vendor/
+vendor-dev/
+vendor-prod/
 .claude/
 docs/
 dist/

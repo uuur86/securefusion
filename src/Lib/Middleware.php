@@ -7,6 +7,10 @@
 
 namespace SecureFusion\Lib;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
+
 use SecureFusion\Lib\Traits\WPCommon;
 
 /**
@@ -65,7 +69,7 @@ class Middleware {
 		}
 
 		if ( $this->get_settings( 'disable_rest_api' ) ) {
-			$service_regex = 'users';
+			$service_regex = 'users|posts|pages|comments|taxonomies|categories|tags|types|statuses|settings|themes|plugins|blocks|block-types|block-directories|block-patterns|block-pattern-categories|search|media';
 			$request_uri   = isset( $_SERVER['REQUEST_URI'] ) ? sanitize_url( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
 			$controlling   = \preg_match( '#(^\/?wp\-json\/wp\/v[12]\/?$|^\/?wp\-json\/wp\/v[12]\/?(' . $service_regex . ')\/?.*$)#siu', $request_uri );
 
@@ -655,24 +659,35 @@ class Middleware {
 			return $username;
 		}
 
-		$ip_time_limit  = $this->get_settings( 'ip_time_limit' );
-		$ip_login_limit = $this->get_settings( 'ip_login_limit' );
-
-		if ( ! $ip_login_limit || ! $ip_time_limit ) {
+		if ( $this->brute_force_db->is_ip_whitelisted( $ip ) ) {
 			return $username;
 		}
 
-		$window_seconds = $ip_time_limit * HOUR_IN_SECONDS;
+		$ip_login_limit    = $this->get_settings( 'ip_login_limit' );
+		$ip_attempt_window = $this->get_settings( 'ip_attempt_window' );
+		$ip_time_limit     = $this->get_settings( 'ip_time_limit' );
+
+		if ( ! $ip_login_limit ) {
+			return $username;
+		}
+
+		$ip_attempt_window = ! empty( $ip_attempt_window ) ? absint( $ip_attempt_window ) : 1;
+		$ip_time_limit     = ! empty( $ip_time_limit ) ? absint( $ip_time_limit ) : 2;
+
+		$window_seconds = $ip_attempt_window * MINUTE_IN_SECONDS;
 		$attempts       = $this->brute_force_db->get_failed_login_attempts_in_window( $ip, $window_seconds );
 
 		// Failed login attempts.
 		if ( $attempts >= $ip_login_limit ) {
+			$duration_seconds = $ip_time_limit * HOUR_IN_SECONDS;
+			$this->brute_force_db->block_ip( $ip, $duration_seconds );
+
 			wp_die(
-				esc_html__( '<strong>ERROR</strong>: You have reached the login attempts limit.', 'secuplug' ),
+				esc_html__( '<strong>ERROR</strong>: You have reached the login attempts limit. Your IP has been locked out.', 'secuplug' ),
 				esc_html__( 'Too many failed login attempts', 'secuplug' ),
 				[
 					'response'  => 403,
-					'back_link' => true,
+					'back_link' => false,
 				]
 			);
 		}

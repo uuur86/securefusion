@@ -10,6 +10,10 @@
 
 namespace SecureFusion\Lib;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
+
 use SecureFusion\Lib\Traits\WPCommon;
 
 /**
@@ -39,6 +43,12 @@ class CommentsBlock {
 		// AJAX handlers.
 		add_action( 'wp_ajax_securefusion_toggle_comment_ip_block', [ $this, 'ajax_toggle_ip_block' ] );
 		add_action( 'wp_ajax_securefusion_block_all_spam_ips', [ $this, 'ajax_block_all_spam_ips' ] );
+
+		// Cache invalidation hooks.
+		add_action( 'transition_comment_status', [ $this, 'clear_spam_cache' ] );
+		add_action( 'comment_post', [ $this, 'clear_spam_cache' ] );
+		add_action( 'edit_comment', [ $this, 'clear_spam_cache' ] );
+		add_action( 'deleted_comment', [ $this, 'clear_spam_cache' ] );
 	}
 
 	/**
@@ -51,6 +61,7 @@ class CommentsBlock {
 	 */
 	public function comment_row_actions( $actions, $comment ) {
 		$ip = $comment->comment_author_IP;
+
 		if ( empty( $ip ) ) {
 			return $actions;
 		}
@@ -80,15 +91,22 @@ class CommentsBlock {
 	 * Inject the responsive bulk block panel in the filters bar on the comments list table.
 	 */
 	public function restrict_manage_comments() {
-		// Only display when filter is set to spam.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Non-state-changing query parameter check.
 		if ( ! isset( $_GET['comment_status'] ) || $_GET['comment_status'] !== 'spam' ) {
 			return;
 		}
 
 		// Check if we have spam comments to block.
-		global $wpdb;
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
-		$spam_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->comments} WHERE comment_approved = 'spam' AND comment_author_IP != ''" );
+		$spam_count = wp_cache_get( 'sf_spam_comments_with_ip_count', 'securefusion' );
+
+		if ( false === $spam_count ) {
+			global $wpdb;
+
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+			$spam_count = (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->comments} WHERE comment_approved = 'spam' AND comment_author_IP != ''" );
+
+			wp_cache_set( 'sf_spam_comments_with_ip_count', $spam_count, 'securefusion', 300 );
+		}
 
 		if ( $spam_count === 0 ) {
 			return;
@@ -159,11 +177,13 @@ class CommentsBlock {
 	public function ajax_toggle_ip_block() {
 		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['nonce'] ) ), self::NONCE_ACTION ) ) {
 			wp_send_json_error( [ 'message' => esc_html__( 'Security check failed.', 'secuplug' ) ] );
+
 			return;
 		}
 
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_send_json_error( [ 'message' => esc_html__( 'Permission denied.', 'secuplug' ) ] );
+
 			return;
 		}
 
@@ -172,22 +192,27 @@ class CommentsBlock {
 
 		if ( ! filter_var( $ip, FILTER_VALIDATE_IP ) ) {
 			wp_send_json_error( [ 'message' => esc_html__( 'Invalid IP address.', 'secuplug' ) ] );
+
 			return;
 		}
 
 		$db = new BruteForceDB();
 
 		if ( $action === 'block' ) {
+
 			if ( $db->is_ip_whitelisted( $ip ) ) {
 				wp_send_json_error( [ 'message' => esc_html__( 'This IP is whitelisted and cannot be blocked.', 'secuplug' ) ] );
 				return;
 			}
+
 			$success = $db->block_ip( $ip );
+
 			if ( $success ) {
 				wp_send_json_success( [ 'message' => esc_html__( 'IP blocked.', 'secuplug' ) ] );
 			}
 		} elseif ( $action === 'unblock' ) {
 			$success = $db->unblock_ip( $ip );
+
 			if ( $success ) {
 				wp_send_json_success( [ 'message' => esc_html__( 'IP unblocked.', 'secuplug' ) ] );
 			}
@@ -202,22 +227,32 @@ class CommentsBlock {
 	public function ajax_block_all_spam_ips() {
 		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['nonce'] ) ), self::NONCE_ACTION ) ) {
 			wp_send_json_error( [ 'message' => esc_html__( 'Security check failed.', 'secuplug' ) ] );
+
 			return;
 		}
 
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_send_json_error( [ 'message' => esc_html__( 'Permission denied.', 'secuplug' ) ] );
+
 			return;
 		}
 
 		$block_ranges = isset( $_POST['block_ranges'] ) && $_POST['block_ranges'] === '1';
 
-		global $wpdb;
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
-		$spam_ips = $wpdb->get_col( "SELECT DISTINCT comment_author_IP FROM {$wpdb->comments} WHERE comment_approved = 'spam' AND comment_author_IP != ''" );
+		$spam_ips = wp_cache_get( 'sf_spam_ips_list', 'securefusion' );
+
+		if ( false === $spam_ips ) {
+			global $wpdb;
+
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+			$spam_ips = $wpdb->get_col( "SELECT DISTINCT comment_author_IP FROM {$wpdb->comments} WHERE comment_approved = 'spam' AND comment_author_IP != ''" );
+
+			wp_cache_set( 'sf_spam_ips_list', $spam_ips, 'securefusion', 300 );
+		}
 
 		if ( empty( $spam_ips ) ) {
 			wp_send_json_error( [ 'message' => esc_html__( 'No spam comment IPs found.', 'secuplug' ) ] );
+
 			return;
 		}
 
@@ -232,14 +267,14 @@ class CommentsBlock {
 				if ( filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 ) ) {
 					$parts = explode( '.', $ip );
 					if ( count( $parts ) === 4 ) {
-						$prefix = $parts[0] . '.' . $parts[1] . '.' . $parts[2];
-						$last_octet = (int) $parts[3];
+						$prefix                   = $parts[0] . '.' . $parts[1] . '.' . $parts[2];
+						$last_octet               = (int) $parts[3];
 						$ipv4_groups[ $prefix ][] = $last_octet;
 					}
 				} elseif ( filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6 ) ) {
 					$parts = explode( ':', $ip );
 					if ( count( $parts ) >= 4 ) {
-						$prefix = implode( ':', array_slice( $parts, 0, 4 ) );
+						$prefix                   = implode( ':', array_slice( $parts, 0, 4 ) );
 						$ipv6_groups[ $prefix ][] = $ip;
 					} else {
 						$targets_to_block[] = $ip;
@@ -295,5 +330,17 @@ class CommentsBlock {
 				'message' => sprintf( esc_html__( 'Successfully blocked %d IP addresses/ranges.', 'secuplug' ), $blocked_count ),
 			]
 		);
+	}
+
+
+
+	/**
+	 * Clear spam comments cache.
+	 *
+	 * @return void
+	 */
+	public function clear_spam_cache() {
+		wp_cache_delete( 'sf_spam_comments_with_ip_count', 'securefusion' );
+		wp_cache_delete( 'sf_spam_ips_list', 'securefusion' );
 	}
 }

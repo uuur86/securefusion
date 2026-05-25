@@ -10,6 +10,10 @@
 
 namespace SecureFusion\Lib;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
+
 /**
  * BruteForceDB functionality class.
  */
@@ -110,39 +114,39 @@ class BruteForceDB {
 			'success_login'    => self::TYPE_SUCCESSFUL_LOGIN,
 
 			// failed_login aliases.
-			'failed_login'  => self::TYPE_FAILED_LOGIN,
-			'failed_logins' => self::TYPE_FAILED_LOGIN,
-			'login'         => self::TYPE_FAILED_LOGIN,
-			'logins'        => self::TYPE_FAILED_LOGIN,
-			'login_failure' => self::TYPE_FAILED_LOGIN,
+			'failed_login'     => self::TYPE_FAILED_LOGIN,
+			'failed_logins'    => self::TYPE_FAILED_LOGIN,
+			'login'            => self::TYPE_FAILED_LOGIN,
+			'logins'           => self::TYPE_FAILED_LOGIN,
+			'login_failure'    => self::TYPE_FAILED_LOGIN,
 
 			// bad_request aliases.
-			'bad_request'   => self::TYPE_BAD_REQUEST,
-			'bad_requests'  => self::TYPE_BAD_REQUEST,
-			'request'       => self::TYPE_BAD_REQUEST,
-			'requests'      => self::TYPE_BAD_REQUEST,
+			'bad_request'      => self::TYPE_BAD_REQUEST,
+			'bad_requests'     => self::TYPE_BAD_REQUEST,
+			'request'          => self::TYPE_BAD_REQUEST,
+			'requests'         => self::TYPE_BAD_REQUEST,
 
 			// bad_cookie aliases.
-			'bad_cookie'    => self::TYPE_BAD_COOKIE,
-			'bad_cookies'   => self::TYPE_BAD_COOKIE,
-			'cookie'        => self::TYPE_BAD_COOKIE,
-			'cookies'       => self::TYPE_BAD_COOKIE,
+			'bad_cookie'       => self::TYPE_BAD_COOKIE,
+			'bad_cookies'      => self::TYPE_BAD_COOKIE,
+			'cookie'           => self::TYPE_BAD_COOKIE,
+			'cookies'          => self::TYPE_BAD_COOKIE,
 
 			// bad_bot aliases.
-			'bad_bot'       => self::TYPE_BAD_BOT,
-			'bad_bots'      => self::TYPE_BAD_BOT,
-			'bot'           => self::TYPE_BAD_BOT,
-			'bots'          => self::TYPE_BAD_BOT,
+			'bad_bot'          => self::TYPE_BAD_BOT,
+			'bad_bots'         => self::TYPE_BAD_BOT,
+			'bot'              => self::TYPE_BAD_BOT,
+			'bots'             => self::TYPE_BAD_BOT,
 
 			// bad_query aliases.
-			'bad_query'     => self::TYPE_BAD_QUERY,
-			'bad_queries'   => self::TYPE_BAD_QUERY,
-			'query'         => self::TYPE_BAD_QUERY,
-			'queries'       => self::TYPE_BAD_QUERY,
+			'bad_query'        => self::TYPE_BAD_QUERY,
+			'bad_queries'      => self::TYPE_BAD_QUERY,
+			'query'            => self::TYPE_BAD_QUERY,
+			'queries'          => self::TYPE_BAD_QUERY,
 
 			// blocked aliases.
-			'blocked'       => self::TYPE_BLOCKED,
-			'block'         => self::TYPE_BLOCKED,
+			'blocked'          => self::TYPE_BLOCKED,
+			'block'            => self::TYPE_BLOCKED,
 		];
 
 		return isset( $aliases[ $type ] ) ? $aliases[ $type ] : self::TYPE_FAILED_LOGIN;
@@ -156,49 +160,6 @@ class BruteForceDB {
 	 */
 	public function get_table_name() {
 		return $this->table_name;
-	}
-
-
-	/**
-	 * Get a row by IP address.
-	 *
-	 * Uses object caching to minimize direct database queries.
-	 * Falls back to a prepared database query on cache miss.
-	 *
-	 * @param string $ip The IP address to look up.
-	 * @return object|null The row object with 'ip', 'attempts', 'last_attempt' properties, or null if not found.
-	 */
-	public function get_row_by_ip( $ip ) {
-		$cache_key = 'securefusion_bf_ip_' . md5( $ip );
-		$cached    = \wp_cache_get( $cache_key, self::CACHE_GROUP );
-
-		if ( false !== $cached ) {
-			return $cached;
-		}
-
-		// phpcs:disable
-		$data = $this->wpdb->get_row(
-			$this->wpdb->prepare(
-				"SELECT COUNT(*) as attempts, MAX(last_attempt) as last_attempt FROM {$this->table_name} WHERE ip = %s AND log_type = %s",
-				$ip,
-				self::TYPE_FAILED_LOGIN
-			)
-		);
-		// phpcs:enable
-
-		if ( ! $data || ! $data->last_attempt ) {
-			$row = null;
-		} else {
-			$row = (object) [
-				'ip'           => $ip,
-				'attempts'     => (int) $data->attempts,
-				'last_attempt' => (int) $data->last_attempt,
-			];
-		}
-
-		wp_cache_set( $cache_key, $row, self::CACHE_GROUP, self::CACHE_TTL );
-
-		return $row;
 	}
 
 
@@ -223,47 +184,6 @@ class BruteForceDB {
 		// phpcs:enable
 
 		return (int) $attempts;
-	}
-
-
-	/**
-	 * Increment the attempt count for an existing IP and update the last_attempt timestamp.
-	 *
-	 * Now just inserts a new attempt to keep them as separate records.
-	 *
-	 * @param string $ip       The IP address to update.
-	 * @param int    $attempts The current attempt count (ignored).
-	 * @return int|false The number of rows inserted, or false on error.
-	 */
-	public function increment_attempts( $ip, $attempts ) {
-		return $this->insert_attempt( $ip );
-	}
-
-
-	/**
-	 * Insert a new IP row with initial attempt count of 1.
-	 *
-	 * Invalidates the relevant object cache entries after the write.
-	 *
-	 * @param string $ip The IP address to insert.
-	 * @return int|false The number of rows inserted, or false on error.
-	 */
-	public function insert_attempt( $ip ) {
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
-		$result = $this->wpdb->insert(
-			$this->table_name,
-			array(
-				'ip'           => $ip,
-				'attempts'     => 1,
-				'last_attempt' => time(),
-				'log_type'     => self::TYPE_FAILED_LOGIN,
-			),
-			array( '%s', '%d', '%d', '%s' )
-		);
-
-		$this->invalidate_cache_for_ip( $ip );
-
-		return $result;
 	}
 
 
@@ -470,17 +390,23 @@ class BruteForceDB {
 			return (int) $count;
 		}
 
-		$where = '';
 		if ( ! empty( $type_filter ) ) {
 			$type_filter = self::normalize_log_type( $type_filter );
-			$where       = $this->wpdb->prepare( ' WHERE log_type = %s', $type_filter );
+			// phpcs:disable
+			$count       = $this->wpdb->get_var(
+				$this->wpdb->prepare(
+					"SELECT COUNT(*) FROM {$this->table_name} WHERE log_type = %s",
+					$type_filter
+				)
+			);
+			// phpcs:enable
+		} else {
+			// phpcs:disable
+			$count       = $this->wpdb->get_var(
+				"SELECT COUNT(*) FROM {$this->table_name}"
+			);
+			// phpcs:enable
 		}
-
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
-		$count = $this->wpdb->get_var(
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name from validated $wpdb->prefix constant.
-			"SELECT COUNT(*) FROM {$this->table_name}{$where}"
-		);
 
 		return (int) $count;
 	}
@@ -956,7 +882,7 @@ class BruteForceDB {
 	 * @return void
 	 */
 	public function maybe_migrate_old_table() {
-		$old_table = $this->wpdb->prefix . 'secuplug_brute_force_table';
+		$old_table = \esc_sql( $this->wpdb->prefix . 'secuplug_brute_force_table' );
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$exists = $this->wpdb->get_var(
@@ -1007,6 +933,7 @@ class BruteForceDB {
             ip varchar(50) NOT NULL,
             rule_type varchar(50) NOT NULL,
             created_at int DEFAULT '0' NOT NULL,
+            expiration int DEFAULT '0' NOT NULL,
             PRIMARY KEY  (id),
             UNIQUE KEY  ip (ip)
         ) {$charset_collate};";
@@ -1041,6 +968,19 @@ class BruteForceDB {
 			);
 		}
 		// phpcs:enable
+
+		// Check if expiration column exists in ip_rules_table.
+		// phpcs:disable
+		$col_exists = $this->wpdb->get_results(
+			$this->wpdb->prepare(
+				"SHOW COLUMNS FROM {$this->ip_rules_table} LIKE %s",
+				'expiration'
+			)
+		);
+		// phpcs:enable
+		if ( empty( $col_exists ) ) {
+			$this->create_table();
+		}
 	}
 
 
@@ -1099,16 +1039,22 @@ class BruteForceDB {
 
 
 	/**
-	 * Block an IP address permanently.
+	 * Block an IP address.
 	 *
 	 * Whitelisted IPs cannot be blocked.
 	 *
-	 * @param string $ip The IP address to block.
+	 * @param string $ip               The IP address to block.
+	 * @param int    $duration_seconds Optional lockout duration in seconds.
 	 * @return bool True if blocked, false if whitelisted or error.
 	 */
-	public function block_ip( $ip ) {
+	public function block_ip( $ip, $duration_seconds = 0 ) {
 		if ( $this->is_ip_whitelisted( $ip ) ) {
 			return false;
+		}
+
+		$expiration = 0;
+		if ( $duration_seconds > 0 ) {
+			$expiration = time() + (int) $duration_seconds;
 		}
 
 		// phpcs:disable
@@ -1127,9 +1073,10 @@ class BruteForceDB {
 				array(
 					'rule_type'  => 'blocked',
 					'created_at' => time(),
+					'expiration' => $expiration,
 				),
 				array( 'id' => $existing_id ),
-				array( '%s', '%d' ),
+				array( '%s', '%d', '%d' ),
 				array( '%d' )
 			);
 		} else {
@@ -1140,13 +1087,15 @@ class BruteForceDB {
 					'ip'         => $ip,
 					'rule_type'  => 'blocked',
 					'created_at' => time(),
+					'expiration' => $expiration,
 				),
-				array( '%s', '%s', '%d' )
+				array( '%s', '%s', '%d', '%d' )
 			);
 		}
 
 		$this->invalidate_cache_for_ip( $ip );
 		\wp_cache_delete( 'securefusion_bf_whitelisted_' . md5( $ip ), self::CACHE_GROUP );
+		\wp_cache_delete( 'securefusion_bf_blocked_rules', self::CACHE_GROUP );
 
 		return $result !== false;
 	}
@@ -1214,16 +1163,45 @@ class BruteForceDB {
 		}
 
 		// phpcs:disable
-		$rules = $this->wpdb->get_col(
+		$rows = $this->wpdb->get_results(
 			$this->wpdb->prepare(
-				"SELECT ip FROM {$this->ip_rules_table} WHERE rule_type = %s",
+				"SELECT ip, expiration FROM {$this->ip_rules_table} WHERE rule_type = %s",
 				'blocked'
-			)
+			),
+			ARRAY_A
 		);
-		 // phpcs:enable
+		// phpcs:enable
 
-		if ( ! is_array( $rules ) ) {
-			$rules = [];
+		if ( ! is_array( $rows ) ) {
+			$rows = [];
+		}
+
+		$now         = time();
+		$rules       = [];
+		$expired_ips = [];
+
+		foreach ( $rows as $row ) {
+			$expiration = isset( $row['expiration'] ) ? (int) $row['expiration'] : 0;
+			if ( $expiration > 0 && $now > $expiration ) {
+				$expired_ips[] = $row['ip'];
+			} else {
+				$rules[] = $row['ip'];
+			}
+		}
+
+		if ( ! empty( $expired_ips ) ) {
+			foreach ( $expired_ips as $expired_ip ) {
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+				$this->wpdb->delete(
+					$this->ip_rules_table,
+					array(
+						'ip'        => $expired_ip,
+						'rule_type' => 'blocked',
+					),
+					array( '%s', '%s' )
+				);
+			}
+			$this->invalidate_all_cache();
 		}
 
 		\wp_cache_set( $cache_key, $rules, self::CACHE_GROUP, self::CACHE_TTL );
@@ -1434,7 +1412,7 @@ class BruteForceDB {
 	 * @return array Array of rule objects.
 	 */
 	public function get_all_rules( $per_page = 20, $offset = 0, $orderby = 'created_at', $order = 'DESC' ) {
-		$allowed_columns = [ 'id', 'ip', 'rule_type', 'created_at' ];
+		$allowed_columns = [ 'id', 'ip', 'rule_type', 'created_at', 'expiration' ];
 		$orderby         = in_array( $orderby, $allowed_columns, true ) ? $orderby : 'created_at';
 		$order           = strtoupper( $order ) === 'ASC' ? 'ASC' : 'DESC';
 		$per_page        = absint( $per_page );
@@ -1443,7 +1421,7 @@ class BruteForceDB {
 		// phpcs:disable
 		return $this->wpdb->get_results(
 			$this->wpdb->prepare(
-				"SELECT id, ip, rule_type, created_at FROM {$this->ip_rules_table} ORDER BY {$orderby} {$order} LIMIT %d OFFSET %d",
+				"SELECT id, ip, rule_type, created_at, expiration FROM {$this->ip_rules_table} ORDER BY {$orderby} {$order} LIMIT %d OFFSET %d",
 				$per_page,
 				$offset
 			)

@@ -10,6 +10,10 @@
 
 namespace SecureFusion\Lib;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
+
 use SecureFusion\Lib\Traits\WPCommon;
 
 /**
@@ -279,15 +283,17 @@ class IPRules {
 								$columns = [
 									'ip'         => esc_html__( 'IP / Subnet (CIDR)', 'secuplug' ),
 									'rule_type'  => esc_html__( 'Rule Type', 'secuplug' ),
+									'duration'   => esc_html__( 'Duration', 'secuplug' ),
 									'created_at' => esc_html__( 'Created At', 'secuplug' ),
 								];
 
 								foreach ( $columns as $col_key => $col_label ) :
-									$is_sorted  = ( $orderby === $col_key );
+									$sort_key   = ( $col_key === 'duration' ) ? 'expiration' : $col_key;
+									$is_sorted  = ( $orderby === $sort_key );
 									$next_order = $is_sorted && $order === 'ASC' ? 'DESC' : 'ASC';
 									$sort_url   = add_query_arg(
 										[
-											'orderby' => $col_key,
+											'orderby' => $sort_key,
 											'order'   => $next_order,
 											'paged'   => 1,
 										],
@@ -320,6 +326,21 @@ class IPRules {
 										<?php else : ?>
 											<span class="fynd-sf-status-badge fynd-sf-status-blocked"><?php esc_html_e( 'Blocked', 'secuplug' ); ?></span>
 										<?php endif; ?>
+									</td>
+									<td class="column-duration">
+										<?php
+										if ( $row->rule_type === 'whitelisted' ) {
+											echo esc_html__( 'Permanent', 'secuplug' );
+										} else {
+											$expiration = isset( $row->expiration ) ? (int) $row->expiration : 0;
+											if ( $expiration === 0 ) {
+												echo esc_html__( 'Permanent', 'secuplug' );
+											} else {
+												/* translators: %s: Formatted expiration date and time */
+												printf( esc_html__( 'Until %s', 'secuplug' ), esc_html( wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $expiration ) ) );
+											}
+										}
+										?>
 									</td>
 									<td class="column-created_at">
 										<?php

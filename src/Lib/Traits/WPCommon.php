@@ -8,6 +8,10 @@
 
 namespace SecureFusion\Lib\Traits;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
+
 use Exception;
 
 
@@ -136,14 +140,14 @@ trait WPCommon {
 		$requested_page = $this->get_requested_page();
 
 		$wp_login      = strpos( $pagenow, 'wp-login.php' ) !== false;
-		$is_login_page = in_array( $requested_page, $login_dir );
+		$is_login_page = in_array( $requested_page, $login_dir, true );
 		$is_login_page = ( $wp_login || $is_login_page );
 
 		if ( $old ) {
 			return $is_login_page;
 		}
 
-		return ( $requested_page == $this->get_new_login_url() );
+		return ( $requested_page === $this->get_new_login_url() );
 	}
 
 
@@ -255,7 +259,7 @@ trait WPCommon {
 	 * @return string Client IP.
 	 */
 	protected function get_client_ip() {
-		$server_var = wp_unslash( $_SERVER );
+		$server_var  = wp_unslash( $_SERVER );
 		$remote_addr = isset( $server_var['REMOTE_ADDR'] ) ? trim( $server_var['REMOTE_ADDR'] ) : '';
 
 		// If REMOTE_ADDR is a public IP, trust it directly to prevent spoofing via custom headers.
@@ -330,8 +334,24 @@ trait WPCommon {
 				<?php if ( ! empty( $custom_actions ) ) : ?>
 					<?php foreach ( $custom_actions as $action_html ) : ?>
 						<?php
-						// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Pre-escaped action HTML from caller.
-						echo $action_html;
+						$allowed_tags = [
+							'button' => [
+								'type'  => [],
+								'id'    => [],
+								'class' => [],
+							],
+							'span'   => [
+								'class' => [],
+							],
+							'a'      => [
+								'href'   => [],
+								'class'  => [],
+								'id'     => [],
+								'target' => [],
+								'rel'    => [],
+							],
+						];
+						echo wp_kses( $action_html, $allowed_tags );
 						?>
 					<?php endforeach; ?>
 				<?php endif; ?>

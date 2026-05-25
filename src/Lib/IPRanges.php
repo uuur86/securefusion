@@ -9,6 +9,10 @@
 
 namespace SecureFusion\Lib;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
+
 use SecureFusion\Lib\Traits\WPCommon;
 
 /**

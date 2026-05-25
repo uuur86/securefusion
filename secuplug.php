@@ -10,7 +10,7 @@
  * License: GPL v3 or later
  * Text Domain: secuplug
  * Domain Path:  /languages
- * Requires PHP: 7.4 or later
+ * Requires PHP: 7.4
  *
  * @package secuplug
  * @license GPL v3

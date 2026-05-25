@@ -42,7 +42,7 @@ function securefusion_uninstall_site_data() {
 	// ──────────────────────────────────────────────
 	$wasp = new Wasp(
 		'securefusion-settings',
-		'secuplug',
+		'securefusion',
 		'secuplug'
 	);
 
@@ -130,7 +130,7 @@ function securefusion_uninstall_network_data() {
 	// ──────────────────────────────────────────────
 	$wasp = new Wasp(
 		'securefusion-settings',
-		'secuplug',
+		'securefusion',
 		'secuplug'
 	);
 

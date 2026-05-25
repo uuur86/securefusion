@@ -7,6 +7,10 @@
 
 namespace SecureFusion\Lib;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
+
 use SecureFusion\Lib as Sources;
 use SecureFusion\Lib\Traits\WPCommon;
 
@@ -76,6 +80,7 @@ class Main {
 			'disable_self_pingback'         => '1',
 			'ip_time_limit'                 => '2',
 			'ip_login_limit'                => '5',
+			'ip_attempt_window'             => '10',
 			'cleanup_ip_days'               => '30',
 			'cleanup_ip_attempts'           => '10',
 			'custom_login_url'              => '',

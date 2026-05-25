@@ -7,6 +7,10 @@
 
 namespace SecureFusion\Lib;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
+
 use SecureFusion\Lib\Traits\WPCommon;
 
 /**
@@ -51,6 +55,23 @@ class Login {
 		}
 
 		$user = get_userdata( $admin_id );
+
+		// Check if the new ID is already assigned to a different user to prevent database conflicts.
+		$existing_user_with_new_id = get_userdata( $new_id );
+
+		if ( $existing_user_with_new_id ) {
+
+			if ( $existing_user_with_new_id->user_login !== $user->user_login ) {
+
+				if ( $admin_id !== $new_id ) {
+					$this->set_settings( 'change_admin_id', $admin_id );
+				}
+
+				return;
+			}
+
+			return;
+		}
 
 		if ( ! empty( $user->roles ) && in_array( 'administrator', $user->roles, true ) ) {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
