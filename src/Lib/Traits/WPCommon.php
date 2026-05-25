@@ -192,38 +192,104 @@ trait WPCommon {
 
 
 	/**
-	 * Get client IP
+	 * Check if an IP address is a private, loopback, or link-local IP.
+	 *
+	 * @param string $ip The IP address to check.
+	 * @return bool True if private/local, false otherwise.
+	 */
+	public function is_private_ip( $ip ) {
+		return filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE ) === false;
+	}
 
+
+
+	/**
+	 * Check if an IP address is a public IP.
+	 *
+	 * @param string $ip The IP address to check.
+	 * @return bool True if public, false otherwise.
+	 */
+	public function is_public_ip( $ip ) {
+		return filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE ) !== false;
+	}
+
+
+
+	/**
+	 * Calculate the smallest CIDR block for a /24 prefix given the min and max last octet.
+	 *
+	 * If the min and max are equal (single IP), it returns the exact IP address.
+	 *
+	 * @param string $range_prefix   The first 3 octets (e.g. '192.168.1').
+	 * @param int    $min_last_octet The minimum last octet.
+	 * @param int    $max_last_octet The maximum last octet.
+	 * @return string The CIDR notation (e.g. '192.168.1.0/28') or exact IP (e.g. '192.168.1.5').
+	 */
+	public function calculate_cidr( $range_prefix, $min_last_octet, $max_last_octet ) {
+		$min = (int) $min_last_octet;
+		$max = (int) $max_last_octet;
+
+		if ( $min === $max ) {
+			return $range_prefix . '.' . $min;
+		}
+
+		$diff = $min ^ $max;
+		$mask = 32;
+
+		while ( $diff > 0 ) {
+			$diff >>= 1;
+			--$mask;
+		}
+
+		$shift_amount       = 32 - $mask;
+		$network_last_octet = $min & ( ~ ( ( 1 << $shift_amount ) - 1 ) & 0xFF );
+
+		return $range_prefix . '.' . $network_last_octet . '/' . $mask;
+	}
+
+
+
+	/**
+	 * Get client IP
+	 *
 	 * @return string Client IP.
 	 */
 	protected function get_client_ip() {
+		$server_var = wp_unslash( $_SERVER );
+		$remote_addr = isset( $server_var['REMOTE_ADDR'] ) ? trim( $server_var['REMOTE_ADDR'] ) : '';
+
+		// If REMOTE_ADDR is a public IP, trust it directly to prevent spoofing via custom headers.
+		if ( ! empty( $remote_addr ) && $this->is_public_ip( $remote_addr ) ) {
+			return $remote_addr;
+		}
+
+		// Otherwise, if REMOTE_ADDR is a private IP (e.g. Docker proxy, local env), check forwarding headers.
 		$ipaddress = '';
 
-		$server_var = wp_unslash( $_SERVER );
-
-		if ( isset( $_SERVER['HTTP_CLIENT_IP'] ) ) {
+		if ( isset( $server_var['HTTP_CLIENT_IP'] ) ) {
 			$ipaddress = $server_var['HTTP_CLIENT_IP'];
-		} elseif ( isset( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
+		} elseif ( isset( $server_var['HTTP_X_FORWARDED_FOR'] ) ) {
 			$ipaddress = $server_var['HTTP_X_FORWARDED_FOR'];
-		} elseif ( isset( $_SERVER['HTTP_X_FORWARDED'] ) ) {
+		} elseif ( isset( $server_var['HTTP_X_FORWARDED'] ) ) {
 			$ipaddress = $server_var['HTTP_X_FORWARDED'];
-		} elseif ( isset( $_SERVER['HTTP_FORWARDED_FOR'] ) ) {
+		} elseif ( isset( $server_var['HTTP_FORWARDED_FOR'] ) ) {
 			$ipaddress = $server_var['HTTP_FORWARDED_FOR'];
-		} elseif ( isset( $_SERVER['HTTP_FORWARDED'] ) ) {
+		} elseif ( isset( $server_var['HTTP_FORWARDED'] ) ) {
 			$ipaddress = $server_var['HTTP_FORWARDED'];
 		} else {
-			$ipaddress = $server_var['REMOTE_ADDR'];
+			$ipaddress = $remote_addr;
 		}
 
 		// Multiple IP addresses can be returned, so let's take the first one.
 		if ( strpos( $ipaddress, ',' ) !== false ) {
 			$ipaddress = explode( ',', $ipaddress );
-			$ipaddress = $ipaddress[0] ?? false;
+			$ipaddress = $ipaddress[0] ?? '';
 		}
 
+		$ipaddress = trim( $ipaddress );
 		$ipaddress = filter_var( $ipaddress, FILTER_VALIDATE_IP );
 
-		return $ipaddress;
+		return $ipaddress ? $ipaddress : $remote_addr;
 	}
 	/**
 	 * Render the unified plugin page header.

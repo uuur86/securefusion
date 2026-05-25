@@ -48,12 +48,13 @@ class BruteForceDB {
 	 *
 	 * @var string
 	 */
-	const TYPE_FAILED_LOGIN = 'failed_login';
-	const TYPE_BAD_REQUEST  = 'bad_request';
-	const TYPE_BAD_COOKIE   = 'bad_cookie';
-	const TYPE_BAD_BOT      = 'bad_bot';
-	const TYPE_BAD_QUERY    = 'bad_query';
-	const TYPE_BLOCKED      = 'blocked';
+	const TYPE_FAILED_LOGIN     = 'failed_login';
+	const TYPE_BAD_REQUEST      = 'bad_request';
+	const TYPE_BAD_COOKIE       = 'bad_cookie';
+	const TYPE_BAD_BOT          = 'bad_bot';
+	const TYPE_BAD_QUERY        = 'bad_query';
+	const TYPE_BLOCKED          = 'blocked';
+	const TYPE_SUCCESSFUL_LOGIN = 'successful_login';
 
 	/**
 	 * The validated, prefixed table name.
@@ -104,6 +105,10 @@ class BruteForceDB {
 		$type = strtolower( trim( $type ) );
 
 		$aliases = [
+			// successful_login aliases.
+			'successful_login' => self::TYPE_SUCCESSFUL_LOGIN,
+			'success_login'    => self::TYPE_SUCCESSFUL_LOGIN,
+
 			// failed_login aliases.
 			'failed_login'  => self::TYPE_FAILED_LOGIN,
 			'failed_logins' => self::TYPE_FAILED_LOGIN,
@@ -276,11 +281,14 @@ class BruteForceDB {
 			return (int) $cached;
 		}
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		// phpcs:disable
 		$total = $this->wpdb->get_var(
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name from validated $wpdb->prefix constant, not user input.
-			"SELECT SUM(attempts) FROM {$this->table_name}"
+			$this->wpdb->prepare(
+				"SELECT SUM(attempts) FROM {$this->table_name} WHERE log_type != %s",
+				self::TYPE_SUCCESSFUL_LOGIN
+			)
 		);
+		// phpcs:enable
 
 		$total = (int) $total;
 		\wp_cache_set( 'securefusion_bf_total_attempts', $total, self::CACHE_GROUP, self::CACHE_TTL );
@@ -336,11 +344,14 @@ class BruteForceDB {
 			return (int) $cached;
 		}
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		// phpcs:disable
 		$count = $this->wpdb->get_var(
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name from validated $wpdb->prefix constant, not user input.
-			"SELECT COUNT(DISTINCT ip) FROM {$this->table_name}"
+			$this->wpdb->prepare(
+				"SELECT COUNT(DISTINCT ip) FROM {$this->table_name} WHERE log_type != %s",
+				self::TYPE_SUCCESSFUL_LOGIN
+			)
 		);
+		// phpcs:enable
 
 		$count = (int) $count;
 		\wp_cache_set( 'securefusion_bf_unique_ips', $count, self::CACHE_GROUP, self::CACHE_TTL );

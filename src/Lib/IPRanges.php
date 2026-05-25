@@ -78,31 +78,6 @@ class IPRanges {
 		);
 	}
 
-	/**
-	 * Calculate the smallest CIDR block for a /24 prefix given the min and max last octet.
-	 *
-	 * @param string $range_prefix   The first 3 octets (e.g. '192.168.1').
-	 * @param int    $min_last_octet The minimum last octet.
-	 * @param int    $max_last_octet The maximum last octet.
-	 * @return string The CIDR notation (e.g. '192.168.1.0/28').
-	 */
-	private function calculate_cidr( $range_prefix, $min_last_octet, $max_last_octet ) {
-		$min = (int) $min_last_octet;
-		$max = (int) $max_last_octet;
-
-		$diff = $min ^ $max;
-		$mask = 32;
-
-		while ( $diff > 0 ) {
-			$diff >>= 1;
-			--$mask;
-		}
-
-		$shift_amount       = 32 - $mask;
-		$network_last_octet = $min & ( ~ ( ( 1 << $shift_amount ) - 1 ) & 0xFF );
-
-		return $range_prefix . '.' . $network_last_octet . '/' . $mask;
-	}
 
 	/**
 	 * Render the IP ranges page HTML.

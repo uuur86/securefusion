@@ -50,8 +50,8 @@ class Middleware {
 		}
 
 		if ( \current_user_can( 'manage_options' ) ) {
-			// Automatically whitelist admin IPs.
-			if ( $ip ) {
+			// Automatically whitelist admin IPs if public.
+			if ( $ip && $this->is_public_ip( $ip ) ) {
 				$this->brute_force_db->whitelist_ip( $ip );
 			}
 			return;
@@ -108,13 +108,14 @@ class Middleware {
 		}
 
 		// Calculate total payload: query string + request body.
+		// phpcs:ignore -- We need raw access to these superglobals for accurate size calculation.
 		$query_string_size = isset( $_SERVER['QUERY_STRING'] ) ? strlen( $_SERVER['QUERY_STRING'] ) : 0;
 		$body_size         = isset( $_SERVER['CONTENT_LENGTH'] ) ? (int) $_SERVER['CONTENT_LENGTH'] : 0;
 		$total_size        = $query_string_size + $body_size;
 
 		if ( $total_size > $max_payload_size ) {
-			$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
-			$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? sanitize_url( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
+			$user_agent   = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
+			$request_uri  = isset( $_SERVER['REQUEST_URI'] ) ? sanitize_url( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
 			$payload_info = sprintf( 'Size: %d bytes (limit: %d) | URI: %s', $total_size, $max_payload_size, $request_uri );
 
 			$this->brute_force_db->block_ip( $ip );
@@ -520,8 +521,8 @@ class Middleware {
 			// Log bad query with details.
 			$ip = $this->get_client_ip();
 			if ( $ip ) {
-				$user_agent  = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
-				$payload     = http_build_query( $wp->query_vars );
+				$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
+				$payload    = http_build_query( $wp->query_vars );
 				$this->brute_force_db->log_attempt_with_details( $ip, BruteForceDB::TYPE_BAD_QUERY, $user_agent, $payload );
 			}
 
@@ -598,7 +599,7 @@ class Middleware {
 	 *
 	 * Fired on 'wp_login_failed' action.
 	 *
-	 * @param string $username Username attempted.
+	 * @param string         $username Username attempted.
 	 * @param \WP_Error|null $error Optional. Error object.
 	 * @return void
 	 */
@@ -612,17 +613,21 @@ class Middleware {
 		// Log with full details (IP, UA, payload).
 		$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
 
-		// Construct payload: username and sanitized POST data excluding passwords
+		// Construct payload: username and sanitized POST data excluding passwords.
+		// phpcs:ignore -- We need raw access to these superglobals for accurate logging, but we sanitize them before use.
 		$post_data = wp_unslash( $_POST );
+
 		if ( isset( $post_data['pwd'] ) ) {
 			$post_data['pwd'] = '******';
 		}
+
 		if ( isset( $post_data['password'] ) ) {
 			$post_data['password'] = '******';
 		}
 
-		// Serialize payload safely
+		// Serialize payload safely.
 		$payload = 'Username: ' . sanitize_text_field( $username );
+
 		if ( ! empty( $post_data ) && is_array( $post_data ) ) {
 			$payload .= ' | POST: ' . http_build_query( $post_data );
 		}
@@ -673,5 +678,35 @@ class Middleware {
 		}
 
 		return $username;
+	}
+
+
+	/**
+	 * Track successful login attempts.
+	 *
+	 * Fired on 'wp_login' action.
+	 *
+	 * @param string   $user_login Username.
+	 * @param \WP_User $user       User object.
+	 * @return void
+	 */
+	public function track_login_successful( $user_login, $user ) {
+		$ip = $this->get_client_ip();
+
+		if ( ! $ip ) {
+			return;
+		}
+
+		$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
+
+		// Construct payload safely (Username & User ID).
+		$payload = sprintf( 'User: %s (ID: %d)', sanitize_text_field( $user_login ), $user->ID );
+
+		$this->brute_force_db->log_attempt_with_details(
+			$ip,
+			BruteForceDB::TYPE_SUCCESSFUL_LOGIN,
+			$user_agent,
+			$payload
+		);
 	}
 }

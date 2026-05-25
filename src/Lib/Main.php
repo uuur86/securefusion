@@ -130,8 +130,12 @@ class Main {
 		$this->ssl_control = new Sources\SSLControl();
 		$this->xmlrpc      = new Sources\XMLRPC();
 		$this->middleware  = new Sources\Middleware();
+		$comments_block    = new Sources\CommentsBlock();
 
 		add_action( 'admin_init', array( 'PAnD', 'init' ) );
+
+		// COMMENTS BLOCK.
+		add_action( 'init', array( $comments_block, 'init' ) );
 
 		// ADMIN.
 		add_action( 'init', array( $this->admin, 'init' ) );
@@ -150,6 +154,7 @@ class Main {
 		add_action( 'init', array( $this->middleware, 'filter_bad_requests' ), 10 );
 		add_action( 'wp_login_failed', array( $this->middleware, 'track_login_failed' ), 10, 2 );
 		add_action( 'wp_authenticate', array( $this->middleware, 'track_limit_login_attempts' ), 10, 2 );
+		add_action( 'wp_login', array( $this->middleware, 'track_login_successful' ), 10, 2 );
 		add_action( 'init', array( $this->middleware, 'headers' ), 9 );
 
 		// SECURITY LOG — AJAX handlers.
@@ -186,7 +191,7 @@ class Main {
 
 		$ip = $this->get_client_ip();
 
-		if ( $ip ) {
+		if ( $ip && $this->is_public_ip( $ip ) ) {
 			$brute_force_db = new BruteForceDB();
 			$brute_force_db->whitelist_ip( $ip );
 		}

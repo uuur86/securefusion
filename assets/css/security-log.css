@@ -373,6 +373,11 @@
 	color: #6a1b9a;
 }
 
+.fynd-sf-login-log .fynd-sf-type-badge.fynd-sf-type-successful_login {
+	background: #d4edda;
+	color: #155724;
+}
+
 /* Attempt badges */
 .fynd-sf-login-log .fynd-sf-attempt-badge {
 	display: inline-block;

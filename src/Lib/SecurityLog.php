@@ -42,13 +42,14 @@ class SecurityLog {
 	 */
 	private function get_log_type_options() {
 		return [
-			''                              => esc_html__( 'All Types', 'securefusion' ),
-			BruteForceDB::TYPE_FAILED_LOGIN => esc_html__( 'Failed Login', 'securefusion' ),
-			BruteForceDB::TYPE_BAD_REQUEST  => esc_html__( 'Bad Request', 'securefusion' ),
-			BruteForceDB::TYPE_BAD_COOKIE   => esc_html__( 'Bad Cookie', 'securefusion' ),
-			BruteForceDB::TYPE_BAD_BOT      => esc_html__( 'Bad Bot', 'securefusion' ),
-			BruteForceDB::TYPE_BAD_QUERY    => esc_html__( 'Bad Query', 'securefusion' ),
-			BruteForceDB::TYPE_BLOCKED      => esc_html__( 'Blocked', 'securefusion' ),
+			''                                  => esc_html__( 'All Types', 'securefusion' ),
+			BruteForceDB::TYPE_FAILED_LOGIN     => esc_html__( 'Failed Login', 'securefusion' ),
+			BruteForceDB::TYPE_SUCCESSFUL_LOGIN => esc_html__( 'Successful Login', 'securefusion' ),
+			BruteForceDB::TYPE_BAD_REQUEST      => esc_html__( 'Bad Request', 'securefusion' ),
+			BruteForceDB::TYPE_BAD_COOKIE       => esc_html__( 'Bad Cookie', 'securefusion' ),
+			BruteForceDB::TYPE_BAD_BOT          => esc_html__( 'Bad Bot', 'securefusion' ),
+			BruteForceDB::TYPE_BAD_QUERY        => esc_html__( 'Bad Query', 'securefusion' ),
+			BruteForceDB::TYPE_BLOCKED          => esc_html__( 'Blocked', 'securefusion' ),
 		];
 	}
 
