@@ -212,13 +212,12 @@ class Admin {
 			?>
 			<h1 class="fynd-sf-sr-only"><?php esc_html_e( 'SecureFusion Dashboard', 'securefusion' ); ?></h1>
 
-			<header class="fynd-sf-log-header">
-				<img src="<?php echo esc_url( $this->plugin_url ); ?>assets/icon.svg" alt="SecureFusion Logo" class="fynd-sf-log-logo">
-				<div class="fynd-sf-log-header-text">
-					<h2 class="fynd-sf-log-title"><?php esc_html_e( 'SecureFusion Dashboard', 'securefusion' ); ?></h2>
-					<p class="fynd-sf-log-desc"><?php esc_html_e( 'You can monitor your WordPress security settings.', 'securefusion' ); ?></p>
-				</div>
-			</header>
+			<?php
+			$this->render_header(
+				esc_html__( 'SecureFusion Dashboard', 'securefusion' ),
+				esc_html__( 'You can monitor your WordPress security settings.', 'securefusion' )
+			);
+			?>
 
 			<section class="fynd-sf-charts-section">
 				<div class="fynd-sf-chart-container">
@@ -533,29 +532,12 @@ class Admin {
 			?>
 			<h1 class="fynd-sf-sr-only"><?php esc_html_e( 'SecureFusion Security Settings', 'securefusion' ); ?></h1>
 
-			<header class="fynd-sf-log-header">
-				<img src="<?php echo esc_url( $this->plugin_url ); ?>assets/icon.svg" alt="SecureFusion Logo" class="fynd-sf-log-logo">
-				<div class="fynd-sf-log-header-text" style="flex-grow: 1;">
-					<h2 class="fynd-sf-log-title"><?php esc_html_e( 'SecureFusion Security Settings', 'securefusion' ); ?></h2>
-					<p class="fynd-sf-log-desc">
-						<?php esc_html_e( 'You can manage your WordPress security settings.', 'securefusion' ); ?>
-						<span class="version-info" style="margin-left: 10px; color: #646970;">
-							<?php
-								/* translators: %s: Version number */
-								printf( esc_html__( 'Version %s - Check out.', 'securefusion' ), esc_html( SECUREFUSION_VERSION ) );
-							?>
-							<a href="https://fyndsoft.com/securefusion/changelog" target="_blank" rel="noopener" style="color: #01b9ba; text-decoration: none; font-weight: 500;">
-								<?php esc_html_e( 'What\'s New', 'securefusion' ); ?>
-							</a>
-						</span>
-					</p>
-				</div>
-				<div class="plugin-links">
-					<a href="#" class="fynd-sf-btn fynd-sf-btn-secondary">
-						<?php esc_html_e( 'Additional Plugins', 'securefusion' ); ?>
-					</a>
-				</div>
-			</header>
+			<?php
+			$this->render_header(
+				esc_html__( 'SecureFusion Security Settings', 'securefusion' ),
+				esc_html__( 'You can manage your WordPress security settings.', 'securefusion' )
+			);
+			?>
 			<?php
 			if ( $this->settings_page->is_ready() ) {
 				?>
@@ -640,40 +622,16 @@ class Admin {
 
 		$settings_menu = $this->admin_link . '?page=securefusion-settings';
 		?>
-		<div data-dismissible="do-securefusion-settings-forever" class="welcome-panel notice is-dismissible fynd-sf-welcome-notice">
-			<div class="welcome-panel-content">
-				<h2>
-					<?php esc_html_e( 'Welcome to SecureFusion', 'securefusion' ); ?>
-				</h2>
-				<p class="about-description">
-					<?php
-						echo wp_kses(
-							sprintf(
-								/* translators: %s: Plugin Settings URL */
-								__(
-									'Thank you for installing SecureFusion! Check out <a href="%s">the Plugin Settings</a>',
-									'securefusion'
-								),
-								esc_url( $settings_menu )
-							),
-							[
-								'a' => [
-									'href' => [],
-								],
-							]
-						);
-					?>
-				</p>
-				<div class="welcome-panel-column-container">
-					<div class="welcome-panel-column">
-						<p>
-							<a href="<?php echo esc_url( $settings_menu ); ?>" class="button button-primary button-large fynd-sf-btn fynd-sf-btn-primary fynd-sf-btn-large">
-								<span class="dashicons dashicons-admin-settings"></span>
-								<?php esc_html_e( 'Get started', 'securefusion' ); ?>
-							</a>
-						</p>
-					</div>
+		<div data-dismissible="do-securefusion-settings-forever" class="notice is-dismissible fynd-sf-welcome-notice">
+			<div class="fynd-sf-welcome-inner">
+				<span class="dashicons dashicons-shield-alt fynd-sf-welcome-icon"></span>
+				<div class="fynd-sf-welcome-text">
+					<strong><?php esc_html_e( 'SecureFusion is active!', 'securefusion' ); ?></strong>
+					<span><?php esc_html_e( 'Configure your security settings to protect your site.', 'securefusion' ); ?></span>
 				</div>
+				<a href="<?php echo esc_url( $settings_menu ); ?>" class="fynd-sf-btn fynd-sf-btn-primary fynd-sf-welcome-btn">
+					<?php esc_html_e( 'Go to Settings', 'securefusion' ); ?>
+				</a>
 			</div>
 		</div>
 		<?php
@@ -895,7 +853,7 @@ class Admin {
 						'placeholder'       => 'fonts.googleapis.com',
 						'field_type'        => 'url',
 						'sanitize_callback' => [ CSP::class, 'validate_csp_source' ],
-						'presets'           => '<button type="button" class="fynd-sf-taginput-preset-btn" data-preset="\'unsafe-inline\'">unsafe-inline</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://fonts.googleapis.com">Google Fonts</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://cdnjs.cloudflare.com">Cloudflare</button>',
+						'presets'           => '<button type="button" class="fynd-sf-taginput-preset-btn" data-preset="\'unsafe-inline\'">unsafe-inline</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://fonts.googleapis.com">Google Fonts</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://cdnjs.cloudflare.com">Cloudflare CDN</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://cdn.jsdelivr.net">jsDelivr</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://use.fontawesome.com">FontAwesome</button>',
 					],
 					[
 						'type'    => 'radio',
@@ -920,7 +878,7 @@ class Admin {
 						'placeholder'       => 'googletagmanager.com',
 						'field_type'        => 'url',
 						'sanitize_callback' => [ CSP::class, 'validate_csp_source' ],
-						'presets'           => '<button type="button" class="fynd-sf-taginput-preset-btn" data-preset="\'unsafe-inline\'">unsafe-inline</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://www.googletagmanager.com">Google Tag Manager</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://www.google-analytics.com">GA4</button>',
+						'presets'           => '<button type="button" class="fynd-sf-taginput-preset-btn" data-preset="\'unsafe-inline\'">unsafe-inline</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://www.googletagmanager.com">Google Tag Manager</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://www.google-analytics.com">GA4</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://www.google.com/recaptcha">reCAPTCHA</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://js.stripe.com">Stripe</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://cdn.jsdelivr.net">jsDelivr</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://unpkg.com">UNPKG</button>',
 					],
 					[
 						'type'    => 'radio',
@@ -945,7 +903,7 @@ class Admin {
 						'placeholder'       => 'fonts.gstatic.com',
 						'field_type'        => 'url',
 						'sanitize_callback' => [ CSP::class, 'validate_csp_source' ],
-						'presets'           => '<button type="button" class="fynd-sf-taginput-preset-btn" data-preset="data:">data:</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://fonts.gstatic.com">Google Fonts</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://cdnjs.cloudflare.com">Cloudflare</button>',
+						'presets'           => '<button type="button" class="fynd-sf-taginput-preset-btn" data-preset="data:">data:</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://fonts.gstatic.com">Google Fonts</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://cdnjs.cloudflare.com">Cloudflare CDN</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://use.fontawesome.com">FontAwesome</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://cdn.jsdelivr.net">jsDelivr</button>',
 					],
 					[
 						'type'    => 'radio',
@@ -970,7 +928,7 @@ class Admin {
 						'placeholder'       => 'youtube.com',
 						'field_type'        => 'url',
 						'sanitize_callback' => [ CSP::class, 'validate_csp_source' ],
-						'presets'           => '<button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://www.youtube.com">YouTube</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://www.google.com">Google</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://maps.google.com">Google Maps</button>',
+						'presets'           => '<button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://www.youtube.com">YouTube</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://www.google.com">Google</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://maps.google.com">Google Maps</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://player.vimeo.com">Vimeo</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://js.stripe.com">Stripe</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://www.google.com/recaptcha">reCAPTCHA</button>',
 					],
 					[
 						'type'    => 'radio',
@@ -995,7 +953,7 @@ class Admin {
 						'placeholder'       => 'blob:',
 						'field_type'        => 'url',
 						'sanitize_callback' => [ CSP::class, 'validate_csp_source' ],
-						'presets'           => '<button type="button" class="fynd-sf-taginput-preset-btn" data-preset="blob:">blob:</button>',
+						'presets'           => '<button type="button" class="fynd-sf-taginput-preset-btn" data-preset="blob:">blob:</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="data:">data:</button>',
 					],
 					[
 						'type'    => 'radio',
@@ -1020,7 +978,7 @@ class Admin {
 						'placeholder'       => 'example.com',
 						'field_type'        => 'url',
 						'sanitize_callback' => [ CSP::class, 'validate_csp_source' ],
-						'presets'           => '<button type="button" class="fynd-sf-taginput-preset-btn" data-preset="data:">data:</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https:">https:</button>',
+						'presets'           => '<button type="button" class="fynd-sf-taginput-preset-btn" data-preset="data:">data:</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https:">https:</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://secure.gravatar.com">Gravatar</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://s.w.org">WordPress.org</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://i0.wp.com">Jetpack CDN</button>',
 					],
 					[
 						'type'    => 'radio',
@@ -1245,7 +1203,7 @@ class Admin {
 							// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
 							return @preg_match( '/' . $value . '/', '' ) !== false;
 						},
-						'presets'           => '<button type="button" class="fynd-sf-taginput-preset-btn" data-preset="[a-z0-9]+">Alphanumeric</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="[a-zA-Z0-9_\-]+">Safe Chars</button>',
+						'presets'           => '<button type="button" class="fynd-sf-taginput-preset-btn" data-preset="[a-z0-9]+">Alphanumeric</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="[a-zA-Z0-9_\-]+">Safe Chars</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="[^\x27\x22\x3c\x3e\x5c]+">No Special Chars</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="^PHPSESSID$">PHPSESSID</button>',
 					],
 					[
 						'type'              => 'taginput',
@@ -1257,7 +1215,7 @@ class Admin {
 							// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
 							return @preg_match( '/' . $value . '/', '' ) !== false;
 						},
-						'presets'           => '<button type="button" class="fynd-sf-taginput-preset-btn" data-preset="@@[\w\.\$]+">SQL Vars</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="(union|select|insert)\s+">SQL Keywords</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="base64_\w+\(">Base64 Func</button>',
+						'presets'           => '<button type="button" class="fynd-sf-taginput-preset-btn" data-preset="@@[\w\.\$]+">SQL Vars</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="(union|select|insert)\s+">SQL Keywords</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="base64_\w+\(">Base64 Func</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="<script[^>]*>">XSS Script Tag</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="\bon\w+\s*=\s*[\x27\x22]">XSS Event Handler</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="\.\.[\\/]">LFI Traversal</button>',
 					],
 				],
 			],
@@ -1277,7 +1235,11 @@ class Admin {
 		if ( $this->check_admin_menu_screen( $this->menu_pages ) ) {
 			$this->admin_menu_zone();
 		} else {
-			\add_action( 'admin_notices', [ $this, 'welcome_notice' ] );
+			// Only show the welcome notice on the main WordPress Dashboard page.
+			$screen = get_current_screen();
+			if ( $screen && $screen->id === 'dashboard' ) {
+				\add_action( 'admin_notices', [ $this, 'welcome_notice' ] );
+			}
 		}
 	}
 

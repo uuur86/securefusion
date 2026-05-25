@@ -10,10 +10,14 @@
 
 namespace SecureFusion\Lib;
 
+use SecureFusion\Lib\Traits\WPCommon;
+
 /**
  * IPRules functionality class.
  */
 class IPRules {
+
+	use WPCommon;
 
 	/**
 	 * Nonce action for AJAX operations.
@@ -219,8 +223,7 @@ class IPRules {
 
 		$rows = $db->get_all_rules( self::PER_PAGE, $offset, $orderby, $order );
 
-		$plugin_url = plugins_url( '/', SECUREFUSION_BASENAME );
-		$page_url   = admin_url( 'admin.php?page=securefusion-ip-rules' );
+		$page_url = admin_url( 'admin.php?page=securefusion-ip-rules' );
 
 		$this->enqueue_assets();
 		?>
@@ -234,13 +237,12 @@ class IPRules {
 			?>
 			<h1 class="fynd-sf-sr-only"><?php esc_html_e( 'IP Rules', 'securefusion' ); ?></h1>
 
-			<header class="fynd-sf-log-header">
-				<img src="<?php echo esc_url( $plugin_url ); ?>assets/icon.svg" alt="SecureFusion" class="fynd-sf-log-logo">
-				<div class="fynd-sf-log-header-text">
-					<h2 class="fynd-sf-log-title"><?php esc_html_e( 'IP Rules Management', 'securefusion' ); ?></h2>
-					<p class="fynd-sf-log-desc"><?php esc_html_e( 'Manually block or whitelist specific IP addresses and range blocks.', 'securefusion' ); ?></p>
-				</div>
-			</header>
+			<?php
+			$this->render_header(
+				esc_html__( 'IP Rules Management', 'securefusion' ),
+				esc_html__( 'Manually block or whitelist specific IP addresses and range blocks.', 'securefusion' )
+			);
+			?>
 
 			<div id="fynd-sf-rules-notice" class="fynd-sf-log-notice" style="display:none;"></div>
 

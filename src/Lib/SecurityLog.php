@@ -11,10 +11,14 @@
 
 namespace SecureFusion\Lib;
 
+use SecureFusion\Lib\Traits\WPCommon;
+
 /**
  * SecurityLog functionality class.
  */
 class SecurityLog {
+
+	use WPCommon;
 
 	/**
 	 * Nonce action for AJAX operations.
@@ -385,8 +389,7 @@ class SecurityLog {
 			$rows = $db->get_all_rows( self::PER_PAGE, $offset, $orderby, $order, $type_filter );
 		}
 
-		$plugin_url = plugins_url( '/', SECUREFUSION_BASENAME );
-		$page_url   = admin_url( 'admin.php?page=securefusion-security-log' );
+		$page_url = admin_url( 'admin.php?page=securefusion-security-log' );
 
 		// Preserve filters in sort/page URLs.
 		if ( $range_filter ) {
@@ -408,13 +411,12 @@ class SecurityLog {
 			?>
 			<h1 class="fynd-sf-sr-only"><?php esc_html_e( 'Security Log', 'securefusion' ); ?></h1>
 
-			<header class="fynd-sf-log-header">
-				<img src="<?php echo esc_url( $plugin_url ); ?>assets/icon.svg" alt="SecureFusion" class="fynd-sf-log-logo">
-				<div class="fynd-sf-log-header-text">
-					<h2 class="fynd-sf-log-title"><?php esc_html_e( 'Security Log', 'securefusion' ); ?></h2>
-					<p class="fynd-sf-log-desc"><?php esc_html_e( 'Monitor and manage security events, blocked IPs, and attack records.', 'securefusion' ); ?></p>
-				</div>
-			</header>
+			<?php
+			$this->render_header(
+				esc_html__( 'Security Log', 'securefusion' ),
+				esc_html__( 'Monitor and manage security events, blocked IPs, and attack records.', 'securefusion' )
+			);
+			?>
 
 			<div id="fynd-sf-log-notice" class="fynd-sf-log-notice" style="display:none;"></div>
 

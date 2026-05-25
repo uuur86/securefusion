@@ -1,32 +1,63 @@
 /**
+ * SecureFusion Admin Settings JS
+ *
+ * Handles tab switching, _wp_http_referer synchronization for reliable
+ * post-save redirection, and tag-input component logic.
+ *
  * @package securefusion
  */
 
 (function ($) {
 
 	$(document).ready(function () {
-		let loc_href = $(location).attr('href').split('#');
+		var STORAGE_KEY = 'securefusion_active_tab';
+
+		/**
+		 * Derive the initial tab ID from (in priority order):
+		 * 1. URL hash
+		 * 2. localStorage
+		 * 3. First tab
+		 */
+		function get_initial_tab_id() {
+			var hash = window.location.hash.replace('#', '');
+
+			if (hash && $('a[href="#' + hash + '"]').length) {
+				return hash;
+			}
+
+			var stored = localStorage.getItem(STORAGE_KEY);
+			if (stored && $('a[href="#' + stored + '"]').length) {
+				return stored;
+			}
+
+			var $first = $('.nav-tab-wrapper > a').first();
+			if ($first.length) {
+				return $first.attr('href').split('#')[1];
+			}
+
+			return null;
+		}
+
+		/**
+		 * Update the _wp_http_referer hidden field so that WordPress
+		 * redirects back to the correct tab after saving.
+		 */
+		function sync_referer(tab_id) {
+			var $referer = $('input[name="_wp_http_referer"]');
+			if ($referer.length && tab_id) {
+				var url = window.location.pathname + window.location.search + '#' + tab_id;
+				$referer.val(url);
+			}
+		}
 
 		function securefusion_reset_tab_nav() {
 			$('.content-tab-wrapper > .tab-content').addClass('hidden');
 			$('.nav-tab-wrapper > a').removeClass('nav-tab-active');
 		}
 
-		function securefusion_tab_activate(selected_id = null) {
-
-			if (selected_id === null) {
-
-				if (loc_href.length > 1) {
-					selected_id = loc_href[1];
-				}
-
-				if (selected_id === null) {
-					selected_obj = $('.nav-tab-wrapper > a').first();
-
-					if (selected_obj.is('a')) {
-						selected_id = selected_obj.attr('href').split('#')[1];
-					}
-				}
+		function securefusion_tab_activate(selected_id) {
+			if (!selected_id) {
+				return;
 			}
 
 			var content_id = '#fynd-sf-' + selected_id;
@@ -34,21 +65,40 @@
 
 			$(nav_id).addClass('nav-tab-active');
 			$(content_id).removeClass('hidden');
+
+			// Persist the active tab.
+			localStorage.setItem(STORAGE_KEY, selected_id);
+
+			// Immediately sync the referer for save redirection.
+			sync_referer(selected_id);
+
+			// Update URL hash without scrolling.
+			if (history.pushState) {
+				history.pushState(null, null, '#' + selected_id);
+			}
 		}
 
+		// --- Initial activation ---
+		var initial_tab = get_initial_tab_id();
 		securefusion_reset_tab_nav();
-		securefusion_tab_activate();
+		securefusion_tab_activate(initial_tab);
 
-		$('.nav-tab-wrapper > a').click(function () {
+		// --- Tab click handler ---
+		$('.nav-tab-wrapper > a').click(function (e) {
+			e.preventDefault();
 			securefusion_reset_tab_nav();
 
-			let selected_id = $(this).attr('href').split('#')[1];
-
+			var selected_id = $(this).attr('href').split('#')[1];
 			securefusion_tab_activate(selected_id);
+		});
 
-			setTimeout(function () {
-				$('input[name="_wp_http_referer"]').val($(location).attr('href'));
-			}, 100);
+		// --- Handle browser back/forward ---
+		$(window).on('popstate', function () {
+			var hash = window.location.hash.replace('#', '');
+			if (hash && $('a[href="#' + hash + '"]').length) {
+				securefusion_reset_tab_nav();
+				securefusion_tab_activate(hash);
+			}
 		});
 
 		// Taginput for CSP and regex pattern fields
@@ -106,7 +156,7 @@
 			function validateUrl(value) {
 				if (!value) return false;
 				if (value === "'self'" || value === "'none'" || value.indexOf('data:') === 0) return true;
-				return /^(https?:\/\/)?[\w\-\.]+(\.\w{2,})+$/.test(value);
+				return /^(https?:\/\/)?[\w\-\.]+(\.?\w{2,})+$/.test(value);
 			}
 
 			function validateRegex(value) {

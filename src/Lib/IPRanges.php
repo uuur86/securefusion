@@ -9,10 +9,14 @@
 
 namespace SecureFusion\Lib;
 
+use SecureFusion\Lib\Traits\WPCommon;
+
 /**
  * IPRanges functionality class.
  */
 class IPRanges {
+
+	use WPCommon;
 
 	/**
 	 * Nonce action for AJAX operations.
@@ -121,8 +125,7 @@ class IPRanges {
 
 		$rows = $db->get_paginated_ip_ranges( self::PER_PAGE, $offset, $orderby, $order );
 
-		$plugin_url = plugins_url( '/', SECUREFUSION_BASENAME );
-		$page_url   = admin_url( 'admin.php?page=securefusion-ip-ranges' );
+		$page_url = admin_url( 'admin.php?page=securefusion-ip-ranges' );
 
 		$this->enqueue_assets();
 		?>
@@ -136,19 +139,18 @@ class IPRanges {
 			?>
 			<h1 class="fynd-sf-sr-only"><?php esc_html_e( 'IP Ranges', 'securefusion' ); ?></h1>
 
-			<header class="fynd-sf-log-header">
-				<img src="<?php echo esc_url( $plugin_url ); ?>assets/icon.svg" alt="SecureFusion" class="fynd-sf-log-logo">
-				<div class="fynd-sf-log-header-text">
-					<h2 class="fynd-sf-log-title"><?php esc_html_e( 'IP Ranges Management', 'securefusion' ); ?></h2>
-					<p class="fynd-sf-log-desc"><?php esc_html_e( 'View and manage IP subnets that have generated failed login attempts.', 'securefusion' ); ?></p>
-				</div>
-				<div class="plugin-links">
-					<button type="button" id="fynd-sf-open-txt-list-btn" class="fynd-sf-btn fynd-sf-btn-primary">
-						<span class="dashicons dashicons-list-view"></span>
-						<?php esc_html_e( 'IP Range TXT List', 'securefusion' ); ?>
-					</button>
-				</div>
-			</header>
+			<?php
+			$txt_btn = '<button type="button" id="fynd-sf-open-txt-list-btn" class="fynd-sf-btn fynd-sf-btn-primary">' .
+				'<span class="dashicons dashicons-list-view"></span> ' .
+				esc_html__( 'IP Range TXT List', 'securefusion' ) .
+				'</button>';
+
+			$this->render_header(
+				esc_html__( 'IP Ranges Management', 'securefusion' ),
+				esc_html__( 'View and manage IP subnets that have generated failed login attempts.', 'securefusion' ),
+				[ $txt_btn ]
+			);
+			?>
 
 			<div class="fynd-sf-log-table-wrap" style="margin-top: 20px;">
 				<?php if ( $total_rows > 0 ) : ?>

@@ -74,7 +74,7 @@ class Main {
 			'disable_xmlrpc_user_login'     => '1',
 			'disable_xmlrpc_pingback'       => '1',
 			'disable_self_pingback'         => '1',
-			'ip_time_limit'                 => '10',
+			'ip_time_limit'                 => '2',
 			'ip_login_limit'                => '5',
 			'cleanup_ip_days'               => '30',
 			'cleanup_ip_attempts'           => '10',

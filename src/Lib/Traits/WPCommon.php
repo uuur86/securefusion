@@ -225,4 +225,58 @@ trait WPCommon {
 
 		return $ipaddress;
 	}
+	/**
+	 * Render the unified plugin page header.
+	 *
+	 * Outputs a consistent header component with logo, title, description,
+	 * version info, changelog link, and Fyndsoft product/service links.
+	 *
+	 * @param string $title          Page title.
+	 * @param string $description    Page description.
+	 * @param array  $custom_actions Optional. Array of custom action button HTML strings.
+	 *
+	 * @return void
+	 */
+	public function render_header( $title, $description, $custom_actions = [] ) {
+		$plugin_url    = \plugins_url( '/', SECUREFUSION_BASENAME );
+		$changelog_url = 'https://fyndsoft.com/portfolio/securefusion/#changelog';
+		$products_url  = 'https://fyndsoft.com/portfolio/';
+		$services_url  = 'https://fyndsoft.com/services/';
+		?>
+		<header class="fynd-sf-log-header">
+			<img src="<?php echo esc_url( $plugin_url ); ?>assets/icon.svg" alt="SecureFusion Logo" class="fynd-sf-log-logo">
+			<div class="fynd-sf-log-header-text" style="flex-grow: 1;">
+				<h2 class="fynd-sf-log-title"><?php echo esc_html( $title ); ?></h2>
+				<p class="fynd-sf-log-desc">
+					<?php echo esc_html( $description ); ?>
+					<span class="version-info" style="margin-left: 10px; color: #646970;">
+						<?php
+						/* translators: %s: Version number */
+						printf( esc_html__( 'Version %s - Check out.', 'securefusion' ), esc_html( SECUREFUSION_VERSION ) );
+						?>
+						<a href="<?php echo esc_url( $changelog_url ); ?>" target="_blank" rel="noopener" style="color: #01b9ba; text-decoration: none; font-weight: 500;">
+							<?php esc_html_e( 'What\'s New', 'securefusion' ); ?>
+						</a>
+					</span>
+				</p>
+			</div>
+			<div class="plugin-links">
+				<?php if ( ! empty( $custom_actions ) ) : ?>
+					<?php foreach ( $custom_actions as $action_html ) : ?>
+						<?php
+						// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Pre-escaped action HTML from caller.
+						echo $action_html;
+						?>
+					<?php endforeach; ?>
+				<?php endif; ?>
+				<a href="<?php echo esc_url( $products_url ); ?>" target="_blank" rel="noopener" class="fynd-sf-btn fynd-sf-btn-secondary">
+					<?php esc_html_e( 'Products', 'securefusion' ); ?>
+				</a>
+				<a href="<?php echo esc_url( $services_url ); ?>" target="_blank" rel="noopener" class="fynd-sf-btn fynd-sf-btn-secondary">
+					<?php esc_html_e( 'Services', 'securefusion' ); ?>
+				</a>
+			</div>
+		</header>
+		<?php
+	}
 }
