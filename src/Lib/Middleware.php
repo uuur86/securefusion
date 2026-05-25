@@ -122,8 +122,8 @@ class Middleware {
 			$this->brute_force_db->log_attempt_with_details( $ip, BruteForceDB::TYPE_BAD_REQUEST, $user_agent, $payload_info );
 
 			wp_die(
-				esc_html__( 'SecureFusion: Request payload exceeds the allowed limit. Your IP has been blocked.', 'securefusion' ),
-				esc_html__( 'Payload Too Large', 'securefusion' ),
+				esc_html__( 'SecureFusion: Request payload exceeds the allowed limit. Your IP has been blocked.', 'secuplug' ),
+				esc_html__( 'Payload Too Large', 'secuplug' ),
 				[
 					'response'  => 403,
 					'back_link' => false,
@@ -177,8 +177,8 @@ class Middleware {
 			}
 
 			wp_die(
-				esc_html__( 'SecureFusion Firewall has denied access to this resource.', 'securefusion' ),
-				esc_html__( 'Access Denied', 'securefusion' ),
+				esc_html__( 'SecureFusion Firewall has denied access to this resource.', 'secuplug' ),
+				esc_html__( 'Access Denied', 'secuplug' ),
 				[
 					'response'  => 403,
 					'back_link' => false,
@@ -426,8 +426,8 @@ class Middleware {
 					}
 
 					wp_die(
-						esc_html__( 'SecureFusion Firewall has denied this cookie request.', 'securefusion' ),
-						esc_html__( 'Cookie Failure', 'securefusion' ),
+						esc_html__( 'SecureFusion Firewall has denied this cookie request.', 'secuplug' ),
+						esc_html__( 'Cookie Failure', 'secuplug' ),
 						[
 							'response'  => 403,
 							'back_link' => true,
@@ -493,8 +493,8 @@ class Middleware {
 			// Comments.
 			if ( $pagenow === 'wp-comments-post.php' ) {
 				wp_die(
-					esc_html__( 'SecureFusion Firewall has denied this comment submission.', 'securefusion' ),
-					esc_html__( 'Comment Submission Failure', 'securefusion' ),
+					esc_html__( 'SecureFusion Firewall has denied this comment submission.', 'secuplug' ),
+					esc_html__( 'Comment Submission Failure', 'secuplug' ),
 					[
 						'response'  => 403,
 						'back_link' => true,
@@ -503,8 +503,8 @@ class Middleware {
 			}
 
 			wp_die(
-				esc_html__( 'SecureFusion Firewall has denied this request.', 'securefusion' ),
-				esc_html__( 'Request Failure', 'securefusion' ),
+				esc_html__( 'SecureFusion Firewall has denied this request.', 'secuplug' ),
+				esc_html__( 'Request Failure', 'secuplug' ),
 				[
 					'response'  => 403,
 					'back_link' => true,
@@ -527,8 +527,8 @@ class Middleware {
 			}
 
 			wp_die(
-				esc_html__( 'SecureFusion Firewall has denied this WP Query.', 'securefusion' ),
-				esc_html__( 'WP Query Failure', 'securefusion' ),
+				esc_html__( 'SecureFusion Firewall has denied this WP Query.', 'secuplug' ),
+				esc_html__( 'WP Query Failure', 'secuplug' ),
 				[
 					'response'  => 403,
 					'back_link' => true,
@@ -572,7 +572,7 @@ class Middleware {
 	public function disable_rest_api( $access ) {
 		return new \WP_Error(
 			'rest_disabled',
-			esc_html__( 'The REST API on this site has been disabled.', 'securefusion' ),
+			esc_html__( 'The REST API on this site has been disabled.', 'secuplug' ),
 			array( 'status' => rest_authorization_required_code() )
 		);
 	}
@@ -668,8 +668,8 @@ class Middleware {
 		// Failed login attempts.
 		if ( $attempts >= $ip_login_limit ) {
 			wp_die(
-				esc_html__( '<strong>ERROR</strong>: You have reached the login attempts limit.', 'securefusion' ),
-				esc_html__( 'Too many failed login attempts', 'securefusion' ),
+				esc_html__( '<strong>ERROR</strong>: You have reached the login attempts limit.', 'secuplug' ),
+				esc_html__( 'Too many failed login attempts', 'secuplug' ),
 				[
 					'response'  => 403,
 					'back_link' => true,

@@ -78,7 +78,7 @@ class SecureFusion_wp_xmlrpc_server_debug extends \wp_xmlrpc_server {
 				);
 			}
 
-			$this->error( '404', esc_html__( 'XMLRPC login disabled', 'securefusion' ) );
+			$this->error( '404', esc_html__( 'XMLRPC login disabled', 'secuplug' ) );
 
 			exit;
 		}
@@ -97,7 +97,7 @@ class SecureFusion_wp_xmlrpc_server_debug extends \wp_xmlrpc_server {
 	 */
 	public function pingback_ping( $args ) {
 		if ( $this->get_options['disable_xmlrpc_pingback'] ) {
-			$this->error( '404', esc_html__( 'XMLRPC pingback disabled', 'securefusion' ) );
+			$this->error( '404', esc_html__( 'XMLRPC pingback disabled', 'secuplug' ) );
 			exit;
 		}
 

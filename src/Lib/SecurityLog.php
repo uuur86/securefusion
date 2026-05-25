@@ -42,14 +42,14 @@ class SecurityLog {
 	 */
 	private function get_log_type_options() {
 		return [
-			''                                  => esc_html__( 'All Types', 'securefusion' ),
-			BruteForceDB::TYPE_FAILED_LOGIN     => esc_html__( 'Failed Login', 'securefusion' ),
-			BruteForceDB::TYPE_SUCCESSFUL_LOGIN => esc_html__( 'Successful Login', 'securefusion' ),
-			BruteForceDB::TYPE_BAD_REQUEST      => esc_html__( 'Bad Request', 'securefusion' ),
-			BruteForceDB::TYPE_BAD_COOKIE       => esc_html__( 'Bad Cookie', 'securefusion' ),
-			BruteForceDB::TYPE_BAD_BOT          => esc_html__( 'Bad Bot', 'securefusion' ),
-			BruteForceDB::TYPE_BAD_QUERY        => esc_html__( 'Bad Query', 'securefusion' ),
-			BruteForceDB::TYPE_BLOCKED          => esc_html__( 'Blocked', 'securefusion' ),
+			''                                  => esc_html__( 'All Types', 'secuplug' ),
+			BruteForceDB::TYPE_FAILED_LOGIN     => esc_html__( 'Failed Login', 'secuplug' ),
+			BruteForceDB::TYPE_SUCCESSFUL_LOGIN => esc_html__( 'Successful Login', 'secuplug' ),
+			BruteForceDB::TYPE_BAD_REQUEST      => esc_html__( 'Bad Request', 'secuplug' ),
+			BruteForceDB::TYPE_BAD_COOKIE       => esc_html__( 'Bad Cookie', 'secuplug' ),
+			BruteForceDB::TYPE_BAD_BOT          => esc_html__( 'Bad Bot', 'secuplug' ),
+			BruteForceDB::TYPE_BAD_QUERY        => esc_html__( 'Bad Query', 'secuplug' ),
+			BruteForceDB::TYPE_BLOCKED          => esc_html__( 'Blocked', 'secuplug' ),
 		];
 	}
 
@@ -108,20 +108,20 @@ class SecurityLog {
 			[
 				'ajaxUrl'        => admin_url( 'admin-ajax.php' ),
 				'nonce'          => wp_create_nonce( self::NONCE_ACTION ),
-				'confirmReset'   => esc_html__( 'WARNING: This action is irreversible! Selected log data will be permanently deleted. Are you absolutely sure?', 'securefusion' ),
-				'confirmImport'  => esc_html__( 'Importing data will add records to the existing table. Continue?', 'securefusion' ),
-				'resetSuccess'   => esc_html__( 'Data has been deleted successfully.', 'securefusion' ),
-				'exportEmpty'    => esc_html__( 'No data to export.', 'securefusion' ),
-				'importSuccess'  => esc_html__( 'Import completed successfully.', 'securefusion' ),
-				'importError'    => esc_html__( 'Import failed. Please check the file format.', 'securefusion' ),
-				'invalidFile'    => esc_html__( 'Please select a valid JSON file.', 'securefusion' ),
-				'processing'     => esc_html__( 'Processing...', 'securefusion' ),
-				'copied'         => esc_html__( 'Copied to clipboard!', 'securefusion' ),
-				'copyFailed'     => esc_html__( 'Copy failed. Please select and copy manually.', 'securefusion' ),
-				'blockSuccess'   => esc_html__( 'IP has been blocked.', 'securefusion' ),
-				'unblockSuccess' => esc_html__( 'IP has been unblocked.', 'securefusion' ),
-				'blockFailed'    => esc_html__( 'IP block/unblock operation failed.', 'securefusion' ),
-				'confirmBlock'   => esc_html__( 'Are you sure you want to block this IP?', 'securefusion' ),
+				'confirmReset'   => esc_html__( 'WARNING: This action is irreversible! Selected log data will be permanently deleted. Are you absolutely sure?', 'secuplug' ),
+				'confirmImport'  => esc_html__( 'Importing data will add records to the existing table. Continue?', 'secuplug' ),
+				'resetSuccess'   => esc_html__( 'Data has been deleted successfully.', 'secuplug' ),
+				'exportEmpty'    => esc_html__( 'No data to export.', 'secuplug' ),
+				'importSuccess'  => esc_html__( 'Import completed successfully.', 'secuplug' ),
+				'importError'    => esc_html__( 'Import failed. Please check the file format.', 'secuplug' ),
+				'invalidFile'    => esc_html__( 'Please select a valid JSON file.', 'secuplug' ),
+				'processing'     => esc_html__( 'Processing...', 'secuplug' ),
+				'copied'         => esc_html__( 'Copied to clipboard!', 'secuplug' ),
+				'copyFailed'     => esc_html__( 'Copy failed. Please select and copy manually.', 'secuplug' ),
+				'blockSuccess'   => esc_html__( 'IP has been blocked.', 'secuplug' ),
+				'unblockSuccess' => esc_html__( 'IP has been unblocked.', 'secuplug' ),
+				'blockFailed'    => esc_html__( 'IP block/unblock operation failed.', 'secuplug' ),
+				'confirmBlock'   => esc_html__( 'Are you sure you want to block this IP?', 'secuplug' ),
 			]
 		);
 	}
@@ -134,12 +134,12 @@ class SecurityLog {
 	 */
 	private function validate_ajax_request() {
 		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['nonce'] ) ), self::NONCE_ACTION ) ) {
-			wp_send_json_error( [ 'message' => esc_html__( 'Security check failed.', 'securefusion' ) ] );
+			wp_send_json_error( [ 'message' => esc_html__( 'Security check failed.', 'secuplug' ) ] );
 			return false;
 		}
 
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_send_json_error( [ 'message' => esc_html__( 'Permission denied.', 'securefusion' ) ] );
+			wp_send_json_error( [ 'message' => esc_html__( 'Permission denied.', 'secuplug' ) ] );
 			return false;
 		}
 
@@ -164,9 +164,9 @@ class SecurityLog {
 		$success = $db->delete_by_type( $log_type );
 
 		if ( $success ) {
-			wp_send_json_success( [ 'message' => esc_html__( 'Data has been deleted.', 'securefusion' ) ] );
+			wp_send_json_success( [ 'message' => esc_html__( 'Data has been deleted.', 'secuplug' ) ] );
 		} else {
-			wp_send_json_error( [ 'message' => esc_html__( 'Failed to delete data.', 'securefusion' ) ] );
+			wp_send_json_error( [ 'message' => esc_html__( 'Failed to delete data.', 'secuplug' ) ] );
 		}
 	}
 
@@ -228,7 +228,7 @@ class SecurityLog {
 		$data = json_decode( $raw_data, true );
 
 		if ( ! is_array( $data ) || empty( $data ) ) {
-			wp_send_json_error( [ 'message' => esc_html__( 'Invalid JSON data.', 'securefusion' ) ] );
+			wp_send_json_error( [ 'message' => esc_html__( 'Invalid JSON data.', 'secuplug' ) ] );
 			return;
 		}
 
@@ -238,7 +238,7 @@ class SecurityLog {
 		wp_send_json_success(
 			[
 				/* translators: %d: Number of imported rows. */
-				'message' => sprintf( esc_html__( '%d records imported successfully.', 'securefusion' ), $inserted ),
+				'message' => sprintf( esc_html__( '%d records imported successfully.', 'secuplug' ), $inserted ),
 			]
 		);
 	}
@@ -258,7 +258,7 @@ class SecurityLog {
 		$range_prefix = isset( $_POST['range_prefix'] ) ? sanitize_text_field( wp_unslash( $_POST['range_prefix'] ) ) : '';
 
 		if ( empty( $range_prefix ) || ! preg_match( '/^\d{1,3}\.\d{1,3}\.\d{1,3}$/', $range_prefix ) ) {
-			wp_send_json_error( [ 'message' => esc_html__( 'Invalid range prefix.', 'securefusion' ) ] );
+			wp_send_json_error( [ 'message' => esc_html__( 'Invalid range prefix.', 'secuplug' ) ] );
 			return;
 		}
 
@@ -275,7 +275,7 @@ class SecurityLog {
 				'ips'   => $ip_list,
 				'range' => $range_prefix . '.0/24',
 				/* translators: %d: Number of IPs in the range. */
-				'title' => sprintf( esc_html__( '%1$d IPs in range %2$s', 'securefusion' ), count( $ip_list ), $range_prefix . '.0/24' ),
+				'title' => sprintf( esc_html__( '%1$d IPs in range %2$s', 'secuplug' ), count( $ip_list ), $range_prefix . '.0/24' ),
 			]
 		);
 	}
@@ -306,7 +306,7 @@ class SecurityLog {
 		}
 
 		if ( ! $is_valid_ip && ! $is_valid_cidr ) {
-			wp_send_json_error( [ 'message' => esc_html__( 'Invalid IP address or range.', 'securefusion' ) ] );
+			wp_send_json_error( [ 'message' => esc_html__( 'Invalid IP address or range.', 'secuplug' ) ] );
 			return;
 		}
 
@@ -314,7 +314,7 @@ class SecurityLog {
 
 		if ( $action === 'block' ) {
 			if ( $db->is_ip_whitelisted( $ip ) ) {
-				wp_send_json_error( [ 'message' => esc_html__( 'This IP is whitelisted and cannot be blocked.', 'securefusion' ) ] );
+				wp_send_json_error( [ 'message' => esc_html__( 'This IP is whitelisted and cannot be blocked.', 'secuplug' ) ] );
 				return;
 			}
 
@@ -323,7 +323,7 @@ class SecurityLog {
 			if ( $success ) {
 				wp_send_json_success(
 					[
-						'message'    => esc_html__( 'IP has been blocked.', 'securefusion' ),
+						'message'    => esc_html__( 'IP has been blocked.', 'secuplug' ),
 						'new_status' => 'blocked',
 					]
 				);
@@ -334,14 +334,14 @@ class SecurityLog {
 			if ( $success ) {
 				wp_send_json_success(
 					[
-						'message'    => esc_html__( 'IP has been unblocked.', 'securefusion' ),
+						'message'    => esc_html__( 'IP has been unblocked.', 'secuplug' ),
 						'new_status' => 'active',
 					]
 				);
 			}
 		}
 
-		wp_send_json_error( [ 'message' => esc_html__( 'Operation failed.', 'securefusion' ) ] );
+		wp_send_json_error( [ 'message' => esc_html__( 'Operation failed.', 'secuplug' ) ] );
 	}
 
 
@@ -410,12 +410,12 @@ class SecurityLog {
 			 * outside our styled header component.
 			 */
 			?>
-			<h1 class="fynd-sf-sr-only"><?php esc_html_e( 'Security Log', 'securefusion' ); ?></h1>
+			<h1 class="fynd-sf-sr-only"><?php esc_html_e( 'Security Log', 'secuplug' ); ?></h1>
 
 			<?php
 			$this->render_header(
-				esc_html__( 'Security Log', 'securefusion' ),
-				esc_html__( 'Monitor and manage security events, blocked IPs, and attack records.', 'securefusion' )
+				esc_html__( 'Security Log', 'secuplug' ),
+				esc_html__( 'Monitor and manage security events, blocked IPs, and attack records.', 'secuplug' )
 			);
 			?>
 
@@ -426,56 +426,56 @@ class SecurityLog {
 					<span class="fynd-sf-stat-icon dashicons dashicons-shield"></span>
 					<div class="fynd-sf-stat-data">
 						<span class="fynd-sf-stat-value"><?php echo (int) $db->get_total_attempts(); ?></span>
-						<span class="fynd-sf-stat-label"><?php esc_html_e( 'Total Attacks', 'securefusion' ); ?></span>
+						<span class="fynd-sf-stat-label"><?php esc_html_e( 'Total Attacks', 'secuplug' ); ?></span>
 					</div>
 				</div>
 				<div class="fynd-sf-stat-card">
 					<span class="fynd-sf-stat-icon dashicons dashicons-lock"></span>
 					<div class="fynd-sf-stat-data">
 						<span class="fynd-sf-stat-value"><?php echo (int) $db->get_total_attempts_by_type( 'failed_login' ); ?></span>
-						<span class="fynd-sf-stat-label"><?php esc_html_e( 'Failed Logins', 'securefusion' ); ?></span>
+						<span class="fynd-sf-stat-label"><?php esc_html_e( 'Failed Logins', 'secuplug' ); ?></span>
 					</div>
 				</div>
 				<div class="fynd-sf-stat-card">
 					<span class="fynd-sf-stat-icon dashicons dashicons-warning"></span>
 					<div class="fynd-sf-stat-data">
 						<span class="fynd-sf-stat-value"><?php echo (int) $db->get_total_attempts_by_type( 'bad_request' ); ?></span>
-						<span class="fynd-sf-stat-label"><?php esc_html_e( 'Bad Requests', 'securefusion' ); ?></span>
+						<span class="fynd-sf-stat-label"><?php esc_html_e( 'Bad Requests', 'secuplug' ); ?></span>
 					</div>
 				</div>
 				<div class="fynd-sf-stat-card">
 					<span class="fynd-sf-stat-icon dashicons dashicons-excerpt-view"></span>
 					<div class="fynd-sf-stat-data">
 						<span class="fynd-sf-stat-value"><?php echo (int) $db->get_total_attempts_by_type( 'bad_cookie' ); ?></span>
-						<span class="fynd-sf-stat-label"><?php esc_html_e( 'Bad Cookies', 'securefusion' ); ?></span>
+						<span class="fynd-sf-stat-label"><?php esc_html_e( 'Bad Cookies', 'secuplug' ); ?></span>
 					</div>
 				</div>
 				<div class="fynd-sf-stat-card">
 					<span class="fynd-sf-stat-icon dashicons dashicons-networking"></span>
 					<div class="fynd-sf-stat-data">
 						<span class="fynd-sf-stat-value"><?php echo (int) $db->get_total_attempts_by_type( 'bad_bot' ); ?></span>
-						<span class="fynd-sf-stat-label"><?php esc_html_e( 'Bad Bots', 'securefusion' ); ?></span>
+						<span class="fynd-sf-stat-label"><?php esc_html_e( 'Bad Bots', 'secuplug' ); ?></span>
 					</div>
 				</div>
 				<div class="fynd-sf-stat-card">
 					<span class="fynd-sf-stat-icon dashicons dashicons-search"></span>
 					<div class="fynd-sf-stat-data">
 						<span class="fynd-sf-stat-value"><?php echo (int) $db->get_total_attempts_by_type( 'bad_query' ); ?></span>
-						<span class="fynd-sf-stat-label"><?php esc_html_e( 'Bad Queries', 'securefusion' ); ?></span>
+						<span class="fynd-sf-stat-label"><?php esc_html_e( 'Bad Queries', 'secuplug' ); ?></span>
 					</div>
 				</div>
 				<div class="fynd-sf-stat-card">
 					<span class="fynd-sf-stat-icon dashicons dashicons-admin-site-alt3"></span>
 					<div class="fynd-sf-stat-data">
 						<span class="fynd-sf-stat-value"><?php echo (int) $db->get_unique_ips_count(); ?></span>
-						<span class="fynd-sf-stat-label"><?php esc_html_e( 'Unique IPs', 'securefusion' ); ?></span>
+						<span class="fynd-sf-stat-label"><?php esc_html_e( 'Unique IPs', 'secuplug' ); ?></span>
 					</div>
 				</div>
 				<div class="fynd-sf-stat-card">
 					<span class="fynd-sf-stat-icon dashicons dashicons-database"></span>
 					<div class="fynd-sf-stat-data">
 						<span class="fynd-sf-stat-value"><?php echo (int) $total_rows; ?></span>
-						<span class="fynd-sf-stat-label"><?php esc_html_e( 'Total Records', 'securefusion' ); ?></span>
+						<span class="fynd-sf-stat-label"><?php esc_html_e( 'Total Records', 'secuplug' ); ?></span>
 					</div>
 				</div>
 			</div>
@@ -492,18 +492,18 @@ class SecurityLog {
 					</select>
 					<button type="button" id="fynd-sf-log-export" class="fynd-sf-btn fynd-sf-btn-secondary">
 						<span class="dashicons dashicons-download"></span>
-						<?php esc_html_e( 'Export JSON', 'securefusion' ); ?>
+						<?php esc_html_e( 'Export JSON', 'secuplug' ); ?>
 					</button>
 					<label for="fynd-sf-log-import-file" class="fynd-sf-btn fynd-sf-btn-secondary fynd-sf-import-label">
 						<span class="dashicons dashicons-upload"></span>
-						<?php esc_html_e( 'Import JSON', 'securefusion' ); ?>
+						<?php esc_html_e( 'Import JSON', 'secuplug' ); ?>
 					</label>
 					<input type="file" id="fynd-sf-log-import-file" accept=".json" class="fynd-sf-hidden-file">
 				</div>
 				<div class="fynd-sf-toolbar-right">
 					<button type="button" id="fynd-sf-log-reset" class="fynd-sf-btn fynd-sf-btn-danger">
 						<span class="dashicons dashicons-trash"></span>
-						<?php esc_html_e( 'Delete Data', 'securefusion' ); ?>
+						<?php esc_html_e( 'Delete Data', 'secuplug' ); ?>
 					</button>
 				</div>
 			</div>
@@ -515,12 +515,12 @@ class SecurityLog {
 						<?php
 						printf(
 							/* translators: %s: IP range prefix. */
-							esc_html__( 'Filtered by range: %s', 'securefusion' ),
+							esc_html__( 'Filtered by range: %s', 'secuplug' ),
 							'<strong>' . esc_html( $range_filter ) . '.0/24</strong>'
 						);
 						?>
 						<a href="<?php echo esc_url( admin_url( 'admin.php?page=securefusion-security-log' . ( $type_filter ? '&log_type=' . $type_filter : '' ) ) ); ?>" class="fynd-sf-filter-clear-link">
-							<?php esc_html_e( 'Show all', 'securefusion' ); ?>
+							<?php esc_html_e( 'Show all', 'secuplug' ); ?>
 						</a>
 					</div>
 				<?php endif; ?>
@@ -531,10 +531,10 @@ class SecurityLog {
 							<tr>
 								<?php
 								$columns = [
-									'ip'           => esc_html__( 'IP Address', 'securefusion' ),
-									'log_type'     => esc_html__( 'Attack Type', 'securefusion' ),
-									'attempts'     => esc_html__( 'Attempts', 'securefusion' ),
-									'last_attempt' => esc_html__( 'Last Attempt', 'securefusion' ),
+									'ip'           => esc_html__( 'IP Address', 'secuplug' ),
+									'log_type'     => esc_html__( 'Attack Type', 'secuplug' ),
+									'attempts'     => esc_html__( 'Attempts', 'secuplug' ),
+									'last_attempt' => esc_html__( 'Last Attempt', 'secuplug' ),
 								];
 
 								foreach ( $columns as $col_key => $col_label ) :
@@ -560,8 +560,8 @@ class SecurityLog {
 										</a>
 									</th>
 								<?php endforeach; ?>
-								<th scope="col" class="manage-column column-status"><?php esc_html_e( 'Status', 'securefusion' ); ?></th>
-								<th scope="col" class="manage-column column-actions"><?php esc_html_e( 'Actions', 'securefusion' ); ?></th>
+								<th scope="col" class="manage-column column-status"><?php esc_html_e( 'Status', 'secuplug' ); ?></th>
+								<th scope="col" class="manage-column column-actions"><?php esc_html_e( 'Actions', 'secuplug' ); ?></th>
 							</tr>
 						</thead>
 						<tbody id="fynd-sf-log-tbody">
@@ -586,7 +586,7 @@ class SecurityLog {
 											<div class="fynd-sf-meta-line" title="<?php echo esc_attr( $row_payload ); ?>">
 												<span class="dashicons dashicons-editor-code"></span>
 												<span class="fynd-sf-meta-text"><?php echo esc_html( mb_substr( $row_payload, 0, 60 ) ); ?><?php echo strlen( $row_payload ) > 60 ? '…' : ''; ?></span>
-												<button type="button" class="fynd-sf-view-payload-btn" data-payload="<?php echo esc_attr( $row_payload ); ?>" title="<?php esc_attr_e( 'View Payload Details', 'securefusion' ); ?>">
+												<button type="button" class="fynd-sf-view-payload-btn" data-payload="<?php echo esc_attr( $row_payload ); ?>" title="<?php esc_attr_e( 'View Payload Details', 'secuplug' ); ?>">
 													<span class="dashicons dashicons-visibility"></span>
 												</button>
 											</div>
@@ -613,7 +613,7 @@ class SecurityLog {
 												)
 											);
 											echo '<br><small class="fynd-sf-time-ago">';
-											echo esc_html( human_time_diff( $timestamp, time() ) . ' ' . __( 'ago', 'securefusion' ) );
+											echo esc_html( human_time_diff( $timestamp, time() ) . ' ' . __( 'ago', 'secuplug' ) );
 											echo '</small>';
 										} else {
 											echo '—';
@@ -622,27 +622,27 @@ class SecurityLog {
 									</td>
 									<td class="column-status">
 										<?php if ( $is_whitelisted ) : ?>
-											<span class="fynd-sf-status-badge fynd-sf-status-whitelisted"><?php esc_html_e( 'Whitelisted', 'securefusion' ); ?></span>
+											<span class="fynd-sf-status-badge fynd-sf-status-whitelisted"><?php esc_html_e( 'Whitelisted', 'secuplug' ); ?></span>
 										<?php elseif ( $is_blocked ) : ?>
-											<span class="fynd-sf-status-badge fynd-sf-status-blocked"><?php esc_html_e( 'Blocked', 'securefusion' ); ?></span>
+											<span class="fynd-sf-status-badge fynd-sf-status-blocked"><?php esc_html_e( 'Blocked', 'secuplug' ); ?></span>
 										<?php else : ?>
-											<span class="fynd-sf-status-badge fynd-sf-status-active"><?php esc_html_e( 'Active', 'securefusion' ); ?></span>
+											<span class="fynd-sf-status-badge fynd-sf-status-active"><?php esc_html_e( 'Active', 'secuplug' ); ?></span>
 										<?php endif; ?>
 									</td>
 									<td class="column-actions">
 										<?php if ( $is_whitelisted ) : ?>
-											<span class="fynd-sf-action-protected" title="<?php esc_attr_e( 'Admin IP — Cannot be blocked', 'securefusion' ); ?>">
+											<span class="fynd-sf-action-protected" title="<?php esc_attr_e( 'Admin IP — Cannot be blocked', 'secuplug' ); ?>">
 												<span class="dashicons dashicons-shield-alt"></span>
 											</span>
 										<?php elseif ( $is_blocked ) : ?>
 											<button type="button" class="fynd-sf-btn fynd-sf-btn-sm fynd-sf-btn-unblock" data-ip="<?php echo esc_attr( $row->ip ); ?>" data-action="unblock">
 												<span class="dashicons dashicons-unlock"></span>
-												<?php esc_html_e( 'Unblock', 'securefusion' ); ?>
+												<?php esc_html_e( 'Unblock', 'secuplug' ); ?>
 											</button>
 										<?php else : ?>
 											<button type="button" class="fynd-sf-btn fynd-sf-btn-sm fynd-sf-btn-block" data-ip="<?php echo esc_attr( $row->ip ); ?>" data-action="block">
 												<span class="dashicons dashicons-lock"></span>
-												<?php esc_html_e( 'Block', 'securefusion' ); ?>
+												<?php esc_html_e( 'Block', 'secuplug' ); ?>
 											</button>
 										<?php endif; ?>
 									</td>
@@ -661,7 +661,7 @@ class SecurityLog {
 
 								printf(
 									/* translators: 1: Current page, 2: Total pages, 3: Total items. */
-									esc_html__( 'Page %1$s of %2$s (%3$s items)', 'securefusion' ),
+									esc_html__( 'Page %1$s of %2$s (%3$s items)', 'secuplug' ),
 									esc_html( $current_page_f ),
 									esc_html( $total_pages_f ),
 									esc_html( $total_rows_f )
@@ -701,9 +701,9 @@ class SecurityLog {
 						<span class="dashicons dashicons-shield-alt"></span>
 						<p>
 							<?php if ( $range_filter || $type_filter ) : ?>
-								<?php esc_html_e( 'No records found for the current filter.', 'securefusion' ); ?>
+								<?php esc_html_e( 'No records found for the current filter.', 'secuplug' ); ?>
 							<?php else : ?>
-								<?php esc_html_e( 'No security events recorded yet. Your site is clean!', 'securefusion' ); ?>
+								<?php esc_html_e( 'No security events recorded yet. Your site is clean!', 'secuplug' ); ?>
 							<?php endif; ?>
 						</p>
 					</div>
@@ -714,7 +714,7 @@ class SecurityLog {
 			<div id="fynd-sf-payload-modal" class="fynd-sf-modal" style="display: none;">
 				<div class="fynd-sf-modal-content">
 					<div class="fynd-sf-modal-header">
-						<h3 class="fynd-sf-modal-title"><?php esc_html_e( 'Payload Details', 'securefusion' ); ?></h3>
+						<h3 class="fynd-sf-modal-title"><?php esc_html_e( 'Payload Details', 'secuplug' ); ?></h3>
 						<button type="button" class="fynd-sf-modal-close">&times;</button>
 					</div>
 					<div class="fynd-sf-modal-body">
@@ -723,10 +723,10 @@ class SecurityLog {
 					<div class="fynd-sf-modal-footer">
 						<button type="button" class="fynd-sf-btn fynd-sf-btn-primary fynd-sf-modal-copy-btn">
 							<span class="dashicons dashicons-clipboard"></span>
-							<span class="fynd-sf-modal-copy-btn-text"><?php esc_html_e( 'Copy Payload', 'securefusion' ); ?></span>
+							<span class="fynd-sf-modal-copy-btn-text"><?php esc_html_e( 'Copy Payload', 'secuplug' ); ?></span>
 						</button>
 						<button type="button" class="fynd-sf-modal-close-btn fynd-sf-btn fynd-sf-btn-secondary">
-							<?php esc_html_e( 'Close', 'securefusion' ); ?>
+							<?php esc_html_e( 'Close', 'secuplug' ); ?>
 						</button>
 					</div>
 				</div>

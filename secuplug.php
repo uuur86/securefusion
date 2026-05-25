@@ -8,11 +8,11 @@
  * Author: codeplusdev <contact@fyndsoft.com>
  * Author URI: https://profiles.wordpress.org/codeplusdev/
  * License: GPL v3 or later
- * Text Domain : securefusion
+ * Text Domain: secuplug
  * Domain Path:  /languages
  * Requires PHP: 7.4 or later
  *
- * @package SecureFusion
+ * @package secuplug
  * @license GPL v3
  */
 
@@ -47,7 +47,7 @@ use SecureFusion\Lib\Main;
 
 $securefusion = new Main();
 
-load_textdomain( 'securefusion', SECUREFUSION_PATH . 'languages/' . get_locale() . '.mo' );
+load_textdomain( 'secuplug', SECUREFUSION_PATH . 'languages/' . get_locale() . '.mo' );
 
 register_activation_hook( __FILE__, array( $securefusion, 'activate' ) );
 register_deactivation_hook( __FILE__, array( $securefusion, 'deactivate' ) );

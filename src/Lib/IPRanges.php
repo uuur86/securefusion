@@ -60,20 +60,20 @@ class IPRanges {
 			[
 				'ajaxUrl'        => admin_url( 'admin-ajax.php' ),
 				'nonce'          => wp_create_nonce( \SecureFusion\Lib\SecurityLog::NONCE_ACTION ),
-				'confirmReset'   => esc_html__( 'WARNING: This action is irreversible! All failed login attempt data will be permanently deleted. Are you absolutely sure?', 'securefusion' ),
-				'confirmImport'  => esc_html__( 'Importing data will add records to the existing table. Continue?', 'securefusion' ),
-				'resetSuccess'   => esc_html__( 'All data has been deleted successfully.', 'securefusion' ),
-				'exportEmpty'    => esc_html__( 'No data to export.', 'securefusion' ),
-				'importSuccess'  => esc_html__( 'Import completed successfully.', 'securefusion' ),
-				'importError'    => esc_html__( 'Import failed. Please check the file format.', 'securefusion' ),
-				'invalidFile'    => esc_html__( 'Please select a valid JSON file.', 'securefusion' ),
-				'processing'     => esc_html__( 'Processing...', 'securefusion' ),
-				'copied'         => esc_html__( 'Copied to clipboard!', 'securefusion' ),
-				'copyFailed'     => esc_html__( 'Copy failed. Please select and copy manually.', 'securefusion' ),
-				'blockSuccess'   => esc_html__( 'IP range has been blocked.', 'securefusion' ),
-				'unblockSuccess' => esc_html__( 'IP range has been unblocked.', 'securefusion' ),
-				'blockFailed'    => esc_html__( 'IP range block/unblock operation failed.', 'securefusion' ),
-				'confirmBlock'   => esc_html__( 'Are you sure you want to block this IP range?', 'securefusion' ),
+				'confirmReset'   => esc_html__( 'WARNING: This action is irreversible! All failed login attempt data will be permanently deleted. Are you absolutely sure?', 'secuplug' ),
+				'confirmImport'  => esc_html__( 'Importing data will add records to the existing table. Continue?', 'secuplug' ),
+				'resetSuccess'   => esc_html__( 'All data has been deleted successfully.', 'secuplug' ),
+				'exportEmpty'    => esc_html__( 'No data to export.', 'secuplug' ),
+				'importSuccess'  => esc_html__( 'Import completed successfully.', 'secuplug' ),
+				'importError'    => esc_html__( 'Import failed. Please check the file format.', 'secuplug' ),
+				'invalidFile'    => esc_html__( 'Please select a valid JSON file.', 'secuplug' ),
+				'processing'     => esc_html__( 'Processing...', 'secuplug' ),
+				'copied'         => esc_html__( 'Copied to clipboard!', 'secuplug' ),
+				'copyFailed'     => esc_html__( 'Copy failed. Please select and copy manually.', 'secuplug' ),
+				'blockSuccess'   => esc_html__( 'IP range has been blocked.', 'secuplug' ),
+				'unblockSuccess' => esc_html__( 'IP range has been unblocked.', 'secuplug' ),
+				'blockFailed'    => esc_html__( 'IP range block/unblock operation failed.', 'secuplug' ),
+				'confirmBlock'   => esc_html__( 'Are you sure you want to block this IP range?', 'secuplug' ),
 			]
 		);
 	}
@@ -112,17 +112,17 @@ class IPRanges {
 			 * outside our styled header component.
 			 */
 			?>
-			<h1 class="fynd-sf-sr-only"><?php esc_html_e( 'IP Ranges', 'securefusion' ); ?></h1>
+			<h1 class="fynd-sf-sr-only"><?php esc_html_e( 'IP Ranges', 'secuplug' ); ?></h1>
 
 			<?php
 			$txt_btn = '<button type="button" id="fynd-sf-open-txt-list-btn" class="fynd-sf-btn fynd-sf-btn-primary">' .
 				'<span class="dashicons dashicons-list-view"></span> ' .
-				esc_html__( 'IP Range TXT List', 'securefusion' ) .
+				esc_html__( 'IP Range TXT List', 'secuplug' ) .
 				'</button>';
 
 			$this->render_header(
-				esc_html__( 'IP Ranges Management', 'securefusion' ),
-				esc_html__( 'View and manage IP subnets that have generated failed login attempts.', 'securefusion' ),
+				esc_html__( 'IP Ranges Management', 'secuplug' ),
+				esc_html__( 'View and manage IP subnets that have generated failed login attempts.', 'secuplug' ),
 				[ $txt_btn ]
 			);
 			?>
@@ -134,9 +134,9 @@ class IPRanges {
 							<tr>
 								<?php
 								$columns = [
-									'range_prefix'   => esc_html__( 'IP Range', 'securefusion' ),
-									'ip_count'       => esc_html__( 'Unique IPs', 'securefusion' ),
-									'total_attempts' => esc_html__( 'Total Attempts', 'securefusion' ),
+									'range_prefix'   => esc_html__( 'IP Range', 'secuplug' ),
+									'ip_count'       => esc_html__( 'Unique IPs', 'secuplug' ),
+									'total_attempts' => esc_html__( 'Total Attempts', 'secuplug' ),
 								];
 
 								foreach ( $columns as $col_key => $col_label ) :
@@ -162,7 +162,7 @@ class IPRanges {
 										</a>
 									</th>
 								<?php endforeach; ?>
-								<th scope="col" class="manage-column column-actions"><?php esc_html_e( 'Actions', 'securefusion' ); ?></th>
+								<th scope="col" class="manage-column column-actions"><?php esc_html_e( 'Actions', 'secuplug' ); ?></th>
 							</tr>
 						</thead>
 						<tbody>
@@ -196,21 +196,21 @@ class IPRanges {
 										<div class="fynd-sf-actions-wrap">
 											<a href="<?php echo esc_url( $range_url ); ?>" class="fynd-sf-btn fynd-sf-btn-secondary">
 												<span class="dashicons dashicons-filter"></span>
-												<?php esc_html_e( 'Logs', 'securefusion' ); ?>
+												<?php esc_html_e( 'Logs', 'secuplug' ); ?>
 											</a>
 											<button type="button" class="fynd-sf-btn fynd-sf-btn-secondary fynd-sf-range-detail-btn" data-range="<?php echo esc_attr( $row->range_prefix ); ?>">
 												<span class="dashicons dashicons-visibility"></span>
-												<?php esc_html_e( 'List', 'securefusion' ); ?>
+												<?php esc_html_e( 'List', 'secuplug' ); ?>
 											</button>
 											<?php if ( $is_range_blocked ) : ?>
 												<button type="button" class="fynd-sf-btn fynd-sf-btn-unblock" data-ip="<?php echo esc_attr( $cidr ); ?>" data-action="unblock">
 													<span class="dashicons dashicons-unlock"></span>
-													<?php esc_html_e( 'Unblock', 'securefusion' ); ?>
+													<?php esc_html_e( 'Unblock', 'secuplug' ); ?>
 												</button>
 											<?php else : ?>
 												<button type="button" class="fynd-sf-btn fynd-sf-btn-block" data-ip="<?php echo esc_attr( $cidr ); ?>" data-action="block">
 													<span class="dashicons dashicons-lock"></span>
-													<?php esc_html_e( 'Block', 'securefusion' ); ?>
+													<?php esc_html_e( 'Block', 'secuplug' ); ?>
 												</button>
 											<?php endif; ?>
 										</div>
@@ -230,7 +230,7 @@ class IPRanges {
 
 								printf(
 									/* translators: 1: Current page, 2: Total pages, 3: Total items. */
-									esc_html__( 'Page %1$s of %2$s (%3$s items)', 'securefusion' ),
+									esc_html__( 'Page %1$s of %2$s (%3$s items)', 'secuplug' ),
 									esc_html( $current_page_f ),
 									esc_html( $total_pages_f ),
 									esc_html( $total_rows_f )
@@ -268,7 +268,7 @@ class IPRanges {
 				<?php else : ?>
 					<div class="fynd-sf-log-empty">
 						<span class="dashicons dashicons-shield-alt"></span>
-						<p><?php esc_html_e( 'No IP ranges found. Your site is clean!', 'securefusion' ); ?></p>
+						<p><?php esc_html_e( 'No IP ranges found. Your site is clean!', 'secuplug' ); ?></p>
 					</div>
 				<?php endif; ?>
 			</div>
@@ -277,7 +277,7 @@ class IPRanges {
 			<div id="fynd-sf-range-modal" class="fynd-sf-modal" style="display:none;">
 				<div class="fynd-sf-modal-content">
 					<div class="fynd-sf-modal-header">
-						<h3 id="fynd-sf-range-modal-title" class="fynd-sf-modal-title"><?php esc_html_e( 'IPs in Range', 'securefusion' ); ?></h3>
+						<h3 id="fynd-sf-range-modal-title" class="fynd-sf-modal-title"><?php esc_html_e( 'IPs in Range', 'secuplug' ); ?></h3>
 						<button type="button" class="fynd-sf-modal-close">&times;</button>
 					</div>
 					<div class="fynd-sf-modal-body">
@@ -286,10 +286,10 @@ class IPRanges {
 					<div class="fynd-sf-modal-footer">
 						<button type="button" class="fynd-sf-btn fynd-sf-btn-primary fynd-sf-modal-copy-btn">
 							<span class="dashicons dashicons-clipboard"></span>
-							<span class="fynd-sf-modal-copy-btn-text"><?php esc_html_e( 'Copy IP List', 'securefusion' ); ?></span>
+							<span class="fynd-sf-modal-copy-btn-text"><?php esc_html_e( 'Copy IP List', 'secuplug' ); ?></span>
 						</button>
 						<button type="button" class="fynd-sf-modal-close-btn fynd-sf-btn fynd-sf-btn-secondary">
-							<?php esc_html_e( 'Close', 'securefusion' ); ?>
+							<?php esc_html_e( 'Close', 'secuplug' ); ?>
 						</button>
 					</div>
 				</div>
@@ -309,7 +309,7 @@ class IPRanges {
 			<div id="fynd-sf-txt-list-modal" class="fynd-sf-modal" style="display:none;">
 				<div class="fynd-sf-modal-content">
 					<div class="fynd-sf-modal-header">
-						<h3 class="fynd-sf-modal-title"><?php esc_html_e( 'IP Range TXT List', 'securefusion' ); ?></h3>
+						<h3 class="fynd-sf-modal-title"><?php esc_html_e( 'IP Range TXT List', 'secuplug' ); ?></h3>
 						<button type="button" class="fynd-sf-modal-close">&times;</button>
 					</div>
 					<div class="fynd-sf-modal-body">
@@ -318,10 +318,10 @@ class IPRanges {
 					<div class="fynd-sf-modal-footer">
 						<button type="button" class="fynd-sf-btn fynd-sf-btn-primary fynd-sf-modal-copy-btn">
 							<span class="dashicons dashicons-clipboard"></span>
-							<span class="fynd-sf-modal-copy-btn-text"><?php esc_html_e( 'Copy List', 'securefusion' ); ?></span>
+							<span class="fynd-sf-modal-copy-btn-text"><?php esc_html_e( 'Copy List', 'secuplug' ); ?></span>
 						</button>
 						<button type="button" class="fynd-sf-modal-close-btn fynd-sf-btn fynd-sf-btn-secondary">
-							<?php esc_html_e( 'Close', 'securefusion' ); ?>
+							<?php esc_html_e( 'Close', 'secuplug' ); ?>
 						</button>
 					</div>
 				</div>

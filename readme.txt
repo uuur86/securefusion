@@ -1,9 +1,9 @@
-=== SecureFusion: Ultimate Security - Firewall, SSL Control, Anti Spam, Login Security ===
+=== SecureFusion WordPress Security Plugin by Fyndsoft ===
 Contributors: codeplusdev, ugurbicer
 Tags: firewall, security, anti-spam, ssl, xml-rpc
 Requires at least: 4.9
 Tested up to: 7.0
-Stable tag: 1.5.0
+Stable tag: 2.0.0
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 Requires PHP: 7.4
@@ -16,7 +16,7 @@ Are you tired of bloated security plugins that slow down your website and clutte
 
 SecureFusion is designed for WordPress site administrators, developers, and agency owners who demand lightweight, robust, and performance-optimized protection. It acts as an active shield against brute-force attacks, remote XML-RPC exploits, and malicious injections, while keeping your loading speeds lightning fast.
 
-SecureFusion helps you enforce strict Content Security Policies (CSP), hide standard administrative entry points, block automated traffic clusters, and monitor unauthorized access patterns via a clean, modern dashboard.
+SecureFusion helps you enforce strict Content Security Policies (CSP), hide standard administrative entry points, block automated traffic clusters, track successful/failed logins, block spam comment IPs directly, and monitor unauthorized access patterns via a clean, modern dashboard.
 
 == Features ==
 
@@ -38,6 +38,15 @@ SecureFusion helps you enforce strict Content Security Policies (CSP), hide stan
 
 = 4. Enforced SSL / HTTPS =
 * **Secure Protocol Redirection:** Forces HTTP to HTTPS redirection across admin screens, login pages, or the entire site to guarantee secure data transmission.
+
+= 5. Comments IP Blocking & Bulk Shield =
+* **Individual Commenter IP Blocking:** Block or unblock comment author IP addresses directly from the WordPress Comments list page.
+* **Bulk Spam IP Blocking:** Instantly block all IP addresses associated with spam comments currently in the Spam directory.
+* **Smart CIDR Range Calculation:** Option to block entire /24 IPv4 subnets or /64 IPv6 ranges of spam comments automatically based on IP distribution to stop persistent spam networks.
+
+= 6. IP Spoofing Prevention & Successful Login Tracking =
+* **Successful Login Logging:** Tracks successful logins to audit administrator and user access alongside failed login attempts.
+* **IP Spoofing Prevention:** Performs strict public vs. private IP checks on client headers (like HTTP_X_FORWARDED_FOR) to prevent attackers from spoofing their IP addresses when behind load balancers or proxies.
 
 For complete information, please visit our website [the SecureFusion website](https://fyndsoft.com/securefusion).
 

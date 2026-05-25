@@ -1,7 +1,7 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: securefusion\n"
+"Project-Id-Version: secuplug\n"
 "POT-Creation-Date: 2024-01-19 06:40+0300\n"
 "PO-Revision-Date: 2024-01-19 07:27+0300\n"
 "Last-Translator: \n"
@@ -13,7 +13,7 @@ msgstr ""
 "X-Generator: Poedit 3.4.2\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-Flags-xgettext: --add-comments=translators:\n"
-"X-Poedit-WPHeader: securefusion.php\n"
+"X-Poedit-WPHeader: secuplug.php\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
 "esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;"
@@ -21,593 +21,1297 @@ msgstr ""
 "X-Poedit-SearchPathExcluded-0: *.min.js\n"
 "X-Poedit-SearchPathExcluded-1: vendor\n"
 
-#: securefusion.php:24
-msgid "Forbidden!"
-msgstr "Yasak!"
+#: secuplug.php:24
 
-#: src/Lib/Admin.php:48 src/Lib/Admin.php:81 src/Lib/Admin.php:263
+#: src/Lib/Admin.php:81
+#: src/Lib/Admin.php:117
+#: src/Lib/Admin.php:428
 msgid "Settings"
 msgstr "Ayarlar"
 
-#. Plugin Name of the plugin/theme
-#: src/Lib/Admin.php:61 src/Lib/Admin.php:62
+#: src/Lib/Admin.php:97
+#: src/Lib/Admin.php:98
 msgid "SecureFusion"
 msgstr "SecureFusion"
 
-#: src/Lib/Admin.php:71 src/Lib/Admin.php:145
+#: src/Lib/Admin.php:107
+#: src/Lib/Admin.php:213
+#: src/Lib/Admin.php:217
 msgid "SecureFusion Dashboard"
 msgstr "SecureFusion Güvenlik Durumu"
 
-#: src/Lib/Admin.php:72
+#: src/Lib/Admin.php:108
 msgid "Dashboard"
 msgstr "Kontrol Paneli"
 
-#: src/Lib/Admin.php:80
+#: src/Lib/Admin.php:116
 msgid "SecureFusion Settings"
 msgstr "SecureFusion Ayarları"
 
-#: src/Lib/Admin.php:148
+#: src/Lib/Admin.php:125
+msgid "SecureFusion Security Log"
+msgstr "SecureFusion Güvenlik Logu"
+
+#: src/Lib/Admin.php:126
+#: src/Lib/SecurityLog.php:413
+#: src/Lib/SecurityLog.php:417
+msgid "Security Log"
+msgstr "Güvenlik Logu"
+
+#: src/Lib/Admin.php:134
+msgid "SecureFusion IP Rules"
+msgstr "SecureFusion IP Kuralları"
+
+#: src/Lib/Admin.php:135
+#: src/Lib/IPRules.php:238
+msgid "IP Rules"
+msgstr "IP Kuralları"
+
+#: src/Lib/Admin.php:143
+msgid "SecureFusion IP Ranges"
+msgstr "SecureFusion IP Aralıkları"
+
+#: src/Lib/Admin.php:144
+#: src/Lib/IPRanges.php:115
+msgid "IP Ranges"
+msgstr "IP Aralıkları"
+
+#: src/Lib/Admin.php:218
 msgid "You can monitor your WordPress security settings."
 msgstr "WordPress güvenlik ayarlarınızı izleyebilirsiniz."
 
-#: src/Lib/Admin.php:154
+#: src/Lib/Admin.php:225
+msgid "Daily Security Events (Last 30 Days)"
+msgstr ""
+
+#: src/Lib/Admin.php:226
+msgid "Real-time"
+msgstr ""
+
+#: src/Lib/Admin.php:234
+msgid "Monthly Security Events (Last 12 Months)"
+msgstr ""
+
+#: src/Lib/Admin.php:235
+msgid "Overview"
+msgstr ""
+
+#: src/Lib/Admin.php:246
 msgid "Security Status"
 msgstr "Güvenlik Durumu"
 
-#: src/Lib/Admin.php:156
-msgid "WordPress Version:"
-msgstr "Versiyon:"
+#: src/Lib/Admin.php:253
+msgid "Vulnerable version"
+msgstr ""
 
-#: src/Lib/Admin.php:162
-msgid "Your WordPress version has security vulnurabilities."
-msgstr "WordPress sürümünüzde güvenlik açıkları var."
+#: src/Lib/Admin.php:260
+msgid "Outdated version"
+msgstr ""
 
-#: src/Lib/Admin.php:165
-msgid "PHP Version:"
-msgstr "PHP Sürümü:"
+#: src/Lib/Admin.php:271
+#: src/Lib/SecurityLog.php:429
+msgid "Total Attacks"
+msgstr ""
 
-#: src/Lib/Admin.php:171
-msgid "Your PHP version has security vulnurabilities."
-msgstr "PHP sürümünüzde güvenlik açıkları var."
+#: src/Lib/Admin.php:278
+#: src/Lib/SecurityLog.php:436
+msgid "Failed Logins"
+msgstr ""
 
-#: src/Lib/Admin.php:174
-msgid "Failed login attempts:"
-msgstr "Başarısız oturum açma denemeleri:"
+#: src/Lib/Admin.php:285
+#: src/Lib/SecurityLog.php:443
+msgid "Bad Requests"
+msgstr ""
 
-#: src/Lib/Admin.php:175
-msgid "IPs of Failed Attempts:"
-msgstr "Başarısız Girişimlerin IP'leri:"
+#: src/Lib/Admin.php:292
+#: src/Lib/SecurityLog.php:450
+msgid "Bad Cookies"
+msgstr ""
 
-#: src/Lib/Admin.php:178
+#: src/Lib/Admin.php:299
+#: src/Lib/SecurityLog.php:457
+msgid "Bad Bots"
+msgstr ""
+
+#: src/Lib/Admin.php:306
+#: src/Lib/SecurityLog.php:464
+msgid "Bad Queries"
+msgstr ""
+
+#: src/Lib/Admin.php:313
+#: src/Lib/IPRanges.php:138
+#: src/Lib/SecurityLog.php:471
+msgid "Unique IPs"
+msgstr ""
+
+#: src/Lib/Admin.php:322
+msgid "System Security Warnings:"
+msgstr ""
+
+#: src/Lib/Admin.php:325
+msgid "Your WordPress version has security vulnerabilities. Please update WordPress."
+msgstr ""
+
+#: src/Lib/Admin.php:328
+msgid "Your PHP version has security vulnerabilities. Please upgrade PHP."
+msgstr ""
+
+#: src/Lib/Admin.php:336
 msgid "Everything is running smoothly. No security issues have been detected."
 msgstr ""
 "Her şey sorunsuz çalışıyor. Herhangi bir güvenlik sorunu tespit edilmedi."
 
-#: src/Lib/Admin.php:191
+#: src/Lib/Admin.php:343
+msgid "View Security Log"
+msgstr ""
+
+#: src/Lib/Admin.php:356
 msgid "XML-RPC FULL PROTECTION"
 msgstr "XML-RPC TAM KORUMA"
 
-#: src/Lib/Admin.php:193
-msgid ""
-"Blocks all remote requests. Most commonly used to prevent all types of "
-"remote attacks."
+#: src/Lib/Admin.php:358
+msgid "Blocks all remote requests. Most commonly used to prevent all types of remote attacks."
 msgstr ""
 "Tüm uzak istekleri engeller. En yaygın olarak her türlü uzaktan saldırıyı "
 "önlemek için kullanılır."
 
-#: src/Lib/Admin.php:197
+#: src/Lib/Admin.php:362
 msgid "XML-RPC LOGIN PROTECTION"
 msgstr "XML-RPC OTURUM AÇMA KORUMASI"
 
-#: src/Lib/Admin.php:199
-msgid ""
-"Blocks remote login requests. Most commonly used to prevent brute force "
-"login attempts."
+#: src/Lib/Admin.php:364
+msgid "Blocks remote login requests. Most commonly used to prevent brute force login attempts."
 msgstr ""
 "Uzaktan oturum açma isteklerini engeller. En yaygın olarak kaba kuvvet "
 "oturum açma girişimlerini önlemek için kullanılır."
 
-#: src/Lib/Admin.php:203
+#: src/Lib/Admin.php:368
 msgid "XML-RPC PINGBACK PROTECTION"
 msgstr "XML-RPC PINGBACK KORUMASI"
 
-#: src/Lib/Admin.php:205
-msgid ""
-"Blocks remote pingback requests. Most commonly used to prevent DDoS attacks."
+#: src/Lib/Admin.php:370
+msgid "Blocks remote pingback requests. Most commonly used to prevent DDoS attacks."
 msgstr ""
 "Uzak pingback isteklerini engeller. En yaygın olarak DDoS saldırılarını "
 "önlemek için kullanılır."
 
-#: src/Lib/Admin.php:209
+#: src/Lib/Admin.php:374
 msgid "SELF PINGBACK PROTECTION"
 msgstr "KENDI KENDINE PINGBACK KORUMASI"
 
-#: src/Lib/Admin.php:211
-msgid ""
-"Blocks remote self-pingback requests. Most commonly used to prevent DDoS "
-"attacks."
+#: src/Lib/Admin.php:376
+msgid "Blocks remote self-pingback requests. Most commonly used to prevent DDoS attacks."
 msgstr ""
 "Uzaktan kendi kendine geri dönüş isteklerini engeller. En yaygın olarak DDoS "
 "saldırılarını önlemek için kullanılır."
 
-#: src/Lib/Admin.php:215
+#: src/Lib/Admin.php:380
 msgid "New Custom Login URL"
 msgstr "Yeni Özel Giriş URL'si"
 
-#: src/Lib/Admin.php:217
+#: src/Lib/Admin.php:382
 msgid "Hides login url from the attackers."
 msgstr "Saldırganlardan giriş URL'sini gizler."
 
-#: src/Lib/Admin.php:221
+#: src/Lib/Admin.php:386
 msgid "Enable HTTPS / SSL"
 msgstr "HTTPS / SSL'yi Etkinleştir"
 
-#: src/Lib/Admin.php:223
+#: src/Lib/Admin.php:388
 msgid "SSL automatically encrypts your privileged information data."
 msgstr "SSL, ayrıcalıklı bilgi verilerinizi otomatik olarak şifreler."
 
-#: src/Lib/Admin.php:227
+#: src/Lib/Admin.php:392
 msgid "Force HTTPS Login"
 msgstr "HTTPS Girişini Zorla"
 
-#: src/Lib/Admin.php:229
+#: src/Lib/Admin.php:394
 msgid "Redirect login page protocol HTTP to HTTPS"
 msgstr "Oturum açma sayfası protokolü HTTP'yi HTTPS'ye yeniden yönlendirme"
 
-#: src/Lib/Admin.php:232
+#: src/Lib/Admin.php:397
 msgid "Change Login Error"
 msgstr "Giriş Hatasını Değiştir"
 
-#: src/Lib/Admin.php:234
-msgid ""
-"Disable default login errors and provide attackers with less than what they "
-"need."
+#: src/Lib/Admin.php:399
+msgid "Disable default login errors and provide attackers with less than what they need."
 msgstr ""
 "Varsayılan oturum açma hatalarını devre dışı bırakın ve saldırganlara "
 "ihtiyaç duyduklarından daha azını sağlayın."
 
-#: src/Lib/Admin.php:237
+#: src/Lib/Admin.php:402
 msgid "Change Admin ID"
 msgstr "Yönetici Kimliğini Değiştir"
 
-#: src/Lib/Admin.php:239
-msgid ""
-"It's not difficult to predict your Admin ID if it's set to `1`. Secure your "
-"site against simple SQL vulnerabilities."
+#: src/Lib/Admin.php:404
+msgid "It's not difficult to predict your Admin ID if it's set to `1`. Secure your site against simple SQL vulnerabilities."
 msgstr ""
 "Yönetici kimliğiniz `1` olarak ayarlanmışsa bunu tahmin etmek zor değildir. "
 "Sitenizi basit SQL güvenlik açıklarına karşı koruyun."
 
-#: src/Lib/Admin.php:242
+#: src/Lib/Admin.php:407
 msgid "Force HTTPS Admin"
 msgstr "HTTPS Yönetici Sayfasını Zorla"
 
-#: src/Lib/Admin.php:244
+#: src/Lib/Admin.php:409
 msgid "Redirects the admin page protocol from HTTP to HTTPS"
 msgstr "Yönetici sayfası protokolünü HTTP'den HTTPS'ye yönlendirir"
 
-#: src/Lib/Admin.php:247
+#: src/Lib/Admin.php:412
 msgid "Force HTTPS Front Page"
 msgstr "HTTPS Ön Sayfasını Zorla"
 
-#: src/Lib/Admin.php:249
+#: src/Lib/Admin.php:414
 msgid "Redirects the front page protocol from HTTP to HTTPS."
 msgstr "Ön sayfa protokolünü HTTP'den HTTPS'ye yönlendirir."
 
-#: src/Lib/Admin.php:252 src/Lib/Admin.php:524
+#: src/Lib/Admin.php:417
+#: src/Lib/Admin.php:740
 msgid "Filter Bad Requests"
 msgstr "Kötü İstekleri Filtreleme"
 
-#: src/Lib/Admin.php:254
-msgid ""
-"Helps secure your site against attacks like XSS, CSRF, and Code Injections."
+#: src/Lib/Admin.php:419
+msgid "Helps secure your site against attacks like XSS, CSRF, and Code Injections."
 msgstr ""
 "Sitenizi XSS, CSRF ve Kod Enjeksiyonları gibi saldırılara karşı korumaya "
 "yardımcı olur."
 
-#: src/Lib/Admin.php:257
+#: src/Lib/Admin.php:422
 msgid "Disable Rest API"
 msgstr "Rest API'yi Devre Dışı Bırak"
 
-#: src/Lib/Admin.php:259
-msgid ""
-"Conceals sensitive information from attackers, such as Admin user IDs, user "
-"lists, and their IDs."
+#: src/Lib/Admin.php:424
+msgid "Conceals sensitive information from attackers, such as Admin user IDs, user lists, and their IDs."
 msgstr ""
 "Yönetici kullanıcı kimlikleri, kullanıcı listeleri ve kimlikleri gibi hassas "
 "bilgileri saldırganlardan gizler."
 
-#: src/Lib/Admin.php:265
+#: src/Lib/Admin.php:430
 msgid "Manage your security features"
 msgstr "Güvenlik özelliklerinizi yönetin"
 
-#: src/Lib/Admin.php:267
+#: src/Lib/Admin.php:432
 msgid "Go to settings"
 msgstr "Ayarlara git"
 
-#: src/Lib/Admin.php:282
-msgid ""
-"Only use this if you have an SSL certificate; otherwise, it cannot be "
-"enabled."
+#: src/Lib/Admin.php:489
+msgid "Only use this if you have an SSL certificate; otherwise, it cannot be enabled."
 msgstr ""
 "Bunu yalnızca bir SSL sertifikanız varsa kullanın; aksi takdirde "
 "etkinleştirilemez."
 
-#: src/Lib/Admin.php:286
+#: src/Lib/Admin.php:493
 msgid "ERROR! You don’t have any valid SSL certificate. "
 msgstr "HATA! Geçerli bir SSL sertifikanız yok."
 
-#: src/Lib/Admin.php:289
+#: src/Lib/Admin.php:498
 msgid "Free SSL certificate providers"
 msgstr "Ücretsiz SSL sertifika sağlayıcıları"
 
-#: src/Lib/Admin.php:291
+#: src/Lib/Admin.php:501
 msgid "Let’s Encrypt"
 msgstr "Let's Encrypt"
 
-#: src/Lib/Admin.php:295
+#: src/Lib/Admin.php:505
 msgid "Cloudflare"
 msgstr "Cloudflare"
 
-#: src/Lib/Admin.php:300
+#: src/Lib/Admin.php:513
 msgid "Comodo / Sectigo"
 msgstr "Comodo / Sectigo"
 
-#: src/Lib/Admin.php:303
+#: src/Lib/Admin.php:517
 msgid "Digicert"
 msgstr "Digicert"
 
-#: src/Lib/Admin.php:313
+#: src/Lib/Admin.php:533
+#: src/Lib/Admin.php:537
 msgid "SecureFusion Security Settings"
 msgstr "SecureFusion Güvenlik Ayarları"
 
-#: src/Lib/Admin.php:315
-#, php-format
-msgid "Version %s - Check out"
-msgstr "Sürüm %s - Kontrol edin"
-
-#: src/Lib/Admin.php:317
-msgid "What's New"
-msgstr "Neler Yeni"
-
-#: src/Lib/Admin.php:323
-msgid "Additional Plugins"
-msgstr "Ek Eklentiler"
-
-#: src/Lib/Admin.php:328
+#: src/Lib/Admin.php:538
 msgid "You can manage your WordPress security settings."
 msgstr "WordPress güvenlik ayarlarınızı yönetebilirsiniz."
 
-#: src/Lib/Admin.php:337
+#: src/Lib/Admin.php:547
 msgid "XMLRPC"
 msgstr "XMLRPC"
 
-#: src/Lib/Admin.php:341
+#: src/Lib/Admin.php:551
 msgid "Login"
 msgstr "Giriş"
 
-#: src/Lib/Admin.php:345
+#: src/Lib/Admin.php:555
 msgid "SSL"
 msgstr "SSL"
 
+#: src/Lib/Admin.php:559
 msgid "Active Guard"
 msgstr "Aktif Koruma"
 
+#: src/Lib/Admin.php:563
 msgid "Security Policies"
 msgstr "Güvenlik Politikaları"
 
-#: src/Lib/Admin.php:349
-msgid "Firewall"
-msgstr "Güvenlik Duvarı"
-
-#: src/Lib/Admin.php:353
+#: src/Lib/Admin.php:567
 msgid "Advanced"
 msgstr "Gelişmiş"
 
-#: src/Lib/Admin.php:376
-msgid ""
-"If you don't have experience in cybersecurity or regular expressions, do not "
-"modify these areas."
+#: src/Lib/Admin.php:595
+msgid "If you don't have experience in cybersecurity or regular expressions, do not modify these areas."
 msgstr ""
 "Siber güvenlik veya düzenli ifadeler konusunda deneyiminiz yoksa bu "
 "alanlarda değişiklik yapmayın."
 
-#: src/Lib/Admin.php:405
-msgid "Welcome to SecureFusion"
-msgstr "SecureFusion'a Hoş Geldiniz"
-
-#: src/Lib/Admin.php:411
-#, php-format
-msgid ""
-"Thank you for installing SecureFusion! Check out <a href=\"%s\">the Plugin "
-"Settings</a>"
+#: src/Lib/Admin.php:600
+msgid "Save Settings"
 msgstr ""
-"SecureFusion'ı yüklediğiniz için teşekkür ederiz! <a href=\"%s\">Eklenti "
-"Ayarlarına</a> göz atın"
 
-#: src/Lib/Admin.php:422
-msgid "Get started"
-msgstr "Başlayın"
+#: src/Lib/Admin.php:629
+msgid "SecureFusion is active!"
+msgstr ""
 
-#: src/Lib/Admin.php:444
+#: src/Lib/Admin.php:630
+msgid "Configure your security settings to protect your site."
+msgstr ""
+
+#: src/Lib/Admin.php:633
+msgid "Go to Settings"
+msgstr ""
+
+#: src/Lib/Admin.php:655
 msgid "XML-RPC SETTINGS"
 msgstr "XML-RPC AYARLARI"
 
-#: src/Lib/Admin.php:445
+#: src/Lib/Admin.php:656
 msgid "You can prevent XML-RPC attacks."
 msgstr "Xmlrpc saldırılarını önleyebilirsiniz."
 
-#: src/Lib/Admin.php:451
+#: src/Lib/Admin.php:663
 msgid "Disable All XML-RPC Services"
 msgstr "Tüm XML-RPC Hizmetlerini Devre Dışı Bırakın"
 
-#: src/Lib/Admin.php:455 src/Lib/Admin.php:471 src/Lib/Admin.php:487
-#: src/Lib/Admin.php:503 src/Lib/Admin.php:528 src/Lib/Admin.php:543
-#: src/Lib/Admin.php:558 src/Lib/Admin.php:573 src/Lib/Admin.php:588
+#: src/Lib/Admin.php:667
+#: src/Lib/Admin.php:684
+#: src/Lib/Admin.php:701
+#: src/Lib/Admin.php:718
+#: src/Lib/Admin.php:744
+#: src/Lib/Admin.php:760
+#: src/Lib/Admin.php:776
+#: src/Lib/Admin.php:792
+#: src/Lib/Admin.php:808
 msgid "No"
 msgstr "Hayır"
 
-#: src/Lib/Admin.php:459 src/Lib/Admin.php:475 src/Lib/Admin.php:491
-#: src/Lib/Admin.php:507 src/Lib/Admin.php:532 src/Lib/Admin.php:547
-#: src/Lib/Admin.php:562 src/Lib/Admin.php:577 src/Lib/Admin.php:592
+#: src/Lib/Admin.php:671
+#: src/Lib/Admin.php:688
+#: src/Lib/Admin.php:705
+#: src/Lib/Admin.php:722
+#: src/Lib/Admin.php:748
+#: src/Lib/Admin.php:764
+#: src/Lib/Admin.php:780
+#: src/Lib/Admin.php:796
+#: src/Lib/Admin.php:812
 msgid "Yes"
 msgstr "Evet"
 
-#: src/Lib/Admin.php:462
-msgid ""
-"Enabling this option will completely disable XML-RPC functionality, which "
-"can prevent certain types of attacks but may affect integrations with other "
-"systems and applications."
+#: src/Lib/Admin.php:674
+msgid "Enabling this option will completely disable XML-RPC functionality, which can prevent certain types of attacks but may affect integrations with other systems and applications."
 msgstr ""
 "Bu seçeneğin etkinleştirilmesi XML-RPC işlevselliğini tamamen devre dışı "
 "bırakır, bu da belirli saldırı türlerini önleyebilir ancak diğer sistemler "
 "ve uygulamalarla entegrasyonları etkileyebilir."
 
-#: src/Lib/Admin.php:467
+#: src/Lib/Admin.php:680
 msgid "Disable XML-RPC Login Service"
 msgstr "XML-RPC Oturum Açma Hizmetini Devre Dışı Bırakma"
 
-#: src/Lib/Admin.php:478
-msgid ""
-"If checked, this will disable login capability through XML-RPC. This helps "
-"prevent brute force attacks but may affect some legitimate XML-RPC uses."
+#: src/Lib/Admin.php:691
+msgid "If checked, this will disable login capability through XML-RPC. This helps prevent brute force attacks but may affect some legitimate XML-RPC uses."
 msgstr ""
 "İşaretlenirse bu, XML-RPC aracılığıyla oturum açma özelliğini devre dışı "
 "bırakır. Bu, kaba kuvvet saldırılarını önlemeye yardımcı olur ancak bazı "
 "meşru XML-RPC kullanımlarını etkileyebilir."
 
-#: src/Lib/Admin.php:483
+#: src/Lib/Admin.php:697
 msgid "Disable XML-RPC Pingback Service"
 msgstr "XML-RPC Pingback Hizmetini Devre Dışı Bırakma"
 
-#: src/Lib/Admin.php:494
-msgid ""
-"Pingbacks can be abused for DDoS attacks. Disabling this will prevent "
-"pingbacks, improving security."
+#: src/Lib/Admin.php:708
+msgid "Pingbacks can be abused for DDoS attacks. Disabling this will prevent pingbacks, improving security."
 msgstr ""
 "Pingback'ler DDoS saldırıları için kötüye kullanılabilir. Bunu devre dışı "
 "bırakmak, geri pingback'leri önleyerek güvenliği artıracaktır."
 
-#: src/Lib/Admin.php:499
+#: src/Lib/Admin.php:714
 msgid "Disable Self Pingback Service"
 msgstr "Self Pingback Hizmetini Devre Dışı Bırak"
 
-#: src/Lib/Admin.php:510
-msgid ""
-"WordPress generates pingbacks to its own posts by default. This option "
-"disables such self-pingbacks."
+#: src/Lib/Admin.php:725
+msgid "WordPress generates pingbacks to its own posts by default. This option disables such self-pingbacks."
 msgstr ""
 "WordPress varsayılan olarak kendi gönderilerine geri pingback oluşturur. Bu "
 "seçenek, bu tür kendi kendine pingback'leri devre dışı bırakır."
 
+#: src/Lib/Admin.php:732
 msgid "ACTIVE GUARD SETTINGS"
 msgstr "AKTİF KORUMA AYARLARI"
 
+#: src/Lib/Admin.php:733
 msgid "Active guard and firewall settings. (Beta)"
 msgstr "Aktif koruma ve güvenlik duvarı ayarları. (Beta)"
 
-msgid "Content Security Policy (CSP) configurations."
-msgstr "İçerik Güvenliği Politikası (CSP) yapılandırmaları."
-
-#: src/Lib/Admin.php:517
-msgid "FIREWALL SETTINGS"
-msgstr "GÜVENLIK DUVARI AYARLARI"
-
-#: src/Lib/Admin.php:518
-msgid "Firewall security settings. (Beta)"
-msgstr "Güvenlik duvarı güvenlik ayarları. (Beta)"
-
-#: src/Lib/Admin.php:539
+#: src/Lib/Admin.php:756
 msgid "Disable Rest API for Visitors"
 msgstr "Ziyaretçiler için Rest API'yi Devre Dışı Bırak"
 
-#: src/Lib/Admin.php:554
+#: src/Lib/Admin.php:772
 msgid "Hide apache and PHP version"
 msgstr "Apache ve PHP sürümünü gizle"
 
-#: src/Lib/Admin.php:569
+#: src/Lib/Admin.php:788
 msgid "Block bad bots"
 msgstr "Kötü botları engelleyin"
 
-#: src/Lib/Admin.php:584
+#: src/Lib/Admin.php:804
 msgid "Add HTTP Headers for Browser Security"
 msgstr "Tarayıcı Güvenliği için HTTP Üstbilgileri Ekleme"
 
-#: src/Lib/Admin.php:601
+#: src/Lib/Admin.php:819
+msgid "Max Payload Size (Bytes)"
+msgstr ""
+
+#: src/Lib/Admin.php:821
+msgid " bytes"
+msgstr ""
+
+#: src/Lib/Admin.php:821
+msgid "Maximum allowed request payload size (excluding file uploads). IPs exceeding this limit will be permanently blocked. Set 0 to disable. Default: 4096."
+msgstr ""
+
+#: src/Lib/Admin.php:829
+msgid "SECURITY POLICIES"
+msgstr ""
+
+#: src/Lib/Admin.php:830
+msgid "Content Security Policy (CSP) configurations."
+msgstr "İçerik Güvenliği Politikası (CSP) yapılandırmaları."
+
+#: src/Lib/Admin.php:837
+msgid "Enable CSP Style Sources"
+msgstr ""
+
+#: src/Lib/Admin.php:841
+#: src/Lib/Admin.php:866
+#: src/Lib/Admin.php:891
+#: src/Lib/Admin.php:916
+#: src/Lib/Admin.php:941
+#: src/Lib/Admin.php:966
+#: src/Lib/Admin.php:992
+#: src/Lib/Admin.php:1009
+#: src/Lib/Admin.php:1026
+msgid "Disable"
+msgstr ""
+
+#: src/Lib/Admin.php:845
+#: src/Lib/Admin.php:870
+#: src/Lib/Admin.php:895
+#: src/Lib/Admin.php:920
+#: src/Lib/Admin.php:945
+#: src/Lib/Admin.php:970
+#: src/Lib/Admin.php:996
+#: src/Lib/Admin.php:1013
+#: src/Lib/Admin.php:1030
+msgid "Enable"
+msgstr ""
+
+#: src/Lib/Admin.php:852
+msgid "CSP Allowed Style Sources"
+msgstr ""
+
+#: src/Lib/Admin.php:862
+msgid "Enable CSP Script Sources"
+msgstr ""
+
+#: src/Lib/Admin.php:877
+msgid "CSP Allowed Script Sources"
+msgstr ""
+
+#: src/Lib/Admin.php:887
+msgid "Enable CSP Font Sources"
+msgstr ""
+
+#: src/Lib/Admin.php:902
+msgid "CSP Allowed Font Sources"
+msgstr ""
+
+#: src/Lib/Admin.php:912
+msgid "Enable CSP Frame Sources"
+msgstr ""
+
+#: src/Lib/Admin.php:927
+msgid "CSP Frame Sources (iframe embed)"
+msgstr ""
+
+#: src/Lib/Admin.php:937
+msgid "Enable CSP Worker Sources"
+msgstr ""
+
+#: src/Lib/Admin.php:952
+msgid "CSP Worker Sources"
+msgstr ""
+
+#: src/Lib/Admin.php:962
+msgid "Enable CSP Image Sources"
+msgstr ""
+
+#: src/Lib/Admin.php:977
+msgid "CSP Image Sources"
+msgstr ""
+
+#: src/Lib/Admin.php:987
+msgid "Upgrade Insecure Requests"
+msgstr ""
+
+#: src/Lib/Admin.php:988
+msgid "Instructs the browser to upgrade all HTTP requests to HTTPS."
+msgstr ""
+
+#: src/Lib/Admin.php:1004
+msgid "Block All Mixed Content"
+msgstr ""
+
+#: src/Lib/Admin.php:1005
+msgid "Prevents loading any HTTP content on an HTTPS page."
+msgstr ""
+
+#: src/Lib/Admin.php:1021
+msgid "Sandbox"
+msgstr ""
+
+#: src/Lib/Admin.php:1022
+msgid "Enables a sandbox for the requested resource similar to the iframe sandbox attribute. This can block some features of your website (like payment gateway integration). Use with caution!"
+msgstr ""
+
+#: src/Lib/Admin.php:1039
 msgid "LOGIN SETTINGS - BE CAREFUL!"
 msgstr "GIRIŞ AYARLARI - DIKKATLI OLUN!"
 
-#: src/Lib/Admin.php:602
-msgid ""
-"You can hide or secure your login page against attackers. Please save "
-"your new login url before you change it."
+#: src/Lib/Admin.php:1040
+msgid "You can hide or secure your login page against attackers. Please save your new login url before you change it."
 msgstr ""
 "Giriş sayfanızı saldırganlara karşı gizleyebilir veya güvenli hale "
 "getirebilirsiniz. Lütfen değiştirmeden önce yeni giriş url'nizi kaydedin."
 
-#: src/Lib/Admin.php:608
+#: src/Lib/Admin.php:1046
 msgid "Min. Wait Time"
 msgstr "Min. Bekleme Süresi"
 
-#: src/Lib/Admin.php:610
+#: src/Lib/Admin.php:1048
 msgid " hour(s)"
 msgstr " saat"
 
-#: src/Lib/Admin.php:610
+#: src/Lib/Admin.php:1048
 msgid "Minimum Wait Time After Failed Attempt"
 msgstr "Başarısız Denemeden Sonra Minimum Bekleme Süresi"
 
-#: src/Lib/Admin.php:615
+#: src/Lib/Admin.php:1053
 msgid "Max. Attempt Limit"
 msgstr "Maks. Girişim Sınırı"
 
-#: src/Lib/Admin.php:617
+#: src/Lib/Admin.php:1055
 msgid " time(s)"
 msgstr " defa"
 
-#: src/Lib/Admin.php:617
+#: src/Lib/Admin.php:1055
 msgid "Maximum Failed Login Attempt Limit"
 msgstr "Maksimum Başarısız Giriş Denemesi Sınırı"
 
-#: src/Lib/Admin.php:622
+#: src/Lib/Admin.php:1060
+msgid "Auto-Delete IPs: Older Than"
+msgstr ""
+
+#: src/Lib/Admin.php:1062
+msgid " day(s)"
+msgstr ""
+
+#: src/Lib/Admin.php:1062
+msgid "Delete IPs inactive for this many days (0 to disable)."
+msgstr ""
+
+#: src/Lib/Admin.php:1067
+msgid "Auto-Delete IPs: Fewer Than"
+msgstr ""
+
+#: src/Lib/Admin.php:1069
+msgid " attempt(s)"
+msgstr ""
+
+#: src/Lib/Admin.php:1069
+msgid "Only delete IPs that have fewer than this many total attempts."
+msgstr ""
+
+#: src/Lib/Admin.php:1074
 msgid "Custom Login Path"
 msgstr "Özel Giriş Yolu"
 
-#: src/Lib/Admin.php:629
+#: src/Lib/Admin.php:1081
 msgid "Custom Login Error Message"
 msgstr "Özel Oturum Açma Hata Mesajı"
 
-#: src/Lib/Admin.php:634
+#: src/Lib/Admin.php:1086
 msgid "Your Admin ID"
 msgstr "Yönetici Kimliğiniz"
 
-#: src/Lib/Admin.php:646
+#: src/Lib/Admin.php:1098
 msgid "SSL SETTINGS"
 msgstr "SSL AYARLARI"
 
-#: src/Lib/Admin.php:647
+#: src/Lib/Admin.php:1099
 msgid "HTTPS/SSL security settings."
 msgstr "HTTPS/SSL güvenlik ayarları."
 
-#: src/Lib/Admin.php:654
+#: src/Lib/Admin.php:1107
 msgid "HTTPS Support"
 msgstr "HTTPS Desteği"
 
-#: src/Lib/Admin.php:657 src/Lib/Admin.php:673 src/Lib/Admin.php:689
-#: src/Lib/Admin.php:705 src/Lib/Admin.php:721
+#: src/Lib/Admin.php:1110
+#: src/Lib/Admin.php:1127
+#: src/Lib/Admin.php:1144
+#: src/Lib/Admin.php:1161
+#: src/Lib/Admin.php:1178
 msgid "Disabled"
 msgstr "Devre dışı"
 
-#: src/Lib/Admin.php:661 src/Lib/Admin.php:677 src/Lib/Admin.php:693
-#: src/Lib/Admin.php:709 src/Lib/Admin.php:725
+#: src/Lib/Admin.php:1114
+#: src/Lib/Admin.php:1131
+#: src/Lib/Admin.php:1148
+#: src/Lib/Admin.php:1165
+#: src/Lib/Admin.php:1182
 msgid "Enabled"
 msgstr "Etkin"
 
-#: src/Lib/Admin.php:670
+#: src/Lib/Admin.php:1124
 msgid "Force HTTPS on login page"
 msgstr "Giriş sayfasında HTTPS'yi zorla"
 
-#: src/Lib/Admin.php:686
+#: src/Lib/Admin.php:1141
 msgid "Force HTTPS on admin page"
 msgstr "Yönetici sayfasında HTTPS'yi zorla"
 
-#: src/Lib/Admin.php:702
+#: src/Lib/Admin.php:1158
 msgid "Force HTTPS on front page"
 msgstr "Ön sayfada HTTPS'yi zorla"
 
-#: src/Lib/Admin.php:718
+#: src/Lib/Admin.php:1175
 msgid "Force HTTPS site-wide"
 msgstr "Site genelinde HTTPS'yi zorla"
 
-#: src/Lib/Admin.php:735
+#: src/Lib/Admin.php:1192
 msgid "ADVANCED SETTINGS"
 msgstr "GELİŞMİŞ AYARLAR"
 
-#: src/Lib/Admin.php:736
-msgid ""
-"Advanced security settings. `Filter Bad Requests` must be active for it to "
-"work. Separated by lines. For example: [a-z0-9]+/#[a-z]*"
+#: src/Lib/Admin.php:1193
+msgid "Advanced security settings. `Filter Bad Requests` must be active for it to work."
 msgstr ""
-"Gelişmiş güvenlik ayarları. çalışması için `Filter Bad Requests` etkin "
-"olmalıdır. Satırlarla ayrılmış. Örneğin: [a-z0-9]+/#[a-z]*"
 
-#: src/Lib/Admin.php:742
+#: src/Lib/Admin.php:1199
 msgid "Cookie Regex Patterns"
 msgstr "Çerez Regex Kalıpları"
 
-#: src/Lib/Admin.php:748
+#: src/Lib/Admin.php:1211
 msgid "Get/Post Request Regex Patterns"
 msgstr "Get/Post İstek Regex Kalıpları"
 
-#: src/Lib/Admin.php:803
+#: src/Lib/Admin.php:1340
+#: src/Lib/SecurityLog.php:46
+msgid "Failed Login"
+msgstr ""
+
+#: src/Lib/Admin.php:1341
+#: src/Lib/SecurityLog.php:48
+msgid "Bad Request"
+msgstr ""
+
+#: src/Lib/Admin.php:1342
+#: src/Lib/SecurityLog.php:49
+msgid "Bad Cookie"
+msgstr ""
+
+#: src/Lib/Admin.php:1343
+#: src/Lib/SecurityLog.php:50
+msgid "Bad Bot"
+msgstr ""
+
+#: src/Lib/Admin.php:1344
+#: src/Lib/SecurityLog.php:51
+msgid "Bad Query"
+msgstr ""
+
+#: src/Lib/Admin.php:1345
+msgid "Blocked Request"
+msgstr ""
+
+#: src/Lib/Admin.php:1398
 msgid "enabled"
 msgstr "etkin"
 
-#: src/Lib/Admin.php:803
+#: src/Lib/Admin.php:1398
 msgid "disabled"
 msgstr "devre dışı"
 
-#: src/Lib/Middleware.php:156
+#: src/Lib/Admin.php:1443
+msgid "Are you sure you want to reset this field to its default value?"
+msgstr ""
+
+#: src/Lib/Admin.php:1444
+msgid "Reset"
+msgstr ""
+
+#: src/Lib/CommentsBlock.php:61
+msgid "Admin/Whitelisted IP address."
+msgstr ""
+
+#: src/Lib/CommentsBlock.php:61
+#: src/Lib/CommentsBlock.php:148
+msgid "Whitelisted IP"
+msgstr "Güvenli Listede (Whitelist)"
+
+#: src/Lib/CommentsBlock.php:66
+#: src/Lib/CommentsBlock.php:147
+msgid "Unblock IP"
+msgstr ""
+
+#: src/Lib/CommentsBlock.php:72
+#: src/Lib/CommentsBlock.php:146
+msgid "Block IP"
+msgstr ""
+
+#: src/Lib/CommentsBlock.php:102
+msgid "Block ranges"
+msgstr "Aralıkları engelle"
+
+#: src/Lib/CommentsBlock.php:106
+msgid "Block Spam"
+msgstr "Spam Engelle"
+
+#: src/Lib/CommentsBlock.php:143
+#: src/Lib/SecurityLog.php:124
+msgid "Are you sure you want to block this IP?"
+msgstr ""
+
+#: src/Lib/CommentsBlock.php:144
+msgid "Are you sure you want to unblock this IP?"
+msgstr ""
+
+#: src/Lib/CommentsBlock.php:145
+msgid "Are you sure you want to block all IP addresses/ranges for all comments currently in Spam?"
+msgstr ""
+
+#: src/Lib/CommentsBlock.php:149
+msgid "Operation completed successfully."
+msgstr "İşlem başarıyla tamamlandı."
+
+#: src/Lib/CommentsBlock.php:150
+#: src/Lib/CommentsBlock.php:196
+#: src/Lib/SecurityLog.php:344
+msgid "Operation failed."
+msgstr "İşlem başarısız oldu."
+
+#: src/Lib/CommentsBlock.php:151
+#: src/Lib/IPRanges.php:70
+#: src/Lib/SecurityLog.php:118
+msgid "Processing..."
+msgstr "İşleniyor..."
+
+#: src/Lib/CommentsBlock.php:161
+#: src/Lib/CommentsBlock.php:204
+#: src/Lib/IPRules.php:118
+#: src/Lib/IPRules.php:167
+#: src/Lib/SecurityLog.php:137
+msgid "Security check failed."
+msgstr ""
+
+#: src/Lib/CommentsBlock.php:166
+#: src/Lib/CommentsBlock.php:209
+#: src/Lib/IPRules.php:123
+#: src/Lib/IPRules.php:172
+#: src/Lib/SecurityLog.php:142
+msgid "Permission denied."
+msgstr ""
+
+#: src/Lib/CommentsBlock.php:174
+msgid "Invalid IP address."
+msgstr ""
+
+#: src/Lib/CommentsBlock.php:182
+#: src/Lib/SecurityLog.php:317
+msgid "This IP is whitelisted and cannot be blocked."
+msgstr ""
+
+#: src/Lib/CommentsBlock.php:187
+msgid "IP blocked."
+msgstr ""
+
+#: src/Lib/CommentsBlock.php:192
+msgid "IP unblocked."
+msgstr ""
+
+#: src/Lib/CommentsBlock.php:220
+msgid "No spam comment IPs found."
+msgstr ""
+
+#: src/Lib/CommentsBlock.php:295
+msgid "Successfully blocked %d IP addresses/ranges."
+msgstr ""
+
+#: src/Lib/IPRanges.php:63
+msgid "WARNING: This action is irreversible! All failed login attempt data will be permanently deleted. Are you absolutely sure?"
+msgstr ""
+
+#: src/Lib/IPRanges.php:64
+#: src/Lib/SecurityLog.php:112
+msgid "Importing data will add records to the existing table. Continue?"
+msgstr ""
+
+#: src/Lib/IPRanges.php:65
+msgid "All data has been deleted successfully."
+msgstr ""
+
+#: src/Lib/IPRanges.php:66
+#: src/Lib/SecurityLog.php:114
+msgid "No data to export."
+msgstr ""
+
+#: src/Lib/IPRanges.php:67
+#: src/Lib/SecurityLog.php:115
+msgid "Import completed successfully."
+msgstr ""
+
+#: src/Lib/IPRanges.php:68
+#: src/Lib/SecurityLog.php:116
+msgid "Import failed. Please check the file format."
+msgstr ""
+
+#: src/Lib/IPRanges.php:69
+#: src/Lib/SecurityLog.php:117
+msgid "Please select a valid JSON file."
+msgstr ""
+
+#: src/Lib/IPRanges.php:71
+#: src/Lib/SecurityLog.php:119
+msgid "Copied to clipboard!"
+msgstr ""
+
+#: src/Lib/IPRanges.php:72
+#: src/Lib/SecurityLog.php:120
+msgid "Copy failed. Please select and copy manually."
+msgstr ""
+
+#: src/Lib/IPRanges.php:73
+msgid "IP range has been blocked."
+msgstr ""
+
+#: src/Lib/IPRanges.php:74
+msgid "IP range has been unblocked."
+msgstr ""
+
+#: src/Lib/IPRanges.php:75
+msgid "IP range block/unblock operation failed."
+msgstr ""
+
+#: src/Lib/IPRanges.php:76
+msgid "Are you sure you want to block this IP range?"
+msgstr ""
+
+#: src/Lib/IPRanges.php:120
+#: src/Lib/IPRanges.php:312
+msgid "IP Range TXT List"
+msgstr ""
+
+#: src/Lib/IPRanges.php:124
+msgid "IP Ranges Management"
+msgstr ""
+
+#: src/Lib/IPRanges.php:125
+msgid "View and manage IP subnets that have generated failed login attempts."
+msgstr ""
+
+#: src/Lib/IPRanges.php:137
+msgid "IP Range"
+msgstr ""
+
+#: src/Lib/IPRanges.php:139
+msgid "Total Attempts"
+msgstr ""
+
+#: src/Lib/IPRanges.php:165
+#: src/Lib/IPRules.php:308
+#: src/Lib/SecurityLog.php:564
+msgid "Actions"
+msgstr ""
+
+#: src/Lib/IPRanges.php:199
+msgid "Logs"
+msgstr ""
+
+#: src/Lib/IPRanges.php:203
+msgid "List"
+msgstr ""
+
+#: src/Lib/IPRanges.php:208
+#: src/Lib/SecurityLog.php:640
+msgid "Unblock"
+msgstr ""
+
+#: src/Lib/IPRanges.php:213
+#: src/Lib/SecurityLog.php:645
+msgid "Block"
+msgstr ""
+
+#: src/Lib/IPRanges.php:233
+#: src/Lib/IPRules.php:363
+#: src/Lib/SecurityLog.php:664
+msgid "Page %1$s of %2$s (%3$s items)"
+msgstr ""
+
+#: src/Lib/IPRanges.php:271
+msgid "No IP ranges found. Your site is clean!"
+msgstr ""
+
+#: src/Lib/IPRanges.php:280
+msgid "IPs in Range"
+msgstr ""
+
+#: src/Lib/IPRanges.php:289
+msgid "Copy IP List"
+msgstr ""
+
+#: src/Lib/IPRanges.php:292
+#: src/Lib/IPRanges.php:324
+#: src/Lib/SecurityLog.php:729
+msgid "Close"
+msgstr ""
+
+#: src/Lib/IPRanges.php:321
+msgid "Copy List"
+msgstr ""
+
+#: src/Lib/IPRules.php:75
+msgid "Are you sure you want to delete this rule?"
+msgstr ""
+
+#: src/Lib/IPRules.php:76
+#: src/Lib/IPRules.php:153
+msgid "Rule has been added successfully."
+msgstr ""
+
+#: src/Lib/IPRules.php:77
+#: src/Lib/IPRules.php:187
+msgid "Rule has been deleted successfully."
+msgstr ""
+
+#: src/Lib/IPRules.php:78
+#: src/Lib/IPRules.php:155
+msgid "Failed to add rule."
+msgstr ""
+
+#: src/Lib/IPRules.php:79
+#: src/Lib/IPRules.php:189
+msgid "Failed to delete rule."
+msgstr ""
+
+#: src/Lib/IPRules.php:80
+#: src/Lib/IPRules.php:131
+msgid "Invalid IP address or CIDR range format."
+msgstr ""
+
+#: src/Lib/IPRules.php:136
+msgid "Invalid rule type."
+msgstr ""
+
+#: src/Lib/IPRules.php:144
+msgid "This IP/range is whitelisted and cannot be blocked."
+msgstr ""
+
+#: src/Lib/IPRules.php:179
+msgid "Invalid IP or range."
+msgstr ""
+
+#: src/Lib/IPRules.php:242
+msgid "IP Rules Management"
+msgstr ""
+
+#: src/Lib/IPRules.php:243
+msgid "Manually block or whitelist specific IP addresses and range blocks."
+msgstr ""
+
+#: src/Lib/IPRules.php:251
+msgid "Add New Rule"
+msgstr ""
+
+#: src/Lib/IPRules.php:254
+msgid "IP Address or Subnet (CIDR)"
+msgstr ""
+
+#: src/Lib/IPRules.php:258
+#: src/Lib/IPRules.php:281
+msgid "Rule Type"
+msgstr ""
+
+#: src/Lib/IPRules.php:260
+#: src/Lib/IPRules.php:321
+#: src/Lib/SecurityLog.php:52
+#: src/Lib/SecurityLog.php:627
+msgid "Blocked"
+msgstr ""
+
+#: src/Lib/IPRules.php:261
+#: src/Lib/IPRules.php:319
+#: src/Lib/SecurityLog.php:625
+msgid "Whitelisted"
+msgstr ""
+
+#: src/Lib/IPRules.php:267
+msgid "Add Rule"
+msgstr ""
+
+#: src/Lib/IPRules.php:280
+msgid "IP / Subnet (CIDR)"
+msgstr ""
+
+#: src/Lib/IPRules.php:282
+msgid "Created At"
+msgstr ""
+
+#: src/Lib/IPRules.php:335
+#: src/Lib/SecurityLog.php:616
+msgid "ago"
+msgstr ""
+
+#: src/Lib/IPRules.php:345
+msgid "Remove"
+msgstr ""
+
+#: src/Lib/IPRules.php:401
+msgid "No IP rules defined yet."
+msgstr ""
+
+#: src/Lib/Middleware.php:125
+msgid "SecureFusion: Request payload exceeds the allowed limit. Your IP has been blocked."
+msgstr ""
+
+#: src/Lib/Middleware.php:126
+msgid "Payload Too Large"
+msgstr ""
+
+#: src/Lib/Middleware.php:180
+msgid "SecureFusion Firewall has denied access to this resource."
+msgstr ""
+
+#: src/Lib/Middleware.php:181
+msgid "Access Denied"
+msgstr ""
+
+#: src/Lib/Middleware.php:429
 msgid "SecureFusion Firewall has denied this cookie request."
 msgstr "SecureFusion Güvenlik Duvarı bu çerez isteğini reddetti."
 
-#: src/Lib/Middleware.php:157
+#: src/Lib/Middleware.php:430
 msgid "Cookie Failure"
 msgstr "Kurabiye Arızası"
 
-#: src/Lib/Middleware.php:207
+#: src/Lib/Middleware.php:496
 msgid "SecureFusion Firewall has denied this comment submission."
 msgstr "SecureFusion Güvenlik Duvarı bu yorum gönderimini reddetti."
 
-#: src/Lib/Middleware.php:208
+#: src/Lib/Middleware.php:497
 msgid "Comment Submission Failure"
 msgstr "Yorum Gönderme Hatası"
 
-#: src/Lib/Middleware.php:216
+#: src/Lib/Middleware.php:506
 msgid "SecureFusion Firewall has denied this request."
 msgstr "SecureFusion Güvenlik Duvarı bu isteği reddetti."
 
-#: src/Lib/Middleware.php:217
+#: src/Lib/Middleware.php:507
 msgid "Request Failure"
 msgstr "Talep Başarısızlığı"
 
-#: src/Lib/Middleware.php:230
+#: src/Lib/Middleware.php:530
 msgid "SecureFusion Firewall has denied this WP Query."
 msgstr "SecureFusion Güvenlik Duvarı bu WP Sorgusunu reddetti."
 
-#: src/Lib/Middleware.php:231
+#: src/Lib/Middleware.php:531
 msgid "WP Query Failure"
 msgstr "WP Sorgu Hatası"
 
-#: src/Lib/Middleware.php:361
+#: src/Lib/Middleware.php:575
+msgid "The REST API on this site has been disabled."
+msgstr ""
+
+#: src/Lib/Middleware.php:671
 msgid "<strong>ERROR</strong>: You have reached the login attempts limit."
 msgstr "<strong>HATA</strong>: Giriş denemeleri sınırına ulaştınız."
 
-#: src/Lib/Middleware.php:362
+#: src/Lib/Middleware.php:672
 msgid "Too many failed login attempts"
 msgstr "Çok fazla başarısız giriş denemesi"
 
-#: xmlrpc_server.php:47
+#: src/Lib/SecurityLog.php:45
+msgid "All Types"
+msgstr ""
+
+#: src/Lib/SecurityLog.php:47
+msgid "Successful Login"
+msgstr "Başarılı Giriş"
+
+#: src/Lib/SecurityLog.php:111
+msgid "WARNING: This action is irreversible! Selected log data will be permanently deleted. Are you absolutely sure?"
+msgstr ""
+
+#: src/Lib/SecurityLog.php:113
+msgid "Data has been deleted successfully."
+msgstr ""
+
+#: src/Lib/SecurityLog.php:121
+#: src/Lib/SecurityLog.php:326
+msgid "IP has been blocked."
+msgstr ""
+
+#: src/Lib/SecurityLog.php:122
+#: src/Lib/SecurityLog.php:337
+msgid "IP has been unblocked."
+msgstr ""
+
+#: src/Lib/SecurityLog.php:123
+msgid "IP block/unblock operation failed."
+msgstr ""
+
+#: src/Lib/SecurityLog.php:167
+msgid "Data has been deleted."
+msgstr ""
+
+#: src/Lib/SecurityLog.php:169
+msgid "Failed to delete data."
+msgstr ""
+
+#: src/Lib/SecurityLog.php:231
+msgid "Invalid JSON data."
+msgstr ""
+
+#: src/Lib/SecurityLog.php:241
+msgid "%d records imported successfully."
+msgstr ""
+
+#: src/Lib/SecurityLog.php:261
+msgid "Invalid range prefix."
+msgstr ""
+
+#: src/Lib/SecurityLog.php:278
+msgid "%1$d IPs in range %2$s"
+msgstr ""
+
+#: src/Lib/SecurityLog.php:309
+msgid "Invalid IP address or range."
+msgstr ""
+
+#: src/Lib/SecurityLog.php:418
+msgid "Monitor and manage security events, blocked IPs, and attack records."
+msgstr ""
+
+#: src/Lib/SecurityLog.php:478
+msgid "Total Records"
+msgstr ""
+
+#: src/Lib/SecurityLog.php:495
+msgid "Export JSON"
+msgstr ""
+
+#: src/Lib/SecurityLog.php:499
+msgid "Import JSON"
+msgstr ""
+
+#: src/Lib/SecurityLog.php:506
+msgid "Delete Data"
+msgstr ""
+
+#: src/Lib/SecurityLog.php:518
+msgid "Filtered by range: %s"
+msgstr ""
+
+#: src/Lib/SecurityLog.php:523
+msgid "Show all"
+msgstr ""
+
+#: src/Lib/SecurityLog.php:534
+msgid "IP Address"
+msgstr ""
+
+#: src/Lib/SecurityLog.php:535
+msgid "Attack Type"
+msgstr ""
+
+#: src/Lib/SecurityLog.php:536
+msgid "Attempts"
+msgstr ""
+
+#: src/Lib/SecurityLog.php:537
+msgid "Last Attempt"
+msgstr ""
+
+#: src/Lib/SecurityLog.php:563
+msgid "Status"
+msgstr ""
+
+#: src/Lib/SecurityLog.php:589
+msgid "View Payload Details"
+msgstr ""
+
+#: src/Lib/SecurityLog.php:629
+msgid "Active"
+msgstr ""
+
+#: src/Lib/SecurityLog.php:634
+msgid "Admin IP — Cannot be blocked"
+msgstr ""
+
+#: src/Lib/SecurityLog.php:704
+msgid "No records found for the current filter."
+msgstr ""
+
+#: src/Lib/SecurityLog.php:706
+msgid "No security events recorded yet. Your site is clean!"
+msgstr ""
+
+#: src/Lib/SecurityLog.php:717
+msgid "Payload Details"
+msgstr ""
+
+#: src/Lib/SecurityLog.php:726
+msgid "Copy Payload"
+msgstr ""
+
+#: src/Lib/Traits/WPCommon.php:321
+msgid "Version %s - Check out."
+msgstr ""
+
+#: src/Lib/Traits/WPCommon.php:324
+msgid "What's New"
+msgstr "Neler Yeni"
+
+#: src/Lib/Traits/WPCommon.php:339
+msgid "Products"
+msgstr ""
+
+#: src/Lib/Traits/WPCommon.php:342
+msgid "Services"
+msgstr ""
+
+#: xmlrpc_server.php:81
 msgid "XMLRPC login disabled"
 msgstr "XMLRPC oturum açma devre dışı"
 
-#: xmlrpc_server.php:64
+#: xmlrpc_server.php:100
 msgid "XMLRPC pingback disabled"
 msgstr "XMLRPC pingback devre dışı"
 
-#. Plugin URI of the plugin/theme
-msgid "https://fyndsoft.com/securefusion"
-msgstr "https://fyndsoft.com/securefusion"
-
-#. Description of the plugin/theme
-msgid "SecureFusion is a lightweight, robust security plugin for WordPress."
-msgstr ""
-"SecureFusion, WordPress için hafif ve sağlam bir güvenlik eklentisidir."
-
-#. Author of the plugin/theme
-msgid "codeplusdev <contact@fyndsoft.com>"
-msgstr "codeplusdev <contact@fyndsoft.com>"
-
-#. Author URI of the plugin/theme
-msgid "https://profiles.wordpress.org/codeplusdev/"
-msgstr "https://profiles.wordpress.org/codeplusdev/"

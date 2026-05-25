@@ -78,7 +78,7 @@ class Admin {
 	 */
 	public function add_settings_link( $links ) {
 		$settings_link  = '<a href="admin.php?page=securefusion-settings">';
-		$settings_link .= esc_html__( 'Settings', 'securefusion' );
+		$settings_link .= esc_html__( 'Settings', 'secuplug' );
 		$settings_link .= '</a>';
 
 		$links[] = $settings_link;
@@ -94,54 +94,54 @@ class Admin {
 	 */
 	public function admin_menu() {
 		$this->menu_pages['main'] = \add_menu_page(
-			esc_html__( 'SecureFusion', 'securefusion' ),
-			esc_html__( 'SecureFusion', 'securefusion' ),
+			esc_html__( 'SecureFusion', 'secuplug' ),
+			esc_html__( 'SecureFusion', 'secuplug' ),
 			'manage_options',
-			'securefusion',
+			'secuplug',
 			array( $this, 'get_dashboard_html' ),
 			'dashicons-shield'
 		);
 
 		$this->menu_pages['dashboard'] = \add_submenu_page(
-			'securefusion',
-			esc_html__( 'SecureFusion Dashboard', 'securefusion' ),
-			esc_html__( 'Dashboard', 'securefusion' ),
+			'secuplug',
+			esc_html__( 'SecureFusion Dashboard', 'secuplug' ),
+			esc_html__( 'Dashboard', 'secuplug' ),
 			'manage_options',
-			'securefusion',
+			'secuplug',
 			array( $this, 'get_dashboard_html' )
 		);
 
 		$this->menu_pages['settings'] = \add_submenu_page(
-			'securefusion',
-			esc_html__( 'SecureFusion Settings', 'securefusion' ),
-			esc_html__( 'Settings', 'securefusion' ),
+			'secuplug',
+			esc_html__( 'SecureFusion Settings', 'secuplug' ),
+			esc_html__( 'Settings', 'secuplug' ),
 			'manage_options',
 			'securefusion-settings',
 			array( $this, 'get_settings_html' )
 		);
 
 		$this->menu_pages['security_log'] = \add_submenu_page(
-			'securefusion',
-			esc_html__( 'Security Log', 'securefusion' ),
-			esc_html__( 'Security Log', 'securefusion' ),
+			'secuplug',
+			esc_html__( 'SecureFusion Security Log', 'secuplug' ),
+			esc_html__( 'Security Log', 'secuplug' ),
 			'manage_options',
 			'securefusion-security-log',
 			array( $this, 'get_security_log_html' )
 		);
 
 		$this->menu_pages['ip_rules'] = \add_submenu_page(
-			'securefusion',
-			esc_html__( 'IP Rules', 'securefusion' ),
-			esc_html__( 'IP Rules', 'securefusion' ),
+			'secuplug',
+			esc_html__( 'SecureFusion IP Rules', 'secuplug' ),
+			esc_html__( 'IP Rules', 'secuplug' ),
 			'manage_options',
 			'securefusion-ip-rules',
 			array( $this, 'get_ip_rules_html' )
 		);
 
 		$this->menu_pages['ip_ranges'] = \add_submenu_page(
-			'securefusion',
-			esc_html__( 'IP Ranges', 'securefusion' ),
-			esc_html__( 'IP Ranges', 'securefusion' ),
+			'secuplug',
+			esc_html__( 'SecureFusion IP Ranges', 'secuplug' ),
+			esc_html__( 'IP Ranges', 'secuplug' ),
 			'manage_options',
 			'securefusion-ip-ranges',
 			array( $this, 'get_ip_ranges_html' )
@@ -210,20 +210,20 @@ class Admin {
 			 * outside our styled header component.
 			 */
 			?>
-			<h1 class="fynd-sf-sr-only"><?php esc_html_e( 'SecureFusion Dashboard', 'securefusion' ); ?></h1>
+			<h1 class="fynd-sf-sr-only"><?php esc_html_e( 'SecureFusion Dashboard', 'secuplug' ); ?></h1>
 
 			<?php
 			$this->render_header(
-				esc_html__( 'SecureFusion Dashboard', 'securefusion' ),
-				esc_html__( 'You can monitor your WordPress security settings.', 'securefusion' )
+				esc_html__( 'SecureFusion Dashboard', 'secuplug' ),
+				esc_html__( 'You can monitor your WordPress security settings.', 'secuplug' )
 			);
 			?>
 
 			<section class="fynd-sf-charts-section">
 				<div class="fynd-sf-chart-container">
 					<div class="fynd-sf-chart-header">
-						<h3><?php esc_html_e( 'Daily Security Events (Last 30 Days)', 'securefusion' ); ?></h3>
-						<span class="fynd-sf-chart-badge"><?php esc_html_e( 'Real-time', 'securefusion' ); ?></span>
+						<h3><?php esc_html_e( 'Daily Security Events (Last 30 Days)', 'secuplug' ); ?></h3>
+						<span class="fynd-sf-chart-badge"><?php esc_html_e( 'Real-time', 'secuplug' ); ?></span>
 					</div>
 					<div class="fynd-sf-chart-body">
 						<canvas id="fynd-sf-daily-chart"></canvas>
@@ -231,8 +231,8 @@ class Admin {
 				</div>
 				<div class="fynd-sf-chart-container">
 					<div class="fynd-sf-chart-header">
-						<h3><?php esc_html_e( 'Monthly Security Events (Last 12 Months)', 'securefusion' ); ?></h3>
-						<span class="fynd-sf-chart-badge"><?php esc_html_e( 'Overview', 'securefusion' ); ?></span>
+						<h3><?php esc_html_e( 'Monthly Security Events (Last 12 Months)', 'secuplug' ); ?></h3>
+						<span class="fynd-sf-chart-badge"><?php esc_html_e( 'Overview', 'secuplug' ); ?></span>
 					</div>
 					<div class="fynd-sf-chart-body">
 						<canvas id="fynd-sf-monthly-chart"></canvas>
@@ -243,21 +243,21 @@ class Admin {
 			<section class="dashboard-overview">
 				<div class="dashboard-item fynd-sf-security-status-card <?php echo esc_attr( $security_pass ? 'fynd-sf-status-enabled' : 'fynd-sf-status-disabled' ); ?>">
 					<div class="fynd-sf-card-header-row">
-						<h2><?php esc_html_e( 'Security Status', 'securefusion' ); ?></h2>
+						<h2><?php esc_html_e( 'Security Status', 'secuplug' ); ?></h2>
 						
 						<div class="fynd-sf-system-badges">
 							<div class="fynd-sf-system-badge">
 								<span class="dashicons dashicons-wordpress"></span>
 								<span>WordPress: <strong><?php echo esc_html( $wp_version ); ?></strong></span>
 								<?php if ( version_compare( $wp_version, '6.7.0', '<' ) ) : ?>
-									<span class="fynd-sf-badge-warning" title="<?php esc_attr_e( 'Vulnerable version', 'securefusion' ); ?>">!</span>
+									<span class="fynd-sf-badge-warning" title="<?php esc_attr_e( 'Vulnerable version', 'secuplug' ); ?>">!</span>
 								<?php endif; ?>
 							</div>
 							<div class="fynd-sf-system-badge">
 								<span class="dashicons dashicons-admin-settings"></span>
 								<span>PHP: <strong><?php echo esc_html( phpversion() ); ?></strong></span>
 								<?php if ( version_compare( phpversion(), '8.2.0', '<' ) ) : ?>
-									<span class="fynd-sf-badge-warning" title="<?php esc_attr_e( 'Outdated version', 'securefusion' ); ?>">!</span>
+									<span class="fynd-sf-badge-warning" title="<?php esc_attr_e( 'Outdated version', 'secuplug' ); ?>">!</span>
 								<?php endif; ?>
 							</div>
 						</div>
@@ -268,49 +268,49 @@ class Admin {
 							<span class="dashicons dashicons-shield"></span>
 							<div class="fynd-sf-metric-info">
 								<span class="fynd-sf-metric-value"><?php echo (int) $total_attempts; ?></span>
-								<span class="fynd-sf-metric-label"><?php esc_html_e( 'Total Attacks', 'securefusion' ); ?></span>
+								<span class="fynd-sf-metric-label"><?php esc_html_e( 'Total Attacks', 'secuplug' ); ?></span>
 							</div>
 						</div>
 						<div class="fynd-sf-metric-widget fynd-sf-metric-failed-login">
 							<span class="dashicons dashicons-lock"></span>
 							<div class="fynd-sf-metric-info">
 								<span class="fynd-sf-metric-value"><?php echo (int) $brute_force_db->get_total_attempts_by_type( 'failed_login' ); ?></span>
-								<span class="fynd-sf-metric-label"><?php esc_html_e( 'Failed Logins', 'securefusion' ); ?></span>
+								<span class="fynd-sf-metric-label"><?php esc_html_e( 'Failed Logins', 'secuplug' ); ?></span>
 							</div>
 						</div>
 						<div class="fynd-sf-metric-widget fynd-sf-metric-bad-request">
 							<span class="dashicons dashicons-warning"></span>
 							<div class="fynd-sf-metric-info">
 								<span class="fynd-sf-metric-value"><?php echo (int) $brute_force_db->get_total_attempts_by_type( 'bad_request' ); ?></span>
-								<span class="fynd-sf-metric-label"><?php esc_html_e( 'Bad Requests', 'securefusion' ); ?></span>
+								<span class="fynd-sf-metric-label"><?php esc_html_e( 'Bad Requests', 'secuplug' ); ?></span>
 							</div>
 						</div>
 						<div class="fynd-sf-metric-widget fynd-sf-metric-bad-cookie">
 							<span class="dashicons dashicons-excerpt-view"></span>
 							<div class="fynd-sf-metric-info">
 								<span class="fynd-sf-metric-value"><?php echo (int) $brute_force_db->get_total_attempts_by_type( 'bad_cookie' ); ?></span>
-								<span class="fynd-sf-metric-label"><?php esc_html_e( 'Bad Cookies', 'securefusion' ); ?></span>
+								<span class="fynd-sf-metric-label"><?php esc_html_e( 'Bad Cookies', 'secuplug' ); ?></span>
 							</div>
 						</div>
 						<div class="fynd-sf-metric-widget fynd-sf-metric-bad-bot">
 							<span class="dashicons dashicons-networking"></span>
 							<div class="fynd-sf-metric-info">
 								<span class="fynd-sf-metric-value"><?php echo (int) $brute_force_db->get_total_attempts_by_type( 'bad_bot' ); ?></span>
-								<span class="fynd-sf-metric-label"><?php esc_html_e( 'Bad Bots', 'securefusion' ); ?></span>
+								<span class="fynd-sf-metric-label"><?php esc_html_e( 'Bad Bots', 'secuplug' ); ?></span>
 							</div>
 						</div>
 						<div class="fynd-sf-metric-widget fynd-sf-metric-bad-query">
 							<span class="dashicons dashicons-search"></span>
 							<div class="fynd-sf-metric-info">
 								<span class="fynd-sf-metric-value"><?php echo (int) $brute_force_db->get_total_attempts_by_type( 'bad_query' ); ?></span>
-								<span class="fynd-sf-metric-label"><?php esc_html_e( 'Bad Queries', 'securefusion' ); ?></span>
+								<span class="fynd-sf-metric-label"><?php esc_html_e( 'Bad Queries', 'secuplug' ); ?></span>
 							</div>
 						</div>
 						<div class="fynd-sf-metric-widget fynd-sf-metric-unique-ips">
 							<span class="dashicons dashicons-admin-site-alt3"></span>
 							<div class="fynd-sf-metric-info">
 								<span class="fynd-sf-metric-value"><?php echo (int) $unique_ips_count; ?></span>
-								<span class="fynd-sf-metric-label"><?php esc_html_e( 'Unique IPs', 'securefusion' ); ?></span>
+								<span class="fynd-sf-metric-label"><?php esc_html_e( 'Unique IPs', 'secuplug' ); ?></span>
 							</div>
 						</div>
 					</div>
@@ -319,13 +319,13 @@ class Admin {
 						<div class="fynd-sf-status-alert fynd-sf-status-alert-danger">
 							<span class="dashicons dashicons-dismiss"></span>
 							<div class="fynd-sf-alert-content">
-								<strong><?php esc_html_e( 'System Security Warnings:', 'securefusion' ); ?></strong>
+								<strong><?php esc_html_e( 'System Security Warnings:', 'secuplug' ); ?></strong>
 								<ul style="margin: 4px 0 0 16px; padding: 0;">
 									<?php if ( version_compare( $wp_version, '6.7.0', '<' ) ) : ?>
-										<li><?php esc_html_e( 'Your WordPress version has security vulnerabilities. Please update WordPress.', 'securefusion' ); ?></li>
+										<li><?php esc_html_e( 'Your WordPress version has security vulnerabilities. Please update WordPress.', 'secuplug' ); ?></li>
 									<?php endif; ?>
 									<?php if ( version_compare( phpversion(), '8.2.0', '<' ) ) : ?>
-										<li><?php esc_html_e( 'Your PHP version has security vulnerabilities. Please upgrade PHP.', 'securefusion' ); ?></li>
+										<li><?php esc_html_e( 'Your PHP version has security vulnerabilities. Please upgrade PHP.', 'secuplug' ); ?></li>
 									<?php endif; ?>
 								</ul>
 							</div>
@@ -333,14 +333,14 @@ class Admin {
 					<?php else : ?>
 						<div class="fynd-sf-status-alert fynd-sf-status-alert-success">
 							<span class="dashicons dashicons-yes-alt"></span>
-							<span class="fynd-sf-alert-text"><?php esc_html_e( 'Everything is running smoothly. No security issues have been detected.', 'securefusion' ); ?></span>
+							<span class="fynd-sf-alert-text"><?php esc_html_e( 'Everything is running smoothly. No security issues have been detected.', 'secuplug' ); ?></span>
 						</div>
 					<?php endif; ?>
 
 					<div class="fynd-sf-card-actions">
 						<a href="<?php echo esc_url( admin_url( 'admin.php?page=securefusion-security-log' ) ); ?>" class="fynd-sf-btn fynd-sf-btn-primary">
 							<span class="dashicons dashicons-list-view"></span>
-							<?php esc_html_e( 'View Security Log', 'securefusion' ); ?>
+							<?php esc_html_e( 'View Security Log', 'secuplug' ); ?>
 						</a>
 					</div>
 				</div>
@@ -353,83 +353,83 @@ class Admin {
 				);
 
 				$this->add_status_box(
-					esc_html__( 'XML-RPC FULL PROTECTION', 'securefusion' ),
+					esc_html__( 'XML-RPC FULL PROTECTION', 'secuplug' ),
 					$disable_all_xmlrpc,
-					esc_html__( 'Blocks all remote requests. Most commonly used to prevent all types of remote attacks.', 'securefusion' )
+					esc_html__( 'Blocks all remote requests. Most commonly used to prevent all types of remote attacks.', 'secuplug' )
 				);
 
 				$this->add_status_box(
-					esc_html__( 'XML-RPC LOGIN PROTECTION', 'securefusion' ),
+					esc_html__( 'XML-RPC LOGIN PROTECTION', 'secuplug' ),
 					$xmlrpc_login,
-					esc_html__( 'Blocks remote login requests. Most commonly used to prevent brute force login attempts.', 'securefusion' )
+					esc_html__( 'Blocks remote login requests. Most commonly used to prevent brute force login attempts.', 'secuplug' )
 				);
 
 				$this->add_status_box(
-					esc_html__( 'XML-RPC PINGBACK PROTECTION', 'securefusion' ),
+					esc_html__( 'XML-RPC PINGBACK PROTECTION', 'secuplug' ),
 					$xmlrpc_pingback,
-					esc_html__( 'Blocks remote pingback requests. Most commonly used to prevent DDoS attacks.', 'securefusion' )
+					esc_html__( 'Blocks remote pingback requests. Most commonly used to prevent DDoS attacks.', 'secuplug' )
 				);
 
 				$this->add_status_box(
-					esc_html__( 'SELF PINGBACK PROTECTION', 'securefusion' ),
+					esc_html__( 'SELF PINGBACK PROTECTION', 'secuplug' ),
 					$self_pingback,
-					esc_html__( 'Blocks remote self-pingback requests. Most commonly used to prevent DDoS attacks.', 'securefusion' )
+					esc_html__( 'Blocks remote self-pingback requests. Most commonly used to prevent DDoS attacks.', 'secuplug' )
 				);
 
 				$this->add_status_box(
-					esc_html__( 'New Custom Login URL', 'securefusion' ),
+					esc_html__( 'New Custom Login URL', 'secuplug' ),
 					$login_url,
-					esc_html__( 'Hides login url from the attackers.', 'securefusion' )
+					esc_html__( 'Hides login url from the attackers.', 'secuplug' )
 				);
 
 				$this->add_status_box(
-					esc_html__( 'Enable HTTPS / SSL', 'securefusion' ),
+					esc_html__( 'Enable HTTPS / SSL', 'secuplug' ),
 					$enable_https,
-					esc_html__( 'SSL automatically encrypts your privileged information data.', 'securefusion' )
+					esc_html__( 'SSL automatically encrypts your privileged information data.', 'secuplug' )
 				);
 
 				$this->add_status_box(
-					esc_html__( 'Force HTTPS Login', 'securefusion' ),
+					esc_html__( 'Force HTTPS Login', 'secuplug' ),
 					$force_login_https,
-					esc_html__( 'Redirect login page protocol HTTP to HTTPS', 'securefusion' )
+					esc_html__( 'Redirect login page protocol HTTP to HTTPS', 'secuplug' )
 				);
 				$this->add_status_box(
-					esc_html__( 'Change Login Error', 'securefusion' ),
+					esc_html__( 'Change Login Error', 'secuplug' ),
 					$change_login_error,
-					esc_html__( 'Disable default login errors and provide attackers with less than what they need.', 'securefusion' )
+					esc_html__( 'Disable default login errors and provide attackers with less than what they need.', 'secuplug' )
 				);
 				$this->add_status_box(
-					esc_html__( 'Change Admin ID', 'securefusion' ),
+					esc_html__( 'Change Admin ID', 'secuplug' ),
 					$change_admin_id,
-					esc_html__( "It's not difficult to predict your Admin ID if it's set to `1`. Secure your site against simple SQL vulnerabilities.", 'securefusion' )
+					esc_html__( "It's not difficult to predict your Admin ID if it's set to `1`. Secure your site against simple SQL vulnerabilities.", 'secuplug' )
 				);
 				$this->add_status_box(
-					esc_html__( 'Force HTTPS Admin', 'securefusion' ),
+					esc_html__( 'Force HTTPS Admin', 'secuplug' ),
 					$force_admin_https,
-					esc_html__( 'Redirects the admin page protocol from HTTP to HTTPS', 'securefusion' )
+					esc_html__( 'Redirects the admin page protocol from HTTP to HTTPS', 'secuplug' )
 				);
 				$this->add_status_box(
-					esc_html__( 'Force HTTPS Front Page', 'securefusion' ),
+					esc_html__( 'Force HTTPS Front Page', 'secuplug' ),
 					$force_front_https,
-					esc_html__( 'Redirects the front page protocol from HTTP to HTTPS.', 'securefusion' )
+					esc_html__( 'Redirects the front page protocol from HTTP to HTTPS.', 'secuplug' )
 				);
 				$this->add_status_box(
-					esc_html__( 'Filter Bad Requests', 'securefusion' ),
+					esc_html__( 'Filter Bad Requests', 'secuplug' ),
 					$filter_bad_requests,
-					esc_html__( 'Helps secure your site against attacks like XSS, CSRF, and Code Injections.', 'securefusion' )
+					esc_html__( 'Helps secure your site against attacks like XSS, CSRF, and Code Injections.', 'secuplug' )
 				);
 				$this->add_status_box(
-					esc_html__( 'Disable Rest API', 'securefusion' ),
+					esc_html__( 'Disable Rest API', 'secuplug' ),
 					$disable_rest_api,
-					esc_html__( 'Conceals sensitive information from attackers, such as Admin user IDs, user lists, and their IDs.', 'securefusion' )
+					esc_html__( 'Conceals sensitive information from attackers, such as Admin user IDs, user lists, and their IDs.', 'secuplug' )
 				);
 
 				$this->add_status_box(
-					esc_html__( 'Settings', 'securefusion' ),
+					esc_html__( 'Settings', 'secuplug' ),
 					false,
-					esc_html__( 'Manage your security features', 'securefusion' ),
+					esc_html__( 'Manage your security features', 'secuplug' ),
 					[
-						esc_html__( 'Go to settings', 'securefusion' ),
+						esc_html__( 'Go to settings', 'secuplug' ),
 						$settings_link,
 					]
 				);
@@ -486,23 +486,23 @@ class Admin {
 	 */
 	public function get_settings_html() {
 		$ssl_cond  = empty( get_transient( 'securefusion_ssl_cert_data' ) );
-		$ssl_error = esc_html__( 'Only use this if you have an SSL certificate; otherwise, it cannot be enabled.', 'securefusion' );
+		$ssl_error = esc_html__( 'Only use this if you have an SSL certificate; otherwise, it cannot be enabled.', 'secuplug' );
 
 		if ( $ssl_cond ) {
 			$ssl_error = '<p style="color:red">' .
-					esc_html__( 'ERROR! You don’t have any valid SSL certificate. ', 'securefusion' ) .
+					esc_html__( 'ERROR! You don’t have any valid SSL certificate. ', 'secuplug' ) .
 				'</p>' .
 
 				'<p>' .
 
-					'<b>' . esc_html__( 'Free SSL certificate providers', 'securefusion' ) . '</b> : ' .
+					'<b>' . esc_html__( 'Free SSL certificate providers', 'secuplug' ) . '</b> : ' .
 
 					'<a href="https://letsencrypt.org/" target="_blank">' .
-					esc_html__( 'Let’s Encrypt', 'securefusion' ) .
+					esc_html__( 'Let’s Encrypt', 'secuplug' ) .
 					'</a>' .
 
 					' or <a href="https://www.cloudflare.com/" target="_blank">' .
-					esc_html__( 'Cloudflare', 'securefusion' ) .
+					esc_html__( 'Cloudflare', 'secuplug' ) .
 					'</a>' .
 
 					'<br />' .
@@ -510,11 +510,11 @@ class Admin {
 					'<b>Paid SSL certificate providers</b> : ' .
 
 					'<a href="https://sectigo.com/" target="_blank">' .
-					esc_html__( 'Comodo / Sectigo', 'securefusion' ) .
+					esc_html__( 'Comodo / Sectigo', 'secuplug' ) .
 					'</a>' .
 
 					' or <a href="https://www.digicert.com" target="_blank">' .
-					esc_html__( 'Digicert', 'securefusion' ) .
+					esc_html__( 'Digicert', 'secuplug' ) .
 					'</a>' .
 
 				'</p>';
@@ -530,12 +530,12 @@ class Admin {
 			 * outside our styled header component.
 			 */
 			?>
-			<h1 class="fynd-sf-sr-only"><?php esc_html_e( 'SecureFusion Security Settings', 'securefusion' ); ?></h1>
+			<h1 class="fynd-sf-sr-only"><?php esc_html_e( 'SecureFusion Security Settings', 'secuplug' ); ?></h1>
 
 			<?php
 			$this->render_header(
-				esc_html__( 'SecureFusion Security Settings', 'securefusion' ),
-				esc_html__( 'You can manage your WordPress security settings.', 'securefusion' )
+				esc_html__( 'SecureFusion Security Settings', 'secuplug' ),
+				esc_html__( 'You can manage your WordPress security settings.', 'secuplug' )
 			);
 			?>
 			<?php
@@ -544,27 +544,27 @@ class Admin {
 				<h2 class="nav-tab-wrapper">
 					<a href="#xmlrpc" class="nav-tab">
 						<span class="dashicons dashicons-networking"></span>
-						<?php esc_html_e( 'XMLRPC', 'securefusion' ); ?>
+						<?php esc_html_e( 'XMLRPC', 'secuplug' ); ?>
 					</a>
 					<a href="#login" class="nav-tab">
 						<span class="dashicons dashicons-admin-users"></span>
-						<?php esc_html_e( 'Login', 'securefusion' ); ?>
+						<?php esc_html_e( 'Login', 'secuplug' ); ?>
 					</a>
 					<a href="#ssl" class="nav-tab">
 						<span class="dashicons dashicons-admin-network"></span>
-						<?php esc_html_e( 'SSL', 'securefusion' ); ?>
+						<?php esc_html_e( 'SSL', 'secuplug' ); ?>
 					</a>
 					<a href="#active_guard" class="nav-tab">
 						<span class="dashicons dashicons-shield"></span>
-						<?php esc_html_e( 'Active Guard', 'securefusion' ); ?>
+						<?php esc_html_e( 'Active Guard', 'secuplug' ); ?>
 					</a>
 					<a href="#security_policies" class="nav-tab">
 						<span class="dashicons dashicons-clipboard"></span>
-						<?php esc_html_e( 'Security Policies', 'securefusion' ); ?>
+						<?php esc_html_e( 'Security Policies', 'secuplug' ); ?>
 					</a>
 					<a href="#advanced" class="nav-tab">
 						<span class="dashicons dashicons-warning"></span>
-						<?php esc_html_e( 'Advanced', 'securefusion' ); ?>
+						<?php esc_html_e( 'Advanced', 'secuplug' ); ?>
 					</a>
 				</h2>
 				<div class="content-box">
@@ -592,12 +592,12 @@ class Admin {
 							<?php $this->settings_page->run_section( 'advanced_settings' ); ?>
 							<div class="fynd-sf-tab-notice fynd-sf-tab-notice-error">
 								<p>
-									<?php esc_html_e( "If you don't have experience in cybersecurity or regular expressions, do not modify these areas.", 'securefusion' ); ?>
+									<?php esc_html_e( "If you don't have experience in cybersecurity or regular expressions, do not modify these areas.", 'secuplug' ); ?>
 								</p>
 							</div>
 						</div>
 					<?php
-					$submit_text = esc_html__( 'Save Settings', 'securefusion' );
+					$submit_text = esc_html__( 'Save Settings', 'secuplug' );
 					?>
 					<p class="submit">
 						<input type="submit" name="submit" id="submit" class="fynd-sf-btn fynd-sf-btn-primary" value="<?php echo esc_attr( $submit_text ); ?>" style="height: auto; padding: 8px 20px; font-size: 14px;">
@@ -626,11 +626,11 @@ class Admin {
 			<div class="fynd-sf-welcome-inner">
 				<span class="dashicons dashicons-shield-alt fynd-sf-welcome-icon"></span>
 				<div class="fynd-sf-welcome-text">
-					<strong><?php esc_html_e( 'SecureFusion is active!', 'securefusion' ); ?></strong>
-					<span><?php esc_html_e( 'Configure your security settings to protect your site.', 'securefusion' ); ?></span>
+					<strong><?php esc_html_e( 'SecureFusion is active!', 'secuplug' ); ?></strong>
+					<span><?php esc_html_e( 'Configure your security settings to protect your site.', 'secuplug' ); ?></span>
 				</div>
 				<a href="<?php echo esc_url( $settings_menu ); ?>" class="fynd-sf-btn fynd-sf-btn-primary fynd-sf-welcome-btn">
-					<?php esc_html_e( 'Go to Settings', 'securefusion' ); ?>
+					<?php esc_html_e( 'Go to Settings', 'secuplug' ); ?>
 				</a>
 			</div>
 		</div>
@@ -652,100 +652,100 @@ class Admin {
 			[
 				// Section info.
 				'name'  => 'xmlrpc_settings',
-				'title' => esc_html__( 'XML-RPC SETTINGS', 'securefusion' ),
-				'desc'  => esc_html__( 'You can prevent XML-RPC attacks.', 'securefusion' ),
+				'title' => esc_html__( 'XML-RPC SETTINGS', 'secuplug' ),
+				'desc'  => esc_html__( 'You can prevent XML-RPC attacks.', 'secuplug' ),
 				// Form items.
 				'items' => [
 					[
 						'type'    => 'radio',
 						'name'    => 'disable_xmlrpc',
 						'default' => '0',
-						'label'   => esc_html__( 'Disable All XML-RPC Services', 'securefusion' ),
+						'label'   => esc_html__( 'Disable All XML-RPC Services', 'secuplug' ),
 						'options' => [
 							[
 								'value' => '0',
-								'label' => esc_html__( 'No', 'securefusion' ),
+								'label' => esc_html__( 'No', 'secuplug' ),
 							],
 							[
 								'value' => '1',
-								'label' => esc_html__( 'Yes', 'securefusion' ),
+								'label' => esc_html__( 'Yes', 'secuplug' ),
 							],
 						],
-						'after'   => '<p class="description">' . esc_html__( 'Enabling this option will completely disable XML-RPC functionality, which can prevent certain types of attacks but may affect integrations with other systems and applications.', 'securefusion' ) . '</p>',
+						'after'   => '<p class="description">' . esc_html__( 'Enabling this option will completely disable XML-RPC functionality, which can prevent certain types of attacks but may affect integrations with other systems and applications.', 'secuplug' ) . '</p>',
 					],
 					[
 						'type'    => 'radio',
 						'name'    => 'disable_xmlrpc_user_login',
 						'default' => '0',
-						'label'   => esc_html__( 'Disable XML-RPC Login Service', 'securefusion' ),
+						'label'   => esc_html__( 'Disable XML-RPC Login Service', 'secuplug' ),
 						'options' => [
 							[
 								'value' => '0',
-								'label' => esc_html__( 'No', 'securefusion' ),
+								'label' => esc_html__( 'No', 'secuplug' ),
 							],
 							[
 								'value' => '1',
-								'label' => esc_html__( 'Yes', 'securefusion' ),
+								'label' => esc_html__( 'Yes', 'secuplug' ),
 							],
 						],
-						'after'   => '<p class="description">' . esc_html__( 'If checked, this will disable login capability through XML-RPC. This helps prevent brute force attacks but may affect some legitimate XML-RPC uses.', 'securefusion' ) . '</p>',
+						'after'   => '<p class="description">' . esc_html__( 'If checked, this will disable login capability through XML-RPC. This helps prevent brute force attacks but may affect some legitimate XML-RPC uses.', 'secuplug' ) . '</p>',
 					],
 					[
 						'type'    => 'radio',
 						'name'    => 'disable_xmlrpc_pingback',
 						'default' => '0',
-						'label'   => esc_html__( 'Disable XML-RPC Pingback Service', 'securefusion' ),
+						'label'   => esc_html__( 'Disable XML-RPC Pingback Service', 'secuplug' ),
 						'options' => [
 							[
 								'value' => '0',
-								'label' => esc_html__( 'No', 'securefusion' ),
+								'label' => esc_html__( 'No', 'secuplug' ),
 							],
 							[
 								'value' => '1',
-								'label' => esc_html__( 'Yes', 'securefusion' ),
+								'label' => esc_html__( 'Yes', 'secuplug' ),
 							],
 						],
-						'after'   => '<p class="description">' . esc_html__( 'Pingbacks can be abused for DDoS attacks. Disabling this will prevent pingbacks, improving security.', 'securefusion' ) . '</p>',
+						'after'   => '<p class="description">' . esc_html__( 'Pingbacks can be abused for DDoS attacks. Disabling this will prevent pingbacks, improving security.', 'secuplug' ) . '</p>',
 					],
 					[
 						'type'    => 'radio',
 						'name'    => 'disable_self_pingback',
 						'default' => '0',
-						'label'   => esc_html__( 'Disable Self Pingback Service', 'securefusion' ),
+						'label'   => esc_html__( 'Disable Self Pingback Service', 'secuplug' ),
 						'options' => [
 							[
 								'value' => '0',
-								'label' => esc_html__( 'No', 'securefusion' ),
+								'label' => esc_html__( 'No', 'secuplug' ),
 							],
 							[
 								'value' => '1',
-								'label' => esc_html__( 'Yes', 'securefusion' ),
+								'label' => esc_html__( 'Yes', 'secuplug' ),
 							],
 						],
-						'after'   => '<p class="description">' . esc_html__( 'WordPress generates pingbacks to its own posts by default. This option disables such self-pingbacks.', 'securefusion' ) . '</p>',
+						'after'   => '<p class="description">' . esc_html__( 'WordPress generates pingbacks to its own posts by default. This option disables such self-pingbacks.', 'secuplug' ) . '</p>',
 					],
 				],
 			],
 			[
 				// Section info.
 				'name'  => 'active_guard_settings',
-				'title' => esc_html__( 'ACTIVE GUARD SETTINGS', 'securefusion' ),
-				'desc'  => esc_html__( 'Active guard and firewall settings. (Beta)', 'securefusion' ),
+				'title' => esc_html__( 'ACTIVE GUARD SETTINGS', 'secuplug' ),
+				'desc'  => esc_html__( 'Active guard and firewall settings. (Beta)', 'secuplug' ),
 				// Form items.
 				'items' => [
 					[
 						'type'    => 'radio',
 						'name'    => 'filter_bad_requests',
 						'default' => '0',
-						'label'   => esc_html__( 'Filter Bad Requests', 'securefusion' ),
+						'label'   => esc_html__( 'Filter Bad Requests', 'secuplug' ),
 						'options' => [
 							[
 								'value' => '0',
-								'label' => esc_html__( 'No', 'securefusion' ),
+								'label' => esc_html__( 'No', 'secuplug' ),
 							],
 							[
 								'value' => '1',
-								'label' => esc_html__( 'Yes', 'securefusion' ),
+								'label' => esc_html__( 'Yes', 'secuplug' ),
 							],
 						],
 					],
@@ -753,15 +753,15 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'disable_rest_api',
 						'default' => '0',
-						'label'   => esc_html__( 'Disable Rest API for Visitors', 'securefusion' ),
+						'label'   => esc_html__( 'Disable Rest API for Visitors', 'secuplug' ),
 						'options' => [
 							[
 								'value' => '0',
-								'label' => esc_html__( 'No', 'securefusion' ),
+								'label' => esc_html__( 'No', 'secuplug' ),
 							],
 							[
 								'value' => '1',
-								'label' => esc_html__( 'Yes', 'securefusion' ),
+								'label' => esc_html__( 'Yes', 'secuplug' ),
 							],
 						],
 					],
@@ -769,15 +769,15 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'hide_versions',
 						'default' => '0',
-						'label'   => esc_html__( 'Hide apache and PHP version', 'securefusion' ),
+						'label'   => esc_html__( 'Hide apache and PHP version', 'secuplug' ),
 						'options' => [
 							[
 								'value' => '0',
-								'label' => esc_html__( 'No', 'securefusion' ),
+								'label' => esc_html__( 'No', 'secuplug' ),
 							],
 							[
 								'value' => '1',
-								'label' => esc_html__( 'Yes', 'securefusion' ),
+								'label' => esc_html__( 'Yes', 'secuplug' ),
 							],
 						],
 					],
@@ -785,15 +785,15 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'bad_bots',
 						'default' => '0',
-						'label'   => esc_html__( 'Block bad bots', 'securefusion' ),
+						'label'   => esc_html__( 'Block bad bots', 'secuplug' ),
 						'options' => [
 							[
 								'value' => '0',
-								'label' => esc_html__( 'No', 'securefusion' ),
+								'label' => esc_html__( 'No', 'secuplug' ),
 							],
 							[
 								'value' => '1',
-								'label' => esc_html__( 'Yes', 'securefusion' ),
+								'label' => esc_html__( 'Yes', 'secuplug' ),
 							],
 						],
 					],
@@ -801,24 +801,24 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'http_headers',
 						'default' => '0',
-						'label'   => esc_html__( 'Add HTTP Headers for Browser Security', 'securefusion' ),
+						'label'   => esc_html__( 'Add HTTP Headers for Browser Security', 'secuplug' ),
 						'options' => [
 							[
 								'value' => '0',
-								'label' => esc_html__( 'No', 'securefusion' ),
+								'label' => esc_html__( 'No', 'secuplug' ),
 							],
 							[
 								'value' => '1',
-								'label' => esc_html__( 'Yes', 'securefusion' ),
+								'label' => esc_html__( 'Yes', 'secuplug' ),
 							],
 						],
 					],
 					[
 						'type'   => 'text_input',
 						'name'   => 'max_payload_size',
-						'label'  => esc_html__( 'Max Payload Size (Bytes)', 'securefusion' ),
+						'label'  => esc_html__( 'Max Payload Size (Bytes)', 'secuplug' ),
 						'before' => '',
-						'after'  => esc_html__( ' bytes', 'securefusion' ) . '<span class="field-tip"> ' . esc_html__( 'Maximum allowed request payload size (excluding file uploads). IPs exceeding this limit will be permanently blocked. Set 0 to disable. Default: 4096.', 'securefusion' ) . '</span>',
+						'after'  => esc_html__( ' bytes', 'secuplug' ) . '<span class="field-tip"> ' . esc_html__( 'Maximum allowed request payload size (excluding file uploads). IPs exceeding this limit will be permanently blocked. Set 0 to disable. Default: 4096.', 'secuplug' ) . '</span>',
 					],
 				],
 
@@ -826,30 +826,30 @@ class Admin {
 			[
 				// Section info.
 				'name'  => 'security_policies_settings',
-				'title' => esc_html__( 'SECURITY POLICIES', 'securefusion' ),
-				'desc'  => esc_html__( 'Content Security Policy (CSP) configurations.', 'securefusion' ),
+				'title' => esc_html__( 'SECURITY POLICIES', 'secuplug' ),
+				'desc'  => esc_html__( 'Content Security Policy (CSP) configurations.', 'secuplug' ),
 				// Form items.
 				'items' => [
 					[
 						'type'    => 'radio',
 						'name'    => 'enable_csp_style',
 						'default' => $this->default_settings['enable_csp_style'] ?? '0',
-						'label'   => esc_html__( 'Enable CSP Style Sources', 'securefusion' ),
+						'label'   => esc_html__( 'Enable CSP Style Sources', 'secuplug' ),
 						'options' => [
 							[
 								'value' => '0',
-								'label' => esc_html__( 'Disable', 'securefusion' ),
+								'label' => esc_html__( 'Disable', 'secuplug' ),
 							],
 							[
 								'value' => '1',
-								'label' => esc_html__( 'Enable', 'securefusion' ),
+								'label' => esc_html__( 'Enable', 'secuplug' ),
 							],
 						],
 					],
 					[
 						'type'              => 'taginput',
 						'name'              => 'csp_allowed_style_sources',
-						'label'             => esc_html__( 'CSP Allowed Style Sources', 'securefusion' ),
+						'label'             => esc_html__( 'CSP Allowed Style Sources', 'secuplug' ),
 						'placeholder'       => 'fonts.googleapis.com',
 						'field_type'        => 'url',
 						'sanitize_callback' => [ CSP::class, 'validate_csp_source' ],
@@ -859,22 +859,22 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'enable_csp_script',
 						'default' => $this->default_settings['enable_csp_script'] ?? '0',
-						'label'   => esc_html__( 'Enable CSP Script Sources', 'securefusion' ),
+						'label'   => esc_html__( 'Enable CSP Script Sources', 'secuplug' ),
 						'options' => [
 							[
 								'value' => '0',
-								'label' => esc_html__( 'Disable', 'securefusion' ),
+								'label' => esc_html__( 'Disable', 'secuplug' ),
 							],
 							[
 								'value' => '1',
-								'label' => esc_html__( 'Enable', 'securefusion' ),
+								'label' => esc_html__( 'Enable', 'secuplug' ),
 							],
 						],
 					],
 					[
 						'type'              => 'taginput',
 						'name'              => 'csp_allowed_script_sources',
-						'label'             => esc_html__( 'CSP Allowed Script Sources', 'securefusion' ),
+						'label'             => esc_html__( 'CSP Allowed Script Sources', 'secuplug' ),
 						'placeholder'       => 'googletagmanager.com',
 						'field_type'        => 'url',
 						'sanitize_callback' => [ CSP::class, 'validate_csp_source' ],
@@ -884,22 +884,22 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'enable_csp_font',
 						'default' => $this->default_settings['enable_csp_font'] ?? '0',
-						'label'   => esc_html__( 'Enable CSP Font Sources', 'securefusion' ),
+						'label'   => esc_html__( 'Enable CSP Font Sources', 'secuplug' ),
 						'options' => [
 							[
 								'value' => '0',
-								'label' => esc_html__( 'Disable', 'securefusion' ),
+								'label' => esc_html__( 'Disable', 'secuplug' ),
 							],
 							[
 								'value' => '1',
-								'label' => esc_html__( 'Enable', 'securefusion' ),
+								'label' => esc_html__( 'Enable', 'secuplug' ),
 							],
 						],
 					],
 					[
 						'type'              => 'taginput',
 						'name'              => 'csp_allowed_font_sources',
-						'label'             => esc_html__( 'CSP Allowed Font Sources', 'securefusion' ),
+						'label'             => esc_html__( 'CSP Allowed Font Sources', 'secuplug' ),
 						'placeholder'       => 'fonts.gstatic.com',
 						'field_type'        => 'url',
 						'sanitize_callback' => [ CSP::class, 'validate_csp_source' ],
@@ -909,22 +909,22 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'enable_csp_frame',
 						'default' => $this->default_settings['enable_csp_frame'] ?? '0',
-						'label'   => esc_html__( 'Enable CSP Frame Sources', 'securefusion' ),
+						'label'   => esc_html__( 'Enable CSP Frame Sources', 'secuplug' ),
 						'options' => [
 							[
 								'value' => '0',
-								'label' => esc_html__( 'Disable', 'securefusion' ),
+								'label' => esc_html__( 'Disable', 'secuplug' ),
 							],
 							[
 								'value' => '1',
-								'label' => esc_html__( 'Enable', 'securefusion' ),
+								'label' => esc_html__( 'Enable', 'secuplug' ),
 							],
 						],
 					],
 					[
 						'type'              => 'taginput',
 						'name'              => 'csp_allowed_frame_sources',
-						'label'             => esc_html__( 'CSP Frame Sources (iframe embed)', 'securefusion' ),
+						'label'             => esc_html__( 'CSP Frame Sources (iframe embed)', 'secuplug' ),
 						'placeholder'       => 'youtube.com',
 						'field_type'        => 'url',
 						'sanitize_callback' => [ CSP::class, 'validate_csp_source' ],
@@ -934,22 +934,22 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'enable_csp_worker',
 						'default' => $this->default_settings['enable_csp_worker'] ?? '0',
-						'label'   => esc_html__( 'Enable CSP Worker Sources', 'securefusion' ),
+						'label'   => esc_html__( 'Enable CSP Worker Sources', 'secuplug' ),
 						'options' => [
 							[
 								'value' => '0',
-								'label' => esc_html__( 'Disable', 'securefusion' ),
+								'label' => esc_html__( 'Disable', 'secuplug' ),
 							],
 							[
 								'value' => '1',
-								'label' => esc_html__( 'Enable', 'securefusion' ),
+								'label' => esc_html__( 'Enable', 'secuplug' ),
 							],
 						],
 					],
 					[
 						'type'              => 'taginput',
 						'name'              => 'csp_allowed_worker_sources',
-						'label'             => esc_html__( 'CSP Worker Sources', 'securefusion' ),
+						'label'             => esc_html__( 'CSP Worker Sources', 'secuplug' ),
 						'placeholder'       => 'blob:',
 						'field_type'        => 'url',
 						'sanitize_callback' => [ CSP::class, 'validate_csp_source' ],
@@ -959,22 +959,22 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'enable_csp_img',
 						'default' => $this->default_settings['enable_csp_img'] ?? '0',
-						'label'   => esc_html__( 'Enable CSP Image Sources', 'securefusion' ),
+						'label'   => esc_html__( 'Enable CSP Image Sources', 'secuplug' ),
 						'options' => [
 							[
 								'value' => '0',
-								'label' => esc_html__( 'Disable', 'securefusion' ),
+								'label' => esc_html__( 'Disable', 'secuplug' ),
 							],
 							[
 								'value' => '1',
-								'label' => esc_html__( 'Enable', 'securefusion' ),
+								'label' => esc_html__( 'Enable', 'secuplug' ),
 							],
 						],
 					],
 					[
 						'type'              => 'taginput',
 						'name'              => 'csp_allowed_img_sources',
-						'label'             => esc_html__( 'CSP Image Sources', 'securefusion' ),
+						'label'             => esc_html__( 'CSP Image Sources', 'secuplug' ),
 						'placeholder'       => 'example.com',
 						'field_type'        => 'url',
 						'sanitize_callback' => [ CSP::class, 'validate_csp_source' ],
@@ -984,16 +984,16 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'csp_upgrade_insecure_requests',
 						'default' => $this->default_settings['csp_upgrade_insecure_requests'] ?? '0',
-						'label'   => esc_html__( 'Upgrade Insecure Requests', 'securefusion' ),
-						'after'   => '<p class="description">' . esc_html__( 'Instructs the browser to upgrade all HTTP requests to HTTPS.', 'securefusion' ) . '</p>',
+						'label'   => esc_html__( 'Upgrade Insecure Requests', 'secuplug' ),
+						'after'   => '<p class="description">' . esc_html__( 'Instructs the browser to upgrade all HTTP requests to HTTPS.', 'secuplug' ) . '</p>',
 						'options' => [
 							[
 								'value' => '0',
-								'label' => esc_html__( 'Disable', 'securefusion' ),
+								'label' => esc_html__( 'Disable', 'secuplug' ),
 							],
 							[
 								'value' => '1',
-								'label' => esc_html__( 'Enable', 'securefusion' ),
+								'label' => esc_html__( 'Enable', 'secuplug' ),
 							],
 						],
 					],
@@ -1001,16 +1001,16 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'csp_block_all_mixed_content',
 						'default' => $this->default_settings['csp_block_all_mixed_content'] ?? '0',
-						'label'   => esc_html__( 'Block All Mixed Content', 'securefusion' ),
-						'after'   => '<p class="description">' . esc_html__( 'Prevents loading any HTTP content on an HTTPS page.', 'securefusion' ) . '</p>',
+						'label'   => esc_html__( 'Block All Mixed Content', 'secuplug' ),
+						'after'   => '<p class="description">' . esc_html__( 'Prevents loading any HTTP content on an HTTPS page.', 'secuplug' ) . '</p>',
 						'options' => [
 							[
 								'value' => '0',
-								'label' => esc_html__( 'Disable', 'securefusion' ),
+								'label' => esc_html__( 'Disable', 'secuplug' ),
 							],
 							[
 								'value' => '1',
-								'label' => esc_html__( 'Enable', 'securefusion' ),
+								'label' => esc_html__( 'Enable', 'secuplug' ),
 							],
 						],
 					],
@@ -1018,16 +1018,16 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'csp_sandbox',
 						'default' => $this->default_settings['csp_sandbox'] ?? '0',
-						'label'   => esc_html__( 'Sandbox', 'securefusion' ),
-						'after'   => '<p class="description">' . esc_html__( 'Enables a sandbox for the requested resource similar to the iframe sandbox attribute. This can block some features of your website (like payment gateway integration). Use with caution!', 'securefusion' ) . '</p>',
+						'label'   => esc_html__( 'Sandbox', 'secuplug' ),
+						'after'   => '<p class="description">' . esc_html__( 'Enables a sandbox for the requested resource similar to the iframe sandbox attribute. This can block some features of your website (like payment gateway integration). Use with caution!', 'secuplug' ) . '</p>',
 						'options' => [
 							[
 								'value' => '0',
-								'label' => esc_html__( 'Disable', 'securefusion' ),
+								'label' => esc_html__( 'Disable', 'secuplug' ),
 							],
 							[
 								'value' => '1',
-								'label' => esc_html__( 'Enable', 'securefusion' ),
+								'label' => esc_html__( 'Enable', 'secuplug' ),
 							],
 						],
 					],
@@ -1036,54 +1036,54 @@ class Admin {
 			[
 				// Section info.
 				'name'  => 'login_settings',
-				'title' => esc_html__( 'LOGIN SETTINGS - BE CAREFUL!', 'securefusion' ),
-				'desc'  => esc_html__( 'You can hide or secure your login page against attackers. Please save your new login url before you change it.', 'securefusion' ),
+				'title' => esc_html__( 'LOGIN SETTINGS - BE CAREFUL!', 'secuplug' ),
+				'desc'  => esc_html__( 'You can hide or secure your login page against attackers. Please save your new login url before you change it.', 'secuplug' ),
 				// Form items.
 				'items' => [
 					[
 						'type'   => 'text_input',
 						'name'   => 'ip_time_limit',
-						'label'  => esc_html__( 'Min. Wait Time', 'securefusion' ),
+						'label'  => esc_html__( 'Min. Wait Time', 'secuplug' ),
 						'before' => '',
-						'after'  => esc_html__( ' hour(s)', 'securefusion' ) . '<span class="field-tip"> ' . esc_html__( 'Minimum Wait Time After Failed Attempt', 'securefusion' ) . '</span>',
+						'after'  => esc_html__( ' hour(s)', 'secuplug' ) . '<span class="field-tip"> ' . esc_html__( 'Minimum Wait Time After Failed Attempt', 'secuplug' ) . '</span>',
 					],
 					[
 						'type'   => 'text_input',
 						'name'   => 'ip_login_limit',
-						'label'  => esc_html__( 'Max. Attempt Limit', 'securefusion' ),
+						'label'  => esc_html__( 'Max. Attempt Limit', 'secuplug' ),
 						'before' => '',
-						'after'  => esc_html__( ' time(s)', 'securefusion' ) . '<span class="field-tip"> ' . esc_html__( 'Maximum Failed Login Attempt Limit', 'securefusion' ) . '</span>',
+						'after'  => esc_html__( ' time(s)', 'secuplug' ) . '<span class="field-tip"> ' . esc_html__( 'Maximum Failed Login Attempt Limit', 'secuplug' ) . '</span>',
 					],
 					[
 						'type'   => 'text_input',
 						'name'   => 'cleanup_ip_days',
-						'label'  => esc_html__( 'Auto-Delete IPs: Older Than', 'securefusion' ),
+						'label'  => esc_html__( 'Auto-Delete IPs: Older Than', 'secuplug' ),
 						'before' => '',
-						'after'  => esc_html__( ' day(s)', 'securefusion' ) . '<span class="field-tip"> ' . esc_html__( 'Delete IPs inactive for this many days (0 to disable).', 'securefusion' ) . '</span>',
+						'after'  => esc_html__( ' day(s)', 'secuplug' ) . '<span class="field-tip"> ' . esc_html__( 'Delete IPs inactive for this many days (0 to disable).', 'secuplug' ) . '</span>',
 					],
 					[
 						'type'   => 'text_input',
 						'name'   => 'cleanup_ip_attempts',
-						'label'  => esc_html__( 'Auto-Delete IPs: Fewer Than', 'securefusion' ),
+						'label'  => esc_html__( 'Auto-Delete IPs: Fewer Than', 'secuplug' ),
 						'before' => '',
-						'after'  => esc_html__( ' attempt(s)', 'securefusion' ) . '<span class="field-tip"> ' . esc_html__( 'Only delete IPs that have fewer than this many total attempts.', 'securefusion' ) . '</span>',
+						'after'  => esc_html__( ' attempt(s)', 'secuplug' ) . '<span class="field-tip"> ' . esc_html__( 'Only delete IPs that have fewer than this many total attempts.', 'secuplug' ) . '</span>',
 					],
 					[
 						'type'   => 'text_input',
 						'name'   => 'custom_login_url',
-						'label'  => esc_html__( 'Custom Login Path', 'securefusion' ),
+						'label'  => esc_html__( 'Custom Login Path', 'secuplug' ),
 						'before' => '<span class="url-text">' . \get_home_url() . '/</span>',
 						'after'  => '<span class="field-tip">/ (For exam. : hidden-login)</span>',
 					],
 					[
 						'type'  => 'text_input',
 						'name'  => 'change_login_error',
-						'label' => esc_html__( 'Custom Login Error Message', 'securefusion' ),
+						'label' => esc_html__( 'Custom Login Error Message', 'secuplug' ),
 					],
 					[
 						'type'   => 'text_input',
 						'name'   => 'change_admin_id',
-						'label'  => esc_html__( 'Your Admin ID', 'securefusion' ),
+						'label'  => esc_html__( 'Your Admin ID', 'secuplug' ),
 						'before' => 'Your current ID is ',
 						'after'  => ' for "' . $current_user->user_login . '". ' .
 							'<span class="field-tip">' .
@@ -1095,8 +1095,8 @@ class Admin {
 			[
 				// Section info.
 				'name'  => 'ssl_settings',
-				'title' => esc_html__( 'SSL SETTINGS', 'securefusion' ),
-				'desc'  => esc_html__( 'HTTPS/SSL security settings.', 'securefusion' ),
+				'title' => esc_html__( 'SSL SETTINGS', 'secuplug' ),
+				'desc'  => esc_html__( 'HTTPS/SSL security settings.', 'secuplug' ),
 				// Form items.
 				'items' => [
 					[
@@ -1104,14 +1104,14 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'enable_https',
 						'default' => '',
-						'label'   => esc_html__( 'HTTPS Support', 'securefusion' ),
+						'label'   => esc_html__( 'HTTPS Support', 'secuplug' ),
 						'options' => [
 							[
-								'label' => esc_html__( 'Disabled', 'securefusion' ),
+								'label' => esc_html__( 'Disabled', 'secuplug' ),
 								'value' => '',
 							],
 							[
-								'label' => esc_html__( 'Enabled', 'securefusion' ),
+								'label' => esc_html__( 'Enabled', 'secuplug' ),
 								'value' => 'https',
 							],
 						],
@@ -1121,14 +1121,14 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'force_login_https',
 						'default' => '',
-						'label'   => esc_html__( 'Force HTTPS on login page', 'securefusion' ),
+						'label'   => esc_html__( 'Force HTTPS on login page', 'secuplug' ),
 						'options' => [
 							[
-								'label' => esc_html__( 'Disabled', 'securefusion' ),
+								'label' => esc_html__( 'Disabled', 'secuplug' ),
 								'value' => '',
 							],
 							[
-								'label' => esc_html__( 'Enabled', 'securefusion' ),
+								'label' => esc_html__( 'Enabled', 'secuplug' ),
 								'value' => 'https',
 							],
 						],
@@ -1138,14 +1138,14 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'force_admin_https',
 						'default' => '',
-						'label'   => esc_html__( 'Force HTTPS on admin page', 'securefusion' ),
+						'label'   => esc_html__( 'Force HTTPS on admin page', 'secuplug' ),
 						'options' => [
 							[
-								'label' => esc_html__( 'Disabled', 'securefusion' ),
+								'label' => esc_html__( 'Disabled', 'secuplug' ),
 								'value' => '',
 							],
 							[
-								'label' => esc_html__( 'Enabled', 'securefusion' ),
+								'label' => esc_html__( 'Enabled', 'secuplug' ),
 								'value' => 'https',
 							],
 						],
@@ -1155,14 +1155,14 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'force_front_https',
 						'default' => '',
-						'label'   => esc_html__( 'Force HTTPS on front page', 'securefusion' ),
+						'label'   => esc_html__( 'Force HTTPS on front page', 'secuplug' ),
 						'options' => [
 							[
-								'label' => esc_html__( 'Disabled', 'securefusion' ),
+								'label' => esc_html__( 'Disabled', 'secuplug' ),
 								'value' => '',
 							],
 							[
-								'label' => esc_html__( 'Enabled', 'securefusion' ),
+								'label' => esc_html__( 'Enabled', 'secuplug' ),
 								'value' => 'https',
 							],
 						],
@@ -1172,14 +1172,14 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'force_site_https',
 						'default' => '',
-						'label'   => esc_html__( 'Force HTTPS site-wide', 'securefusion' ),
+						'label'   => esc_html__( 'Force HTTPS site-wide', 'secuplug' ),
 						'options' => [
 							[
-								'label' => esc_html__( 'Disabled', 'securefusion' ),
+								'label' => esc_html__( 'Disabled', 'secuplug' ),
 								'value' => '',
 							],
 							[
-								'label' => esc_html__( 'Enabled', 'securefusion' ),
+								'label' => esc_html__( 'Enabled', 'secuplug' ),
 								'value' => 'https',
 							],
 						],
@@ -1189,14 +1189,14 @@ class Admin {
 			[
 				// Section info.
 				'name'  => 'advanced_settings',
-				'title' => esc_html__( 'ADVANCED SETTINGS', 'securefusion' ),
-				'desc'  => esc_html__( 'Advanced security settings. `Filter Bad Requests` must be active for it to work.', 'securefusion' ),
+				'title' => esc_html__( 'ADVANCED SETTINGS', 'secuplug' ),
+				'desc'  => esc_html__( 'Advanced security settings. `Filter Bad Requests` must be active for it to work.', 'secuplug' ),
 				// Form items.
 				'items' => [
 					[
 						'type'              => 'taginput',
 						'name'              => 'cookie_patterns',
-						'label'             => esc_html__( 'Cookie Regex Patterns', 'securefusion' ),
+						'label'             => esc_html__( 'Cookie Regex Patterns', 'secuplug' ),
 						'placeholder'       => '[a-z0-9]+',
 						'field_type'        => 'regex',
 						'sanitize_callback' => function ( $value ) {
@@ -1208,7 +1208,7 @@ class Admin {
 					[
 						'type'              => 'taginput',
 						'name'              => 'request_patterns',
-						'label'             => esc_html__( 'Get/Post Request Regex Patterns', 'securefusion' ),
+						'label'             => esc_html__( 'Get/Post Request Regex Patterns', 'secuplug' ),
 						'placeholder'       => '(union|select|insert)\s+\w+',
 						'field_type'        => 'regex',
 						'sanitize_callback' => function ( $value ) {
@@ -1263,7 +1263,7 @@ class Admin {
 		\wp_enqueue_style( 'securefusion-admin-theme-main-css', \plugins_url( 'assets/css/admin.css', SECUREFUSION_BASENAME ), array(), SECUREFUSION_VERSION );
 		\wp_enqueue_script( 'securefusion-admin-js', \plugins_url( 'assets/js/admin.js', SECUREFUSION_BASENAME ), array(), SECUREFUSION_VERSION, true );
 
-		if ( isset( $_GET['page'] ) && 'securefusion' === $_GET['page'] ) {
+		if ( isset( $_GET['page'] ) && 'secuplug' === $_GET['page'] ) {
 			\wp_enqueue_script( 'securefusion-chartjs', \plugins_url( 'assets/lib/chartjs/chart.umd.min.js', SECUREFUSION_BASENAME ), array(), SECUREFUSION_VERSION, true );
 			\wp_enqueue_script( 'securefusion-dashboard-js', \plugins_url( 'assets/js/dashboard.js', SECUREFUSION_BASENAME ), array( 'securefusion-chartjs' ), SECUREFUSION_VERSION, true );
 
@@ -1337,12 +1337,12 @@ class Admin {
 
 		// Human readable labels for types.
 		$type_labels = array(
-			BruteForceDB::TYPE_FAILED_LOGIN => __( 'Failed Login', 'securefusion' ),
-			BruteForceDB::TYPE_BAD_REQUEST  => __( 'Bad Request', 'securefusion' ),
-			BruteForceDB::TYPE_BAD_COOKIE   => __( 'Bad Cookie', 'securefusion' ),
-			BruteForceDB::TYPE_BAD_BOT      => __( 'Bad Bot', 'securefusion' ),
-			BruteForceDB::TYPE_BAD_QUERY    => __( 'Bad Query', 'securefusion' ),
-			BruteForceDB::TYPE_BLOCKED      => __( 'Blocked Request', 'securefusion' ),
+			BruteForceDB::TYPE_FAILED_LOGIN => __( 'Failed Login', 'secuplug' ),
+			BruteForceDB::TYPE_BAD_REQUEST  => __( 'Bad Request', 'secuplug' ),
+			BruteForceDB::TYPE_BAD_COOKIE   => __( 'Bad Cookie', 'secuplug' ),
+			BruteForceDB::TYPE_BAD_BOT      => __( 'Bad Bot', 'secuplug' ),
+			BruteForceDB::TYPE_BAD_QUERY    => __( 'Bad Query', 'secuplug' ),
+			BruteForceDB::TYPE_BLOCKED      => __( 'Blocked Request', 'secuplug' ),
 		);
 
 		return array(
@@ -1395,7 +1395,7 @@ class Admin {
 				?>
 				<div class="status-wrapper" style="margin-top: 10px;">
 					<span class="status <?php echo esc_attr( $status ? 'enabled' : 'disabled' ); ?>">
-						<?php $status ? esc_html_e( 'enabled', 'securefusion' ) : esc_html_e( 'disabled', 'securefusion' ); ?>
+						<?php $status ? esc_html_e( 'enabled', 'secuplug' ) : esc_html_e( 'disabled', 'secuplug' ); ?>
 					</span>
 				</div>
 				<?php
@@ -1430,8 +1430,8 @@ class Admin {
 		// Settings Page Form.
 		$this->settings_page = new Wasp(
 			'securefusion-settings',
-			'securefusion',
-			'securefusion'
+			'secuplug',
+			'secuplug'
 		);
 
 		if ( $this->settings_page instanceof Wasp ) {
@@ -1440,8 +1440,8 @@ class Admin {
 			// Enable reset feature with factory defaults.
 			$this->settings_page->enable_reset(
 				[
-					'confirm_message' => esc_html__( 'Are you sure you want to reset this field to its default value?', 'securefusion' ),
-					'button_text'     => esc_html__( 'Reset', 'securefusion' ),
+					'confirm_message' => esc_html__( 'Are you sure you want to reset this field to its default value?', 'secuplug' ),
+					'button_text'     => esc_html__( 'Reset', 'secuplug' ),
 					'button_class'    => 'fynd-sf-btn fynd-sf-btn-secondary',
 					'wrapper_class'   => 'wasp-reset-wrapper',
 				],

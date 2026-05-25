@@ -72,12 +72,12 @@ class IPRules {
 			[
 				'ajaxUrl'       => admin_url( 'admin-ajax.php' ),
 				'nonce'         => wp_create_nonce( self::NONCE_ACTION ),
-				'confirmDelete' => esc_html__( 'Are you sure you want to delete this rule?', 'securefusion' ),
-				'addSuccess'    => esc_html__( 'Rule has been added successfully.', 'securefusion' ),
-				'deleteSuccess' => esc_html__( 'Rule has been deleted successfully.', 'securefusion' ),
-				'addFailed'     => esc_html__( 'Failed to add rule.', 'securefusion' ),
-				'deleteFailed'  => esc_html__( 'Failed to delete rule.', 'securefusion' ),
-				'invalidFormat' => esc_html__( 'Invalid IP address or CIDR range format.', 'securefusion' ),
+				'confirmDelete' => esc_html__( 'Are you sure you want to delete this rule?', 'secuplug' ),
+				'addSuccess'    => esc_html__( 'Rule has been added successfully.', 'secuplug' ),
+				'deleteSuccess' => esc_html__( 'Rule has been deleted successfully.', 'secuplug' ),
+				'addFailed'     => esc_html__( 'Failed to add rule.', 'secuplug' ),
+				'deleteFailed'  => esc_html__( 'Failed to delete rule.', 'secuplug' ),
+				'invalidFormat' => esc_html__( 'Invalid IP address or CIDR range format.', 'secuplug' ),
 			]
 		);
 	}
@@ -115,12 +115,12 @@ class IPRules {
 	 */
 	public function ajax_add_rule() {
 		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['nonce'] ) ), self::NONCE_ACTION ) ) {
-			wp_send_json_error( [ 'message' => esc_html__( 'Security check failed.', 'securefusion' ) ] );
+			wp_send_json_error( [ 'message' => esc_html__( 'Security check failed.', 'secuplug' ) ] );
 			return;
 		}
 
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_send_json_error( [ 'message' => esc_html__( 'Permission denied.', 'securefusion' ) ] );
+			wp_send_json_error( [ 'message' => esc_html__( 'Permission denied.', 'secuplug' ) ] );
 			return;
 		}
 
@@ -128,12 +128,12 @@ class IPRules {
 		$rule_type = isset( $_POST['rule_type'] ) ? sanitize_text_field( wp_unslash( $_POST['rule_type'] ) ) : '';
 
 		if ( ! $this->validate_ip_or_cidr( $ip ) ) {
-			wp_send_json_error( [ 'message' => esc_html__( 'Invalid IP address or CIDR range format.', 'securefusion' ) ] );
+			wp_send_json_error( [ 'message' => esc_html__( 'Invalid IP address or CIDR range format.', 'secuplug' ) ] );
 			return;
 		}
 
 		if ( ! in_array( $rule_type, [ 'blocked', 'whitelisted' ], true ) ) {
-			wp_send_json_error( [ 'message' => esc_html__( 'Invalid rule type.', 'securefusion' ) ] );
+			wp_send_json_error( [ 'message' => esc_html__( 'Invalid rule type.', 'secuplug' ) ] );
 			return;
 		}
 
@@ -141,7 +141,7 @@ class IPRules {
 
 		if ( $rule_type === 'blocked' ) {
 			if ( $db->is_ip_whitelisted( $ip ) ) {
-				wp_send_json_error( [ 'message' => esc_html__( 'This IP/range is whitelisted and cannot be blocked.', 'securefusion' ) ] );
+				wp_send_json_error( [ 'message' => esc_html__( 'This IP/range is whitelisted and cannot be blocked.', 'secuplug' ) ] );
 				return;
 			}
 			$success = $db->block_ip( $ip );
@@ -150,9 +150,9 @@ class IPRules {
 		}
 
 		if ( $success ) {
-			wp_send_json_success( [ 'message' => esc_html__( 'Rule has been added successfully.', 'securefusion' ) ] );
+			wp_send_json_success( [ 'message' => esc_html__( 'Rule has been added successfully.', 'secuplug' ) ] );
 		} else {
-			wp_send_json_error( [ 'message' => esc_html__( 'Failed to add rule.', 'securefusion' ) ] );
+			wp_send_json_error( [ 'message' => esc_html__( 'Failed to add rule.', 'secuplug' ) ] );
 		}
 	}
 
@@ -164,19 +164,19 @@ class IPRules {
 	 */
 	public function ajax_delete_rule() {
 		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['nonce'] ) ), self::NONCE_ACTION ) ) {
-			wp_send_json_error( [ 'message' => esc_html__( 'Security check failed.', 'securefusion' ) ] );
+			wp_send_json_error( [ 'message' => esc_html__( 'Security check failed.', 'secuplug' ) ] );
 			return;
 		}
 
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_send_json_error( [ 'message' => esc_html__( 'Permission denied.', 'securefusion' ) ] );
+			wp_send_json_error( [ 'message' => esc_html__( 'Permission denied.', 'secuplug' ) ] );
 			return;
 		}
 
 		$ip = isset( $_POST['ip'] ) ? sanitize_text_field( wp_unslash( $_POST['ip'] ) ) : '';
 
 		if ( empty( $ip ) ) {
-			wp_send_json_error( [ 'message' => esc_html__( 'Invalid IP or range.', 'securefusion' ) ] );
+			wp_send_json_error( [ 'message' => esc_html__( 'Invalid IP or range.', 'secuplug' ) ] );
 			return;
 		}
 
@@ -184,9 +184,9 @@ class IPRules {
 		$success = $db->delete_ip_rule( $ip );
 
 		if ( $success ) {
-			wp_send_json_success( [ 'message' => esc_html__( 'Rule has been deleted successfully.', 'securefusion' ) ] );
+			wp_send_json_success( [ 'message' => esc_html__( 'Rule has been deleted successfully.', 'secuplug' ) ] );
 		} else {
-			wp_send_json_error( [ 'message' => esc_html__( 'Failed to delete rule.', 'securefusion' ) ] );
+			wp_send_json_error( [ 'message' => esc_html__( 'Failed to delete rule.', 'secuplug' ) ] );
 		}
 	}
 
@@ -235,12 +235,12 @@ class IPRules {
 			 * outside our styled header component.
 			 */
 			?>
-			<h1 class="fynd-sf-sr-only"><?php esc_html_e( 'IP Rules', 'securefusion' ); ?></h1>
+			<h1 class="fynd-sf-sr-only"><?php esc_html_e( 'IP Rules', 'secuplug' ); ?></h1>
 
 			<?php
 			$this->render_header(
-				esc_html__( 'IP Rules Management', 'securefusion' ),
-				esc_html__( 'Manually block or whitelist specific IP addresses and range blocks.', 'securefusion' )
+				esc_html__( 'IP Rules Management', 'secuplug' ),
+				esc_html__( 'Manually block or whitelist specific IP addresses and range blocks.', 'secuplug' )
 			);
 			?>
 
@@ -248,23 +248,23 @@ class IPRules {
 
 			<!-- Add New Rule Card -->
 			<div class="fynd-sf-card fynd-sf-rules-form-card">
-				<h3><?php esc_html_e( 'Add New Rule', 'securefusion' ); ?></h3>
+				<h3><?php esc_html_e( 'Add New Rule', 'secuplug' ); ?></h3>
 				<form id="fynd-sf-add-rule-form" class="fynd-sf-rules-form">
 					<div class="fynd-sf-form-group-ip">
-						<label for="fynd-sf-rule-ip"><?php esc_html_e( 'IP Address or Subnet (CIDR)', 'securefusion' ); ?></label>
+						<label for="fynd-sf-rule-ip"><?php esc_html_e( 'IP Address or Subnet (CIDR)', 'secuplug' ); ?></label>
 						<input type="text" id="fynd-sf-rule-ip" name="ip" required placeholder="e.g. 192.168.1.1 or 192.168.1.0/24">
 					</div>
 					<div class="fynd-sf-form-group-type">
-						<label for="fynd-sf-rule-type"><?php esc_html_e( 'Rule Type', 'securefusion' ); ?></label>
+						<label for="fynd-sf-rule-type"><?php esc_html_e( 'Rule Type', 'secuplug' ); ?></label>
 						<select id="fynd-sf-rule-type" name="rule_type">
-							<option value="blocked"><?php esc_html_e( 'Blocked', 'securefusion' ); ?></option>
-							<option value="whitelisted"><?php esc_html_e( 'Whitelisted', 'securefusion' ); ?></option>
+							<option value="blocked"><?php esc_html_e( 'Blocked', 'secuplug' ); ?></option>
+							<option value="whitelisted"><?php esc_html_e( 'Whitelisted', 'secuplug' ); ?></option>
 						</select>
 					</div>
 					<div class="fynd-sf-form-group-submit">
 						<button type="submit" class="fynd-sf-btn fynd-sf-btn-primary">
 							<span class="dashicons dashicons-plus"></span>
-							<?php esc_html_e( 'Add Rule', 'securefusion' ); ?>
+							<?php esc_html_e( 'Add Rule', 'secuplug' ); ?>
 						</button>
 					</div>
 				</form>
@@ -277,9 +277,9 @@ class IPRules {
 							<tr>
 								<?php
 								$columns = [
-									'ip'         => esc_html__( 'IP / Subnet (CIDR)', 'securefusion' ),
-									'rule_type'  => esc_html__( 'Rule Type', 'securefusion' ),
-									'created_at' => esc_html__( 'Created At', 'securefusion' ),
+									'ip'         => esc_html__( 'IP / Subnet (CIDR)', 'secuplug' ),
+									'rule_type'  => esc_html__( 'Rule Type', 'secuplug' ),
+									'created_at' => esc_html__( 'Created At', 'secuplug' ),
 								];
 
 								foreach ( $columns as $col_key => $col_label ) :
@@ -305,7 +305,7 @@ class IPRules {
 										</a>
 									</th>
 								<?php endforeach; ?>
-								<th scope="col" class="manage-column column-actions"><?php esc_html_e( 'Actions', 'securefusion' ); ?></th>
+								<th scope="col" class="manage-column column-actions"><?php esc_html_e( 'Actions', 'secuplug' ); ?></th>
 							</tr>
 						</thead>
 						<tbody>
@@ -316,9 +316,9 @@ class IPRules {
 									</td>
 									<td class="column-rule_type">
 										<?php if ( $row->rule_type === 'whitelisted' ) : ?>
-											<span class="fynd-sf-status-badge fynd-sf-status-whitelisted"><?php esc_html_e( 'Whitelisted', 'securefusion' ); ?></span>
+											<span class="fynd-sf-status-badge fynd-sf-status-whitelisted"><?php esc_html_e( 'Whitelisted', 'secuplug' ); ?></span>
 										<?php else : ?>
-											<span class="fynd-sf-status-badge fynd-sf-status-blocked"><?php esc_html_e( 'Blocked', 'securefusion' ); ?></span>
+											<span class="fynd-sf-status-badge fynd-sf-status-blocked"><?php esc_html_e( 'Blocked', 'secuplug' ); ?></span>
 										<?php endif; ?>
 									</td>
 									<td class="column-created_at">
@@ -332,7 +332,7 @@ class IPRules {
 												)
 											);
 											echo '<br><small class="fynd-sf-time-ago">';
-											echo esc_html( human_time_diff( $timestamp, time() ) . ' ' . __( 'ago', 'securefusion' ) );
+											echo esc_html( human_time_diff( $timestamp, time() ) . ' ' . __( 'ago', 'secuplug' ) );
 											echo '</small>';
 										} else {
 											echo '—';
@@ -342,7 +342,7 @@ class IPRules {
 									<td class="column-actions">
 										<button type="button" class="fynd-sf-btn fynd-sf-btn-sm fynd-sf-btn-danger fynd-sf-remove-rule-btn" data-ip="<?php echo esc_attr( $row->ip ); ?>">
 											<span class="dashicons dashicons-trash"></span>
-											<?php esc_html_e( 'Remove', 'securefusion' ); ?>
+											<?php esc_html_e( 'Remove', 'secuplug' ); ?>
 										</button>
 									</td>
 								</tr>
@@ -360,7 +360,7 @@ class IPRules {
 
 								printf(
 									/* translators: 1: Current page, 2: Total pages, 3: Total items. */
-									esc_html__( 'Page %1$s of %2$s (%3$s items)', 'securefusion' ),
+									esc_html__( 'Page %1$s of %2$s (%3$s items)', 'secuplug' ),
 									esc_html( $current_page_f ),
 									esc_html( $total_pages_f ),
 									esc_html( $total_rows_f )
@@ -398,7 +398,7 @@ class IPRules {
 				<?php else : ?>
 					<div class="fynd-sf-log-empty">
 						<span class="dashicons dashicons-shield-alt"></span>
-						<p><?php esc_html_e( 'No IP rules defined yet.', 'securefusion' ); ?></p>
+						<p><?php esc_html_e( 'No IP rules defined yet.', 'secuplug' ); ?></p>
 					</div>
 				<?php endif; ?>
 			</div>

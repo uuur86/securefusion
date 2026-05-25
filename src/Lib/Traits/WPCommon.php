@@ -318,10 +318,10 @@ trait WPCommon {
 					<span class="version-info" style="margin-left: 10px; color: #646970;">
 						<?php
 						/* translators: %s: Version number */
-						printf( esc_html__( 'Version %s - Check out.', 'securefusion' ), esc_html( SECUREFUSION_VERSION ) );
+						printf( esc_html__( 'Version %s - Check out.', 'secuplug' ), esc_html( SECUREFUSION_VERSION ) );
 						?>
 						<a href="<?php echo esc_url( $changelog_url ); ?>" target="_blank" rel="noopener" style="color: #01b9ba; text-decoration: none; font-weight: 500;">
-							<?php esc_html_e( 'What\'s New', 'securefusion' ); ?>
+							<?php esc_html_e( 'What\'s New', 'secuplug' ); ?>
 						</a>
 					</span>
 				</p>
@@ -336,10 +336,10 @@ trait WPCommon {
 					<?php endforeach; ?>
 				<?php endif; ?>
 				<a href="<?php echo esc_url( $products_url ); ?>" target="_blank" rel="noopener" class="fynd-sf-btn fynd-sf-btn-secondary">
-					<?php esc_html_e( 'Products', 'securefusion' ); ?>
+					<?php esc_html_e( 'Products', 'secuplug' ); ?>
 				</a>
 				<a href="<?php echo esc_url( $services_url ); ?>" target="_blank" rel="noopener" class="fynd-sf-btn fynd-sf-btn-secondary">
-					<?php esc_html_e( 'Services', 'securefusion' ); ?>
+					<?php esc_html_e( 'Services', 'secuplug' ); ?>
 				</a>
 			</div>
 		</header>

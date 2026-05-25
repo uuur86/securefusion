@@ -58,18 +58,18 @@ class CommentsBlock {
 		$db = new BruteForceDB();
 
 		if ( $db->is_ip_whitelisted( $ip ) ) {
-			$actions['sf_ip_status'] = '<span style="color: #01b9ba; font-weight: bold;" title="' . esc_attr__( 'Admin/Whitelisted IP address.', 'securefusion' ) . '">' . esc_html__( 'Whitelisted IP', 'securefusion' ) . '</span>';
+			$actions['sf_ip_status'] = '<span style="color: #01b9ba; font-weight: bold;" title="' . esc_attr__( 'Admin/Whitelisted IP address.', 'secuplug' ) . '">' . esc_html__( 'Whitelisted IP', 'secuplug' ) . '</span>';
 		} elseif ( $db->is_ip_blocked( $ip ) ) {
 			$actions['sf_ip_block'] = sprintf(
 				'<a href="#" class="sf-comment-toggle-ip-btn" data-ip="%1$s" data-action="unblock" style="color: #2271b1; font-weight: 500;">%2$s</a>',
 				esc_attr( $ip ),
-				esc_html__( 'Unblock IP', 'securefusion' )
+				esc_html__( 'Unblock IP', 'secuplug' )
 			);
 		} else {
 			$actions['sf_ip_block'] = sprintf(
 				'<a href="#" class="sf-comment-toggle-ip-btn" data-ip="%1$s" data-action="block" style="color: #d63638; font-weight: 500;">%2$s</a>',
 				esc_attr( $ip ),
-				esc_html__( 'Block IP', 'securefusion' )
+				esc_html__( 'Block IP', 'secuplug' )
 			);
 		}
 
@@ -99,11 +99,11 @@ class CommentsBlock {
 		<div class="alignleft actions sf-comments-block-container">
 			<label class="sf-block-ranges-label">
 				<input type="checkbox" id="sf-block-ranges-chk" name="sf_block_ranges" value="1">
-				<?php esc_html_e( 'Block ranges', 'securefusion' ); ?>
+				<?php esc_html_e( 'Block ranges', 'secuplug' ); ?>
 			</label>
 			<button type="button" id="sf-block-spam-btn" class="button button-secondary sf-block-spam-button">
 				<span class="dashicons dashicons-shield-alt"></span>
-				<?php esc_html_e( 'Block Spam', 'securefusion' ); ?>
+				<?php esc_html_e( 'Block Spam', 'secuplug' ); ?>
 			</button>
 		</div>
 		<?php
@@ -140,15 +140,15 @@ class CommentsBlock {
 			[
 				'ajaxUrl'         => admin_url( 'admin-ajax.php' ),
 				'nonce'           => wp_create_nonce( self::NONCE_ACTION ),
-				'confirmBlock'    => esc_html__( 'Are you sure you want to block this IP?', 'securefusion' ),
-				'confirmUnblock'  => esc_html__( 'Are you sure you want to unblock this IP?', 'securefusion' ),
-				'confirmBulk'     => esc_html__( 'Are you sure you want to block all IP addresses/ranges for all comments currently in Spam?', 'securefusion' ),
-				'blockText'       => esc_html__( 'Block IP', 'securefusion' ),
-				'unblockText'     => esc_html__( 'Unblock IP', 'securefusion' ),
-				'whitelistedText' => esc_html__( 'Whitelisted IP', 'securefusion' ),
-				'successText'     => esc_html__( 'Operation completed successfully.', 'securefusion' ),
-				'errorText'       => esc_html__( 'Operation failed.', 'securefusion' ),
-				'processing'      => esc_html__( 'Processing...', 'securefusion' ),
+				'confirmBlock'    => esc_html__( 'Are you sure you want to block this IP?', 'secuplug' ),
+				'confirmUnblock'  => esc_html__( 'Are you sure you want to unblock this IP?', 'secuplug' ),
+				'confirmBulk'     => esc_html__( 'Are you sure you want to block all IP addresses/ranges for all comments currently in Spam?', 'secuplug' ),
+				'blockText'       => esc_html__( 'Block IP', 'secuplug' ),
+				'unblockText'     => esc_html__( 'Unblock IP', 'secuplug' ),
+				'whitelistedText' => esc_html__( 'Whitelisted IP', 'secuplug' ),
+				'successText'     => esc_html__( 'Operation completed successfully.', 'secuplug' ),
+				'errorText'       => esc_html__( 'Operation failed.', 'secuplug' ),
+				'processing'      => esc_html__( 'Processing...', 'secuplug' ),
 			]
 		);
 	}
@@ -158,12 +158,12 @@ class CommentsBlock {
 	 */
 	public function ajax_toggle_ip_block() {
 		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['nonce'] ) ), self::NONCE_ACTION ) ) {
-			wp_send_json_error( [ 'message' => esc_html__( 'Security check failed.', 'securefusion' ) ] );
+			wp_send_json_error( [ 'message' => esc_html__( 'Security check failed.', 'secuplug' ) ] );
 			return;
 		}
 
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_send_json_error( [ 'message' => esc_html__( 'Permission denied.', 'securefusion' ) ] );
+			wp_send_json_error( [ 'message' => esc_html__( 'Permission denied.', 'secuplug' ) ] );
 			return;
 		}
 
@@ -171,7 +171,7 @@ class CommentsBlock {
 		$action = isset( $_POST['block_action'] ) ? sanitize_text_field( wp_unslash( $_POST['block_action'] ) ) : '';
 
 		if ( ! filter_var( $ip, FILTER_VALIDATE_IP ) ) {
-			wp_send_json_error( [ 'message' => esc_html__( 'Invalid IP address.', 'securefusion' ) ] );
+			wp_send_json_error( [ 'message' => esc_html__( 'Invalid IP address.', 'secuplug' ) ] );
 			return;
 		}
 
@@ -179,21 +179,21 @@ class CommentsBlock {
 
 		if ( $action === 'block' ) {
 			if ( $db->is_ip_whitelisted( $ip ) ) {
-				wp_send_json_error( [ 'message' => esc_html__( 'This IP is whitelisted and cannot be blocked.', 'securefusion' ) ] );
+				wp_send_json_error( [ 'message' => esc_html__( 'This IP is whitelisted and cannot be blocked.', 'secuplug' ) ] );
 				return;
 			}
 			$success = $db->block_ip( $ip );
 			if ( $success ) {
-				wp_send_json_success( [ 'message' => esc_html__( 'IP blocked.', 'securefusion' ) ] );
+				wp_send_json_success( [ 'message' => esc_html__( 'IP blocked.', 'secuplug' ) ] );
 			}
 		} elseif ( $action === 'unblock' ) {
 			$success = $db->unblock_ip( $ip );
 			if ( $success ) {
-				wp_send_json_success( [ 'message' => esc_html__( 'IP unblocked.', 'securefusion' ) ] );
+				wp_send_json_success( [ 'message' => esc_html__( 'IP unblocked.', 'secuplug' ) ] );
 			}
 		}
 
-		wp_send_json_error( [ 'message' => esc_html__( 'Operation failed.', 'securefusion' ) ] );
+		wp_send_json_error( [ 'message' => esc_html__( 'Operation failed.', 'secuplug' ) ] );
 	}
 
 	/**
@@ -201,12 +201,12 @@ class CommentsBlock {
 	 */
 	public function ajax_block_all_spam_ips() {
 		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['nonce'] ) ), self::NONCE_ACTION ) ) {
-			wp_send_json_error( [ 'message' => esc_html__( 'Security check failed.', 'securefusion' ) ] );
+			wp_send_json_error( [ 'message' => esc_html__( 'Security check failed.', 'secuplug' ) ] );
 			return;
 		}
 
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_send_json_error( [ 'message' => esc_html__( 'Permission denied.', 'securefusion' ) ] );
+			wp_send_json_error( [ 'message' => esc_html__( 'Permission denied.', 'secuplug' ) ] );
 			return;
 		}
 
@@ -217,7 +217,7 @@ class CommentsBlock {
 		$spam_ips = $wpdb->get_col( "SELECT DISTINCT comment_author_IP FROM {$wpdb->comments} WHERE comment_approved = 'spam' AND comment_author_IP != ''" );
 
 		if ( empty( $spam_ips ) ) {
-			wp_send_json_error( [ 'message' => esc_html__( 'No spam comment IPs found.', 'securefusion' ) ] );
+			wp_send_json_error( [ 'message' => esc_html__( 'No spam comment IPs found.', 'secuplug' ) ] );
 			return;
 		}
 
@@ -247,14 +247,14 @@ class CommentsBlock {
 				}
 			}
 
-			// Process IPv4 subnets using inherited calculate_cidr helper
+			// Process IPv4 subnets using inherited calculate_cidr helper.
 			foreach ( $ipv4_groups as $prefix => $last_octets ) {
-				$min = min( $last_octets );
-				$max = max( $last_octets );
+				$min                = min( $last_octets );
+				$max                = max( $last_octets );
 				$targets_to_block[] = $this->calculate_cidr( $prefix, $min, $max );
 			}
 
-			// Process IPv6 subnets
+			// Process IPv6 subnets.
 			foreach ( $ipv6_groups as $prefix => $ips ) {
 				$ips = array_unique( $ips );
 				if ( count( $ips ) === 1 ) {
@@ -264,7 +264,7 @@ class CommentsBlock {
 				}
 			}
 		} else {
-			// Plain exact IP blocking
+			// Plain exact IP blocking.
 			foreach ( $spam_ips as $ip ) {
 				$ip = trim( $ip );
 				if ( filter_var( $ip, FILTER_VALIDATE_IP ) ) {
@@ -274,25 +274,25 @@ class CommentsBlock {
 		}
 
 		$targets_to_block = array_unique( $targets_to_block );
-		$db = new BruteForceDB();
-		$blocked_count = 0;
+		$db               = new BruteForceDB();
+		$blocked_count    = 0;
 
 		foreach ( $targets_to_block as $target ) {
-			// Skip if already whitelisted
+			// Skip if already whitelisted.
 			if ( $db->is_ip_whitelisted( $target ) ) {
 				continue;
 			}
 
-			// Block the IP or calculated range
+			// Block the IP or calculated range.
 			if ( $db->block_ip( $target ) ) {
-				$blocked_count++;
+				++$blocked_count;
 			}
 		}
 
 		wp_send_json_success(
 			[
 				/* translators: %d: Number of blocked IPs/ranges. */
-				'message' => sprintf( esc_html__( 'Successfully blocked %d IP addresses/ranges.', 'securefusion' ), $blocked_count ),
+				'message' => sprintf( esc_html__( 'Successfully blocked %d IP addresses/ranges.', 'secuplug' ), $blocked_count ),
 			]
 		);
 	}
