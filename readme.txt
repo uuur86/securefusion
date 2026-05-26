@@ -77,12 +77,12 @@ This plugin bundles and/or utilizes the following third-party libraries:
 
 == Screenshots ==
 
-1. The SecureFusion dashboard overview screen showing status cards for active modules and graphs of security events.
-2. The Failed and Successful Login Attempts log showing active filters and toolbar actions.
-3. The IP Ranges management screen showing subnet CIDR blocks and the "View IPs" modal popup.
-4. The Security settings panel showing custom login URL configurations and CSP headers control.
-5. The WordPress Comments list integration allowing admins to block spam IPs and ranges directly.
-6. The IP Rules management screen for manually blocking or whitelisting specific IPs and CIDR ranges.
+1. The WordPress Comments list integration allowing admins to block spam IPs and ranges directly.
+2. The IP Rules management screen for manually blocking or whitelisting specific IPs and CIDR ranges.
+3. The Failed and Successful Login Attempts log showing active filters and toolbar actions.
+4. The SecureFusion dashboard overview screen showing status cards for active modules and graphs of security events.
+5. The Security settings panel showing custom login URL configurations and CSP headers control.
+6. The IP Ranges management screen showing subnet CIDR blocks and the "View IPs" modal popup.
 
 
 == Frequently Asked Questions ==

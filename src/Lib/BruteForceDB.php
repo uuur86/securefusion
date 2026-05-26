@@ -1295,6 +1295,10 @@ class BruteForceDB {
 	 * @return bool Whether the operation succeeded.
 	 */
 	public function whitelist_ip( $ip ) {
+		if ( $this->is_ip_whitelisted( $ip ) ) {
+			return true;
+		}
+
 		// phpcs:disable
 		$existing_id = $this->wpdb->get_var(
 			$this->wpdb->prepare(
