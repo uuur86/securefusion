@@ -570,10 +570,18 @@ class Middleware {
 	/**
 	 * Disable the REST API.
 	 *
-	 * @param array $access The access to the REST API.
-	 * @return \WP_Error The access to the REST API.
+	 * @param array|\WP_Error|null $access The access to the REST API.
+	 * @return array|\WP_Error|null The access to the REST API.
 	 */
 	public function disable_rest_api( $access ) {
+		if ( is_wp_error( $access ) ) {
+			return $access;
+		}
+
+		if ( $this->is_rest_api_access_allowed() ) {
+			return $access;
+		}
+
 		return new \WP_Error(
 			'rest_disabled',
 			esc_html__( 'The REST API on this site has been disabled.', 'secuplug' ),
@@ -589,12 +597,83 @@ class Middleware {
 	 */
 	public function disable_rest_api_manually() {
 		// v 1.x .
-		add_filter( 'json_enabled', '__return_false' );
-		add_filter( 'json_jsonp_enabled', '__return_false' );
+		add_filter( 'json_enabled', [ $this, 'should_allow_rest_api_manually' ] );
+		add_filter( 'json_jsonp_enabled', [ $this, 'should_allow_rest_api_manually' ] );
 
 		// v 2.x .
-		add_filter( 'rest_enabled', '__return_false' );
-		add_filter( 'rest_jsonp_enabled', '__return_false' );
+		add_filter( 'rest_enabled', [ $this, 'should_allow_rest_api_manually' ] );
+		add_filter( 'rest_jsonp_enabled', [ $this, 'should_allow_rest_api_manually' ] );
+	}
+
+
+	/**
+	 * Determine if manual/legacy REST API should be allowed.
+	 *
+	 * @param bool $enabled Default state.
+	 * @return bool True if allowed, false otherwise.
+	 */
+	public function should_allow_rest_api_manually( $enabled ) {
+		return $this->is_rest_api_access_allowed();
+	}
+
+
+	/**
+	 * Verify if the current REST API request should be allowed based on security bypass rules.
+	 *
+	 * @return bool True if allowed, false if blocked.
+	 */
+	private function is_rest_api_access_allowed() {
+		// 1. Allow authenticated users.
+		if ( is_user_logged_in() ) {
+			return true;
+		}
+
+		// 2. Allow internal WordPress executions (Admin dashboard, AJAX, Cron, WP-CLI).
+		if ( is_admin() || ( defined( 'DOING_AJAX' ) && DOING_AJAX ) || ( defined( 'DOING_CRON' ) && DOING_CRON ) || ( defined( 'WP_CLI' ) && WP_CLI ) ) {
+			return true;
+		}
+
+		// 3. Allow loopback/internal requests from the server itself.
+		$ip        = $this->get_client_ip();
+		$server_ip = isset( $_SERVER['SERVER_ADDR'] ) ? $_SERVER['SERVER_ADDR'] : '';
+
+		$is_loopback = (
+			$ip === '127.0.0.1' ||
+			$ip === '::1' ||
+			( ! empty( $server_ip ) && $ip === $server_ip )
+		);
+
+		// Resolve the site's own host IP to handle external-facing loopbacks (e.g., behind proxies).
+		if ( ! $is_loopback ) {
+			$site_host = wp_parse_url( home_url(), PHP_URL_HOST );
+			if ( $site_host ) {
+				$site_ip = gethostbyname( $site_host );
+				if ( $site_ip && $ip === $site_ip ) {
+					$is_loopback = true;
+				}
+			}
+		}
+
+		if ( $is_loopback ) {
+			$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
+			if ( 0 === strpos( $user_agent, 'WordPress/' ) ) {
+				return true;
+			}
+		}
+
+		// 4. Allow requests with a valid REST API Nonce (e.g. from legitimate forms on the site).
+		$nonce = null;
+		if ( isset( $_SERVER['HTTP_X_WP_NONCE'] ) ) {
+			$nonce = sanitize_text_field( wp_unslash( $_SERVER['HTTP_X_WP_NONCE'] ) );
+		} elseif ( isset( $_REQUEST['_wpnonce'] ) ) {
+			$nonce = sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) );
+		}
+
+		if ( $nonce && wp_verify_nonce( $nonce, 'wp_rest' ) ) {
+			return true;
+		}
+
+		return false;
 	}
 
 

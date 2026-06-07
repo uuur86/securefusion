@@ -152,10 +152,10 @@ class Main {
 		add_action( 'init', array( $this->login, 'init' ) );
 
 		// SSL CONTROL.
-		add_action( 'plugin_loaded', array( $this->ssl_control, 'init' ) );
+		add_action( 'plugins_loaded', array( $this->ssl_control, 'init' ) );
 
 		// MIDDLEWARE.
-		add_action( 'plugin_loaded', array( $this->middleware, 'init' ) );
+		add_action( 'plugins_loaded', array( $this->middleware, 'init' ) );
 		add_action( 'init', array( $this->middleware, 'filter_bad_requests' ), 10 );
 		add_action( 'wp_login_failed', array( $this->middleware, 'track_login_failed' ), 10, 2 );
 		add_action( 'wp_authenticate', array( $this->middleware, 'track_limit_login_attempts' ), 10, 2 );
@@ -178,7 +178,7 @@ class Main {
 
 		// MIGRATION & UPDATE DETECTOR.
 		// Run update migrations synchronously during plugin load to prevent race conditions
-		// with Middleware::init() which runs early on 'plugin_loaded' and queries the database.
+		// with Middleware::init() which runs early on 'plugins_loaded' and queries the database.
 		$this->maybe_update_plugin();
 	}
 

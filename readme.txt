@@ -3,7 +3,7 @@ Contributors: codeplusdev, ugurbicer
 Tags: firewall, security, anti-spam, ssl, xml-rpc
 Requires at least: 4.9
 Tested up to: 7.0
-Stable tag: 2.0.0
+Stable tag: 2.0.1
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 Requires PHP: 7.4
@@ -91,6 +91,9 @@ If you have any questions, you can post [a support request](https://wordpress.or
 
 
 == Changelog ==
+
+= 2.0.1 =
+* Resolved compatibility issues with the "Disable REST API for Visitors" feature to prevent conflicts and improve third-party plugin integration.
 
 = 2.0.0 =
 * Added: Comments Block module to block spam IPs directly from the edit-comments.php screen.
