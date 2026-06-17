@@ -1,12 +1,13 @@
 === SecureFusion - Security and Firewall by Fyndsoft ===
 Contributors: codeplusdev, ugurbicer
 Tags: firewall, security, anti-spam, ssl, xml-rpc
-Requires at least: 4.9
+Requires at least: 5.3
 Tested up to: 7.0
-Stable tag: 2.0.1
+Stable tag: 2.0.2
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 Requires PHP: 7.4
+Donate link: https://github.com/sponsors/uuur86
 
 Lightweight, high-performance security suite. Protects from brute-force logins, DDoS pingbacks, bad request injections, and manages CSP headers.
 
@@ -91,6 +92,18 @@ If you have any questions, you can post [a support request](https://wordpress.or
 
 
 == Changelog ==
+
+= 2.0.2 =
+* Added: Google reCAPTCHA Integration supporting v2 Checkbox, v2 Invisible, and v3 versions.
+* Added: Performance-optimized dynamic lazy-loading for Google reCAPTCHA.
+* Added: Native reCAPTCHA integrations with Contact Form 7, Mailchimp for WP (MC4WP), Login, Register, Lost Password, and Comment forms.
+* Added: New CSP directives for `connect-src`, `media-src`, `form-action`, and `base-uri`.
+* Added: Automatic `www` and apex/root domain normalization helper inside CSP settings.
+* Added: CSP Report-Only mode support and custom Report URI field.
+* Added: Advanced HSTS configurations with options for `preload` and `includeSubDomains`.
+* Added: Cross-Origin-Opener-Policy (COOP) configuration toggle (off by default) to keep external pop-up logins functional.
+* Fixed: Duplicate Strict-Transport-Security header output.
+* Removed: Deprecated `X-XSS-Protection` header and hardcoded `Permissions-Policy` header.
 
 = 2.0.1 =
 * Resolved compatibility issues with the "Disable REST API for Visitors" feature to prevent conflicts and improve third-party plugin integration.
@@ -208,3 +221,9 @@ If you have any questions, you can post [a support request](https://wordpress.or
 * Added composer autoload
 * Fixed some typos
 * added new functions to wp_common trait
+
+== Upgrade Notice ==
+
+= 2.0.2 =
+This version introduces Content Security Policy (CSP) enhancements, automated domain normalization, Google reCAPTCHA integrations, and advanced security header configurations.
+IMPORTANT NOTE FOR 1.X.X UPGRADERS: Since 2.x.x introduces significant architectural changes to firewall settings and security policies, please make sure to take a complete database backup before upgrading. Verify your security settings and CSP rules after the update.

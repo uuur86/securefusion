@@ -12,6 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use SecureFusion\Lib\Traits\WPCommon;
+use SecureFusion\Lib\CSP;
 
 /**
  * Middleware functionality class.
@@ -213,29 +214,49 @@ class Middleware {
 			return ( null === $val ) ? $fallback : $val;
 		};
 
-		$enable_csp_style              = $resolve_csp_toggle( 'enable_csp_style', '0' );
-		$enable_csp_script             = $resolve_csp_toggle( 'enable_csp_script', '0' );
-		$enable_csp_font               = $resolve_csp_toggle( 'enable_csp_font', '0' );
-		$enable_csp_frame              = $resolve_csp_toggle( 'enable_csp_frame', '0' );
-		$enable_csp_worker             = $resolve_csp_toggle( 'enable_csp_worker', '0' );
-		$enable_csp_img                = $resolve_csp_toggle( 'enable_csp_img', '0' );
+		$enable_csp_style       = $resolve_csp_toggle( 'enable_csp_style', '0' );
+		$enable_csp_script      = $resolve_csp_toggle( 'enable_csp_script', '0' );
+		$enable_csp_font        = $resolve_csp_toggle( 'enable_csp_font', '0' );
+		$enable_csp_frame       = $resolve_csp_toggle( 'enable_csp_frame', '0' );
+		$enable_csp_worker      = $resolve_csp_toggle( 'enable_csp_worker', '0' );
+		$enable_csp_img         = $resolve_csp_toggle( 'enable_csp_img', '0' );
+		$enable_csp_connect     = $resolve_csp_toggle( 'enable_csp_connect', '0' );
+		$enable_csp_media       = $resolve_csp_toggle( 'enable_csp_media', '0' );
+		$enable_csp_form_action = $resolve_csp_toggle( 'enable_csp_form_action', '0' );
+		$enable_csp_base_uri    = $resolve_csp_toggle( 'enable_csp_base_uri', '0' );
+		$enable_csp_report_only = $resolve_csp_toggle( 'enable_csp_report_only', '0' );
+		$csp_report_uri         = $this->get_settings( 'csp_report_uri' );
+
 		$csp_upgrade_insecure_requests = $resolve_csp_toggle( 'csp_upgrade_insecure_requests', '1' );
 		$csp_block_all_mixed_content   = $resolve_csp_toggle( 'csp_block_all_mixed_content', '1' );
 		$csp_sandbox                   = $resolve_csp_toggle( 'csp_sandbox', '0' );
 
+		$enable_coop            = $this->get_settings( 'enable_coop' );
+		$enable_hsts_preload    = $this->get_settings( 'enable_hsts_preload' );
+		$enable_hsts_subdomains = $this->get_settings( 'enable_hsts_subdomains' );
+		$recaptcha_enable       = $this->get_settings( 'recaptcha_enable' );
+
 		// CSP Sources.
-		$csp_allowed_style_sources  = $this->get_settings( 'csp_allowed_style_sources' );
-		$csp_allowed_style_sources  = str_replace( '|', ' ', $csp_allowed_style_sources );
-		$csp_allowed_script_sources = $this->get_settings( 'csp_allowed_script_sources' );
-		$csp_allowed_script_sources = str_replace( '|', ' ', $csp_allowed_script_sources );
-		$csp_allowed_font_sources   = $this->get_settings( 'csp_allowed_font_sources' );
-		$csp_allowed_font_sources   = str_replace( '|', ' ', $csp_allowed_font_sources );
-		$csp_allowed_frame_sources  = $this->get_settings( 'csp_allowed_frame_sources' );
-		$csp_allowed_frame_sources  = str_replace( '|', ' ', $csp_allowed_frame_sources );
-		$csp_allowed_worker_sources = $this->get_settings( 'csp_allowed_worker_sources' );
-		$csp_allowed_worker_sources = str_replace( '|', ' ', $csp_allowed_worker_sources );
-		$csp_allowed_img_sources    = $this->get_settings( 'csp_allowed_img_sources' );
-		$csp_allowed_img_sources    = str_replace( '|', ' ', $csp_allowed_img_sources );
+		$csp_allowed_style_sources       = $this->get_settings( 'csp_allowed_style_sources' );
+		$csp_allowed_style_sources       = str_replace( '|', ' ', $csp_allowed_style_sources );
+		$csp_allowed_script_sources      = $this->get_settings( 'csp_allowed_script_sources' );
+		$csp_allowed_script_sources      = str_replace( '|', ' ', $csp_allowed_script_sources );
+		$csp_allowed_font_sources        = $this->get_settings( 'csp_allowed_font_sources' );
+		$csp_allowed_font_sources        = str_replace( '|', ' ', $csp_allowed_font_sources );
+		$csp_allowed_frame_sources       = $this->get_settings( 'csp_allowed_frame_sources' );
+		$csp_allowed_frame_sources       = str_replace( '|', ' ', $csp_allowed_frame_sources );
+		$csp_allowed_worker_sources      = $this->get_settings( 'csp_allowed_worker_sources' );
+		$csp_allowed_worker_sources      = str_replace( '|', ' ', $csp_allowed_worker_sources );
+		$csp_allowed_img_sources         = $this->get_settings( 'csp_allowed_img_sources' );
+		$csp_allowed_img_sources         = str_replace( '|', ' ', $csp_allowed_img_sources );
+		$csp_allowed_connect_sources     = $this->get_settings( 'csp_allowed_connect_sources' );
+		$csp_allowed_connect_sources     = str_replace( '|', ' ', $csp_allowed_connect_sources );
+		$csp_allowed_media_sources       = $this->get_settings( 'csp_allowed_media_sources' );
+		$csp_allowed_media_sources       = str_replace( '|', ' ', $csp_allowed_media_sources );
+		$csp_allowed_form_action_sources = $this->get_settings( 'csp_allowed_form_action_sources' );
+		$csp_allowed_form_action_sources = str_replace( '|', ' ', $csp_allowed_form_action_sources );
+		$csp_allowed_base_uri_sources    = $this->get_settings( 'csp_allowed_base_uri_sources' );
+		$csp_allowed_base_uri_sources    = str_replace( '|', ' ', $csp_allowed_base_uri_sources );
 
 		if ( $bad_bots ) {
 			$bad_bots   = get_option( 'bad_bots_list', '^libwww-perl.*' );
@@ -261,45 +282,89 @@ class Middleware {
 
 		if ( $http_headers ) {
 			// Cross-Origin Opener Policy (COOP).
-			header( 'Cross-Origin-Opener-Policy: same-origin' );
+			if ( $enable_coop ) {
+				header( 'Cross-Origin-Opener-Policy: same-origin' );
+			}
 
 			// Clickjacking Mitigation & Other Headers.
 			header( 'X-Frame-Options: SAMEORIGIN' );
 			header( 'X-Content-Type-Options: nosniff' );
 			header( 'Referrer-Policy: no-referrer-when-downgrade' );
-			header( 'X-XSS-Protection: 1; mode=block' );
-			header( 'Strict-Transport-Security: max-age=31536000' );
-			header( 'Permissions-Policy: geolocation=(), microphone=(), camera=()' );
+
+			// Strict-Transport-Security (HSTS).
+			$hsts_max_age = 60 * 60 * 24 * 30 * 24; // 2 years
+			$hsts_header  = 'max-age=' . $hsts_max_age;
+			if ( $enable_hsts_subdomains ) {
+				$hsts_header .= '; includeSubDomains';
+			}
+			if ( $enable_hsts_preload ) {
+				$hsts_header .= '; preload';
+			}
+			header( 'Strict-Transport-Security: ' . $hsts_header );
 
 			/**
 			 * Content Security Policy (CSP)
 			 * Helps prevent Cross-Site Scripting (XSS) and data injection attacks.
 			 * This policy is more specific to reduce risks highlighted by security scanners.
 			 */
+			if ( $recaptcha_enable ) {
+				$csp_allowed_script_sources .= ' https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/';
+				$csp_allowed_frame_sources  .= ' https://www.google.com/recaptcha/ https://www.google.com';
+				$csp_allowed_style_sources  .= ' https://www.google.com/recaptcha/';
+			}
+
+			// Normalize all active CSP source domains (handling www vs non-www automatically).
+			$csp_allowed_frame_sources_norm       = CSP::normalize_csp_sources( $csp_allowed_frame_sources );
+			$csp_allowed_worker_sources_norm      = CSP::normalize_csp_sources( $csp_allowed_worker_sources );
+			$csp_allowed_script_sources_norm      = CSP::normalize_csp_sources( $csp_allowed_script_sources );
+			$csp_allowed_style_sources_norm       = CSP::normalize_csp_sources( $csp_allowed_style_sources );
+			$csp_allowed_img_sources_norm         = CSP::normalize_csp_sources( $csp_allowed_img_sources );
+			$csp_allowed_font_sources_norm        = CSP::normalize_csp_sources( $csp_allowed_font_sources );
+			$csp_allowed_connect_sources_norm     = CSP::normalize_csp_sources( $csp_allowed_connect_sources );
+			$csp_allowed_media_sources_norm       = CSP::normalize_csp_sources( $csp_allowed_media_sources );
+			$csp_allowed_form_action_sources_norm = CSP::normalize_csp_sources( $csp_allowed_form_action_sources );
+			$csp_allowed_base_uri_sources_norm    = CSP::normalize_csp_sources( $csp_allowed_base_uri_sources );
+
 			$csp_policy = '';
 
-			if ( $enable_csp_frame ) {
-				$csp_policy .= "frame-src 'self' " . $csp_allowed_frame_sources . '; ';
+			if ( $enable_csp_frame && ! empty( $csp_allowed_frame_sources_norm ) ) {
+				$csp_policy .= "frame-src 'self' " . $csp_allowed_frame_sources_norm . '; ';
 			}
 
-			if ( $enable_csp_worker ) {
-				$csp_policy .= "worker-src 'self' " . $csp_allowed_worker_sources . '; ';
+			if ( $enable_csp_worker && ! empty( $csp_allowed_worker_sources_norm ) ) {
+				$csp_policy .= "worker-src 'self' " . $csp_allowed_worker_sources_norm . '; ';
 			}
 
-			if ( $enable_csp_script ) {
-				$csp_policy .= "script-src 'self' " . $csp_allowed_script_sources . '; ';
+			if ( $enable_csp_script && ! empty( $csp_allowed_script_sources_norm ) ) {
+				$csp_policy .= "script-src 'self' " . $csp_allowed_script_sources_norm . '; ';
 			}
 
-			if ( $enable_csp_style ) {
-				$csp_policy .= "style-src 'self' " . $csp_allowed_style_sources . '; ';
+			if ( $enable_csp_style && ! empty( $csp_allowed_style_sources_norm ) ) {
+				$csp_policy .= "style-src 'self' " . $csp_allowed_style_sources_norm . '; ';
 			}
 
-			if ( $enable_csp_img ) {
-				$csp_policy .= "img-src 'self' " . $csp_allowed_img_sources . '; ';
+			if ( $enable_csp_img && ! empty( $csp_allowed_img_sources_norm ) ) {
+				$csp_policy .= "img-src 'self' " . $csp_allowed_img_sources_norm . '; ';
 			}
 
-			if ( $enable_csp_font ) {
-				$csp_policy .= "font-src 'self' " . $csp_allowed_font_sources . '; ';
+			if ( $enable_csp_font && ! empty( $csp_allowed_font_sources_norm ) ) {
+				$csp_policy .= "font-src 'self' " . $csp_allowed_font_sources_norm . '; ';
+			}
+
+			if ( $enable_csp_connect && ! empty( $csp_allowed_connect_sources_norm ) ) {
+				$csp_policy .= "connect-src 'self' " . $csp_allowed_connect_sources_norm . '; ';
+			}
+
+			if ( $enable_csp_media && ! empty( $csp_allowed_media_sources_norm ) ) {
+				$csp_policy .= "media-src 'self' " . $csp_allowed_media_sources_norm . '; ';
+			}
+
+			if ( $enable_csp_form_action && ! empty( $csp_allowed_form_action_sources_norm ) ) {
+				$csp_policy .= "form-action 'self' " . $csp_allowed_form_action_sources_norm . '; ';
+			}
+
+			if ( $enable_csp_base_uri && ! empty( $csp_allowed_base_uri_sources_norm ) ) {
+				$csp_policy .= "base-uri 'self' " . $csp_allowed_base_uri_sources_norm . '; ';
 			}
 
 			if ( ! empty( $csp_policy ) ) {
@@ -325,20 +390,17 @@ class Middleware {
 
 				$csp_policy = "default-src 'self'; " . $csp_policy;
 
-				header( 'Content-Security-Policy: ' . $csp_policy );
+				// Append report-uri if configured.
+				if ( ! empty( $csp_report_uri ) ) {
+					$csp_policy .= 'report-uri ' . esc_url( $csp_report_uri ) . '; ';
+				}
+
+				if ( $enable_csp_report_only ) {
+					header( 'Content-Security-Policy-Report-Only: ' . $csp_policy );
+				} else {
+					header( 'Content-Security-Policy: ' . $csp_policy );
+				}
 			}
-
-			/**
-			 * HTTP Strict Transport Security (HSTS)
-			 * Enforces secure (HTTPS) connections.
-			 * To fix the "No 'preload' directive found" warning, you can add the 'preload' directive.
-			 * WARNING: Only add 'preload' if you understand the consequences and are certain
-			 * that your entire site and ALL its subdomains can be served over HTTPS permanently.
-			 * This cannot be easily undone. More info: https://hstspreload.org/
-			 */
-			$hsts_max_age = 60 * 60 * 24 * 30 * 24; // 2 year
-
-			header( 'Strict-Transport-Security: max-age=' . $hsts_max_age . '; includeSubDomains; preload' );
 		}
 	}
 
@@ -613,6 +675,9 @@ class Middleware {
 	 * @return bool True if allowed, false otherwise.
 	 */
 	public function should_allow_rest_api_manually( $enabled ) {
+		if ( ! $enabled ) {
+			return false;
+		}
 		return $this->is_rest_api_access_allowed();
 	}
 
@@ -635,7 +700,7 @@ class Middleware {
 
 		// 3. Allow loopback/internal requests from the server itself.
 		$ip        = $this->get_client_ip();
-		$server_ip = isset( $_SERVER['SERVER_ADDR'] ) ? $_SERVER['SERVER_ADDR'] : '';
+		$server_ip = isset( $_SERVER['SERVER_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['SERVER_ADDR'] ) ) : '';
 
 		$is_loopback = (
 			$ip === '127.0.0.1' ||
@@ -687,6 +752,9 @@ class Middleware {
 	 * @return void
 	 */
 	public function track_login_failed( $username, $error = null ) {
+		// phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- Required by hook action.
+		unset( $error );
+
 		$ip = $this->get_client_ip();
 
 		if ( ! $ip ) {

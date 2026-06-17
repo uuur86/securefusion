@@ -756,6 +756,13 @@
     border-color: #8c8f94;
 }
 
+/* Selected state: generic (Teal/Blue) */
+.fynd-sf-settings .content-box input[type="radio"]:checked + label {
+    background-color: #01b9ba !important;
+    border-color: #01b9ba !important;
+    color: #fff !important;
+}
+
 /* Selected state: YES (green) */
 .fynd-sf-settings .content-box input[type="radio"][value="1"]:checked + label,
 .fynd-sf-settings .content-box input[type="radio"][value="https"]:checked + label,

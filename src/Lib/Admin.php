@@ -566,6 +566,10 @@ class Admin {
 						<span class="dashicons dashicons-clipboard"></span>
 						<?php esc_html_e( 'Security Policies', 'secuplug' ); ?>
 					</a>
+					<a href="#recaptcha" class="nav-tab">
+						<span class="dashicons dashicons-google"></span>
+						<?php esc_html_e( 'reCAPTCHA', 'secuplug' ); ?>
+					</a>
 					<a href="#advanced" class="nav-tab">
 						<span class="dashicons dashicons-warning"></span>
 						<?php esc_html_e( 'Advanced', 'secuplug' ); ?>
@@ -591,6 +595,9 @@ class Admin {
 						</div>
 						<div class="tab-content hidden" id="fynd-sf-security_policies">
 							<?php $this->settings_page->run_section( 'security_policies_settings' ); ?>
+						</div>
+						<div class="tab-content hidden" id="fynd-sf-recaptcha">
+							<?php $this->settings_page->run_section( 'recaptcha_settings' ); ?>
 						</div>
 						<div class="tab-content hidden" id="fynd-sf-advanced">
 							<?php $this->settings_page->run_section( 'advanced_settings' ); ?>
@@ -806,6 +813,57 @@ class Admin {
 						'name'    => 'http_headers',
 						'default' => '0',
 						'label'   => esc_html__( 'Add HTTP Headers for Browser Security', 'secuplug' ),
+						'options' => [
+							[
+								'value' => '0',
+								'label' => esc_html__( 'No', 'secuplug' ),
+							],
+							[
+								'value' => '1',
+								'label' => esc_html__( 'Yes', 'secuplug' ),
+							],
+						],
+					],
+					[
+						'type'    => 'radio',
+						'name'    => 'enable_coop',
+						'default' => '0',
+						'label'   => esc_html__( 'Enable Cross-Origin-Opener-Policy (COOP)', 'secuplug' ),
+						'after'   => '<p class="description">' . esc_html__( 'Sets COOP to same-origin. This mitigates cross-origin leaks, but can break pop-up OAuth flows (like Google/Facebook login). Disable if you use external login popups.', 'secuplug' ) . '</p>',
+						'options' => [
+							[
+								'value' => '0',
+								'label' => esc_html__( 'No', 'secuplug' ),
+							],
+							[
+								'value' => '1',
+								'label' => esc_html__( 'Yes', 'secuplug' ),
+							],
+						],
+					],
+					[
+						'type'    => 'radio',
+						'name'    => 'enable_hsts_subdomains',
+						'default' => '0',
+						'label'   => esc_html__( 'HSTS: Include Subdomains', 'secuplug' ),
+						'after'   => '<p class="description">' . esc_html__( 'Appends the includeSubDomains directive to the HSTS header. WARNING: Ensure all subdomains support HTTPS before enabling!', 'secuplug' ) . '</p>',
+						'options' => [
+							[
+								'value' => '0',
+								'label' => esc_html__( 'No', 'secuplug' ),
+							],
+							[
+								'value' => '1',
+								'label' => esc_html__( 'Yes', 'secuplug' ),
+							],
+						],
+					],
+					[
+						'type'    => 'radio',
+						'name'    => 'enable_hsts_preload',
+						'default' => '0',
+						'label'   => esc_html__( 'HSTS: Preload', 'secuplug' ),
+						'after'   => '<p class="description">' . esc_html__( 'Appends the preload directive to the HSTS header. WARNING: Once preloaded, the site must remain HTTPS-only permanently.', 'secuplug' ) . '</p>',
 						'options' => [
 							[
 								'value' => '0',
@@ -1035,6 +1093,130 @@ class Admin {
 							],
 						],
 					],
+					[
+						'type'    => 'radio',
+						'name'    => 'enable_csp_connect',
+						'default' => $this->default_settings['enable_csp_connect'] ?? '0',
+						'label'   => esc_html__( 'Enable CSP Connect Sources', 'secuplug' ),
+						'options' => [
+							[
+								'value' => '0',
+								'label' => esc_html__( 'Disable', 'secuplug' ),
+							],
+							[
+								'value' => '1',
+								'label' => esc_html__( 'Enable', 'secuplug' ),
+							],
+						],
+					],
+					[
+						'type'              => 'taginput',
+						'name'              => 'csp_allowed_connect_sources',
+						'label'             => esc_html__( 'CSP Allowed Connect Sources', 'secuplug' ),
+						'placeholder'       => 'google-analytics.com',
+						'field_type'        => 'url',
+						'sanitize_callback' => [ CSP::class, 'validate_csp_source' ],
+						'presets'           => '<button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://www.google-analytics.com">GA4</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://*.google-analytics.com">GA4 Wildcard</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://*.googletagmanager.com">Google Tag Manager</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://stats.g.doubleclick.net">DoubleClick</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://api.stripe.com">Stripe API</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://*.wordpress.org">WordPress.org</button>',
+					],
+					[
+						'type'    => 'radio',
+						'name'    => 'enable_csp_media',
+						'default' => $this->default_settings['enable_csp_media'] ?? '0',
+						'label'   => esc_html__( 'Enable CSP Media Sources', 'secuplug' ),
+						'options' => [
+							[
+								'value' => '0',
+								'label' => esc_html__( 'Disable', 'secuplug' ),
+							],
+							[
+								'value' => '1',
+								'label' => esc_html__( 'Enable', 'secuplug' ),
+							],
+						],
+					],
+					[
+						'type'              => 'taginput',
+						'name'              => 'csp_allowed_media_sources',
+						'label'             => esc_html__( 'CSP Allowed Media Sources', 'secuplug' ),
+						'placeholder'       => 'youtube.com',
+						'field_type'        => 'url',
+						'sanitize_callback' => [ CSP::class, 'validate_csp_source' ],
+						'presets'           => '<button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://www.youtube.com">YouTube</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://player.vimeo.com">Vimeo</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https:">https:</button>',
+					],
+					[
+						'type'    => 'radio',
+						'name'    => 'enable_csp_form_action',
+						'default' => $this->default_settings['enable_csp_form_action'] ?? '0',
+						'label'   => esc_html__( 'Enable CSP Form Action', 'secuplug' ),
+						'options' => [
+							[
+								'value' => '0',
+								'label' => esc_html__( 'Disable', 'secuplug' ),
+							],
+							[
+								'value' => '1',
+								'label' => esc_html__( 'Enable', 'secuplug' ),
+							],
+						],
+					],
+					[
+						'type'              => 'taginput',
+						'name'              => 'csp_allowed_form_action_sources',
+						'label'             => esc_html__( 'CSP Allowed Form Action Sources', 'secuplug' ),
+						'placeholder'       => '\'self\'',
+						'field_type'        => 'url',
+						'sanitize_callback' => [ CSP::class, 'validate_csp_source' ],
+						'presets'           => '<button type="button" class="fynd-sf-taginput-preset-btn" data-preset="\'self\'">\'self\'</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://js.stripe.com">Stripe</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="https://www.paypal.com">PayPal</button>',
+					],
+					[
+						'type'    => 'radio',
+						'name'    => 'enable_csp_base_uri',
+						'default' => $this->default_settings['enable_csp_base_uri'] ?? '0',
+						'label'   => esc_html__( 'Enable CSP Base URI', 'secuplug' ),
+						'options' => [
+							[
+								'value' => '0',
+								'label' => esc_html__( 'Disable', 'secuplug' ),
+							],
+							[
+								'value' => '1',
+								'label' => esc_html__( 'Enable', 'secuplug' ),
+							],
+						],
+					],
+					[
+						'type'              => 'taginput',
+						'name'              => 'csp_allowed_base_uri_sources',
+						'label'             => esc_html__( 'CSP Allowed Base URI Sources', 'secuplug' ),
+						'placeholder'       => '\'self\'',
+						'field_type'        => 'url',
+						'sanitize_callback' => [ CSP::class, 'validate_csp_source' ],
+						'presets'           => '<button type="button" class="fynd-sf-taginput-preset-btn" data-preset="\'self\'">\'self\'</button><button type="button" class="fynd-sf-taginput-preset-btn" data-preset="\'none\'">\'none\'</button>',
+					],
+					[
+						'type'    => 'radio',
+						'name'    => 'enable_csp_report_only',
+						'default' => $this->default_settings['enable_csp_report_only'] ?? '0',
+						'label'   => esc_html__( 'CSP Report-Only Mode (Test/Monitor)', 'secuplug' ),
+						'after'   => '<p class="description">' . esc_html__( 'Enabling this will log violations to the console/server but will not block any assets from loading. Recommended for initial testing.', 'secuplug' ) . '</p>',
+						'options' => [
+							[
+								'value' => '0',
+								'label' => esc_html__( 'Disable', 'secuplug' ),
+							],
+							[
+								'value' => '1',
+								'label' => esc_html__( 'Enable', 'secuplug' ),
+							],
+						],
+					],
+					[
+						'type'        => 'text_input',
+						'name'        => 'csp_report_uri',
+						'label'       => esc_html__( 'CSP Report URI', 'secuplug' ),
+						'placeholder' => 'https://report-uri.com/example',
+						'after'       => '<p class="description">' . esc_html__( 'URL where browsers should send report JSON payloads when CSP is violated.', 'secuplug' ) . '</p>',
+					],
 				],
 			],
 			[
@@ -1192,6 +1374,159 @@ class Admin {
 							[
 								'label' => esc_html__( 'Enabled', 'secuplug' ),
 								'value' => 'https',
+							],
+						],
+					],
+				],
+			],
+			[
+				// Section info.
+				'name'  => 'recaptcha_settings',
+				'title' => esc_html__( 'GOOGLE reCAPTCHA', 'secuplug' ),
+				'desc'  => esc_html__( 'Configure Google reCAPTCHA with lazy-loading for better PageSpeed performance.', 'secuplug' ),
+				// Form items.
+				'items' => [
+					[
+						'type'    => 'radio',
+						'name'    => 'recaptcha_enable',
+						'default' => $this->default_settings['recaptcha_enable'] ?? '0',
+						'label'   => esc_html__( 'Enable Google reCAPTCHA', 'secuplug' ),
+						'options' => [
+							[
+								'value' => '0',
+								'label' => esc_html__( 'Disable', 'secuplug' ),
+							],
+							[
+								'value' => '1',
+								'label' => esc_html__( 'Enable', 'secuplug' ),
+							],
+						],
+					],
+					[
+						'type'        => 'text_input',
+						'name'        => 'recaptcha_site_key',
+						'label'       => esc_html__( 'Site Key', 'secuplug' ),
+						'placeholder' => esc_html__( 'Enter reCAPTCHA Site Key', 'secuplug' ),
+					],
+					[
+						'type'        => 'text_input',
+						'name'        => 'recaptcha_secret_key',
+						'label'       => esc_html__( 'Secret Key', 'secuplug' ),
+						'placeholder' => esc_html__( 'Enter reCAPTCHA Secret Key', 'secuplug' ),
+					],
+					[
+						'type'    => 'radio',
+						'name'    => 'recaptcha_version',
+						'default' => $this->default_settings['recaptcha_version'] ?? 'v2_checkbox',
+						'label'   => esc_html__( 'reCAPTCHA Version', 'secuplug' ),
+						'options' => [
+							[
+								'value' => 'v2_checkbox',
+								'label' => esc_html__( 'reCAPTCHA v2 (Checkbox)', 'secuplug' ),
+							],
+							[
+								'value' => 'v2_invisible',
+								'label' => esc_html__( 'reCAPTCHA v2 (Invisible)', 'secuplug' ),
+							],
+							[
+								'value' => 'v3',
+								'label' => esc_html__( 'reCAPTCHA v3', 'secuplug' ),
+							],
+						],
+					],
+					[
+						'type'    => 'radio',
+						'name'    => 'recaptcha_login',
+						'default' => $this->default_settings['recaptcha_login'] ?? '0',
+						'label'   => esc_html__( 'Enable on WordPress Login Form', 'secuplug' ),
+						'options' => [
+							[
+								'value' => '0',
+								'label' => esc_html__( 'No', 'secuplug' ),
+							],
+							[
+								'value' => '1',
+								'label' => esc_html__( 'Yes', 'secuplug' ),
+							],
+						],
+					],
+					[
+						'type'    => 'radio',
+						'name'    => 'recaptcha_register',
+						'default' => $this->default_settings['recaptcha_register'] ?? '0',
+						'label'   => esc_html__( 'Enable on WordPress Registration Form', 'secuplug' ),
+						'options' => [
+							[
+								'value' => '0',
+								'label' => esc_html__( 'No', 'secuplug' ),
+							],
+							[
+								'value' => '1',
+								'label' => esc_html__( 'Yes', 'secuplug' ),
+							],
+						],
+					],
+					[
+						'type'    => 'radio',
+						'name'    => 'recaptcha_lostpassword',
+						'default' => $this->default_settings['recaptcha_lostpassword'] ?? '0',
+						'label'   => esc_html__( 'Enable on WordPress Lost Password Form', 'secuplug' ),
+						'options' => [
+							[
+								'value' => '0',
+								'label' => esc_html__( 'No', 'secuplug' ),
+							],
+							[
+								'value' => '1',
+								'label' => esc_html__( 'Yes', 'secuplug' ),
+							],
+						],
+					],
+					[
+						'type'    => 'radio',
+						'name'    => 'recaptcha_comment',
+						'default' => $this->default_settings['recaptcha_comment'] ?? '0',
+						'label'   => esc_html__( 'Enable on WordPress Comments Form', 'secuplug' ),
+						'options' => [
+							[
+								'value' => '0',
+								'label' => esc_html__( 'No', 'secuplug' ),
+							],
+							[
+								'value' => '1',
+								'label' => esc_html__( 'Yes', 'secuplug' ),
+							],
+						],
+					],
+					[
+						'type'    => 'radio',
+						'name'    => 'recaptcha_cf7',
+						'default' => $this->default_settings['recaptcha_cf7'] ?? '0',
+						'label'   => esc_html__( 'Enable on Contact Form 7 Forms', 'secuplug' ),
+						'options' => [
+							[
+								'value' => '0',
+								'label' => esc_html__( 'No', 'secuplug' ),
+							],
+							[
+								'value' => '1',
+								'label' => esc_html__( 'Yes', 'secuplug' ),
+							],
+						],
+					],
+					[
+						'type'    => 'radio',
+						'name'    => 'recaptcha_mc4wp',
+						'default' => $this->default_settings['recaptcha_mc4wp'] ?? '0',
+						'label'   => esc_html__( 'Enable on Mailchimp for WP Forms', 'secuplug' ),
+						'options' => [
+							[
+								'value' => '0',
+								'label' => esc_html__( 'No', 'secuplug' ),
+							],
+							[
+								'value' => '1',
+								'label' => esc_html__( 'Yes', 'secuplug' ),
 							],
 						],
 					],

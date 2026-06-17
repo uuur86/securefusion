@@ -57,6 +57,13 @@ class Main {
 	 * @var     object
 	 */
 	protected $middleware;
+	/**
+	 * Protected variables
+	 *
+	 * @access  protected
+	 * @var     object
+	 */
+	protected $recaptcha;
 
 	/**
 	 * Protected variables
@@ -74,58 +81,95 @@ class Main {
 	public function __construct() {
 		// Default values.
 		$default_settings = array(
-			'disable_xmlrpc'                => '0',
-			'disable_xmlrpc_user_login'     => '1',
-			'disable_xmlrpc_pingback'       => '1',
-			'disable_self_pingback'         => '1',
-			'ip_time_limit'                 => '2',
-			'ip_login_limit'                => '5',
-			'ip_attempt_window'             => '10',
-			'cleanup_ip_days'               => '30',
-			'cleanup_ip_attempts'           => '10',
-			'custom_login_url'              => '',
-			'change_login_error'            => '',
-			'change_admin_id'               => '',
-			'filter_bad_requests'           => '1',
-			'disable_rest_api'              => '1',
-			'hide_versions'                 => '1',
-			'bad_bots'                      => '1',
-			'http_headers'                  => '1',
-			'cookie_patterns'               => '',
-			'request_patterns'              => '',
-			'max_payload_size'              => '4096',
+			'disable_xmlrpc'                  => '0',
+			'disable_xmlrpc_user_login'       => '1',
+			'disable_xmlrpc_pingback'         => '1',
+			'disable_self_pingback'           => '1',
+			'ip_time_limit'                   => '2',
+			'ip_login_limit'                  => '5',
+			'ip_attempt_window'               => '10',
+			'cleanup_ip_days'                 => '30',
+			'cleanup_ip_attempts'             => '10',
+			'custom_login_url'                => '',
+			'change_login_error'              => '',
+			'change_admin_id'                 => '',
+			'filter_bad_requests'             => '1',
+			'disable_rest_api'                => '1',
+			'hide_versions'                   => '1',
+			'bad_bots'                        => '1',
+			'http_headers'                    => '1',
+			'cookie_patterns'                 => '',
+			'request_patterns'                => '',
+			'max_payload_size'                => '4096',
 
-			'enable_csp_style'              => '0',
-			'enable_csp_script'             => '0',
-			'enable_csp_font'               => '0',
-			'enable_csp_img'                => '0',
-			'enable_csp_frame'              => '0',
-			'enable_csp_worker'             => '0',
-			'csp_upgrade_insecure_requests' => '0',
-			'csp_block_all_mixed_content'   => '0',
-			'csp_sandbox'                   => '0',
+			'enable_csp_style'                => '0',
+			'enable_csp_script'               => '0',
+			'enable_csp_font'                 => '0',
+			'enable_csp_img'                  => '0',
+			'enable_csp_frame'                => '0',
+			'enable_csp_worker'               => '0',
+			'csp_upgrade_insecure_requests'   => '0',
+			'csp_block_all_mixed_content'     => '0',
+			'csp_sandbox'                     => '0',
+
+			// CSP Connect-src.
+			'enable_csp_connect'              => '0',
+			'csp_allowed_connect_sources'     => 'https://www.google-analytics.com' . PHP_EOL . 'https://*.google-analytics.com',
+
+			// CSP Media-src.
+			'enable_csp_media'                => '0',
+			'csp_allowed_media_sources'       => 'https://www.youtube.com' . PHP_EOL . 'https://player.vimeo.com',
+
+			// CSP Form-action.
+			'enable_csp_form_action'          => '0',
+			'csp_allowed_form_action_sources' => '\'self\'',
+
+			// CSP Base-uri.
+			'enable_csp_base_uri'             => '0',
+			'csp_allowed_base_uri_sources'    => '\'self\'',
+
+			// CSP Reporting.
+			'enable_csp_report_only'          => '0',
+			'csp_report_uri'                  => '',
+
+			// Advanced HTTP Headers.
+			'enable_coop'                     => '0',
+			'enable_hsts_preload'             => '0',
+			'enable_hsts_subdomains'          => '0',
+
+			// reCAPTCHA.
+			'recaptcha_enable'                => '0',
+			'recaptcha_site_key'              => '',
+			'recaptcha_secret_key'            => '',
+			'recaptcha_version'               => 'v2_checkbox',
+			'recaptcha_login'                 => '0',
+			'recaptcha_register'              => '0',
+			'recaptcha_lostpassword'          => '0',
+			'recaptcha_comment'               => '0',
+			'recaptcha_cf7'                   => '0',
+			'recaptcha_mc4wp'                 => '0',
 
 			/**
 			 * WARNING: 'unsafe-inline' is needed for compatibility with many WordPress plugins,
 			 * but it is a security risk. The ideal solution is a nonce-based policy,
 			 * which is complex to implement across a theme and plugins.
 			 */
-			'csp_allowed_style_sources'     => '\'unsafe-inline\'' . PHP_EOL .
+			'csp_allowed_style_sources'       => '\'unsafe-inline\'' . PHP_EOL .
 				'https://fonts.googleapis.com' . PHP_EOL .
 				'https://cdnjs.cloudflare.com' . PHP_EOL .
 				'https://www.googletagmanager.com',
-			'csp_allowed_script_sources'    => '\'unsafe-inline\'' . PHP_EOL .
+			'csp_allowed_script_sources'      => '\'unsafe-inline\'' . PHP_EOL .
 				'https://www.googletagmanager.com',
-			'csp_allowed_font_sources'      => 'data:' . PHP_EOL .
+			'csp_allowed_font_sources'        => 'data:' . PHP_EOL .
 				'https://fonts.gstatic.com' . PHP_EOL .
 				'https://cdnjs.cloudflare.com',
-			'csp_allowed_img_sources'       => 'data:' . PHP_EOL .
+			'csp_allowed_img_sources'         => 'data:' . PHP_EOL .
 				'https://secure.gravatar.com' . PHP_EOL .
 				'https://s.w.org',
-			'csp_allowed_frame_sources'     => 'data:' . PHP_EOL .
+			'csp_allowed_frame_sources'       => 'data:' . PHP_EOL .
 				'https://youtube.com' . PHP_EOL .
 				'https://www.youtube.com',
-			'csp_allowed_worker_sources'    => 'blob:',
+			'csp_allowed_worker_sources'      => 'blob:',
 		);
 
 		$this->default_settings = $default_settings;
@@ -135,6 +179,7 @@ class Main {
 		$this->ssl_control = new Sources\SSLControl();
 		$this->xmlrpc      = new Sources\XMLRPC();
 		$this->middleware  = new Sources\Middleware();
+		$this->recaptcha   = new Sources\ReCaptcha();
 		$comments_block    = new Sources\CommentsBlock();
 
 		add_action( 'admin_init', array( 'PAnD', 'init' ) );
@@ -150,6 +195,9 @@ class Main {
 
 		// LOGIN.
 		add_action( 'init', array( $this->login, 'init' ) );
+
+		// RECAPTCHA.
+		add_action( 'init', array( $this->recaptcha, 'init' ) );
 
 		// SSL CONTROL.
 		add_action( 'plugins_loaded', array( $this->ssl_control, 'init' ) );
