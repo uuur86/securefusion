@@ -80,20 +80,10 @@ window.secureFusionRecaptchaInit = function() {
 				'theme': 'light'
 			});
 		} else if (version === 'v2_invisible') {
-			grecaptcha.render(el, {
+			var widgetId = grecaptcha.render(el, {
 				'sitekey': sitekey,
 				'size': 'invisible',
 				'callback': function(token) {
-					var form = el.closest('form');
-					if (form) {
-						form.submit();
-					}
-				}
-			});
-		} else if (version === 'v3') {
-			grecaptcha.ready(function() {
-				grecaptcha.execute(sitekey, { action: 'submit' }).then(function(token) {
-					// Check if hidden input already exists
 					var form = el.closest('form');
 					if (form) {
 						var hiddenInput = form.querySelector('input[name="g-recaptcha-response"]');
@@ -104,9 +94,62 @@ window.secureFusionRecaptchaInit = function() {
 							form.appendChild(hiddenInput);
 						}
 						hiddenInput.value = token;
+						form.dataset.recaptchaSubmitting = 'true';
+
+						var submitBtn = form.querySelector('input[type="submit"], button[type="submit"], #submit');
+						if (submitBtn) {
+							submitBtn.click();
+						} else {
+							form.submit();
+						}
 					}
-				});
+				}
 			});
+
+			if (form) {
+				var submitBtn = form.querySelector('input[type="submit"], button[type="submit"], #submit');
+				if (submitBtn) {
+					submitBtn.addEventListener('click', function(event) {
+						if (form.dataset.recaptchaSubmitting === 'true') {
+							return;
+						}
+						event.preventDefault();
+						grecaptcha.execute(widgetId);
+					});
+				} else {
+					form.addEventListener('submit', function(event) {
+						if (form.dataset.recaptchaSubmitting === 'true') {
+							return;
+						}
+						event.preventDefault();
+						grecaptcha.execute(widgetId);
+					});
+				}
+			}
+		} else if (version === 'v3') {
+			var refreshV3Token = function() {
+				grecaptcha.ready(function() {
+					grecaptcha.execute(sitekey, { action: 'submit' }).then(function(token) {
+						var form = el.closest('form');
+						if (form) {
+							var hiddenInput = form.querySelector('input[name="g-recaptcha-response"]');
+							if (!hiddenInput) {
+								hiddenInput = document.createElement('input');
+								hiddenInput.type = 'hidden';
+								hiddenInput.name = 'g-recaptcha-response';
+								form.appendChild(hiddenInput);
+							}
+							hiddenInput.value = token;
+						}
+					});
+				});
+			};
+
+			// Initial token fetch on load
+			refreshV3Token();
+
+			// Refresh token every 90 seconds (reCAPTCHA v3 tokens expire in 2 minutes)
+			setInterval(refreshV3Token, 90000);
 		}
 	});
 };

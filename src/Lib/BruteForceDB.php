@@ -1057,41 +1057,23 @@ class BruteForceDB {
 			$expiration = time() + (int) $duration_seconds;
 		}
 
+		$now = time();
 		// phpcs:disable
-		$existing_id = $this->wpdb->get_var(
+		$result = $this->wpdb->query(
 			$this->wpdb->prepare(
-				"SELECT id FROM {$this->ip_rules_table} WHERE ip = %s LIMIT 1",
-				$ip
+				"INSERT INTO {$this->ip_rules_table} (ip, rule_type, created_at, expiration)
+				 VALUES (%s, %s, %d, %d)
+				 ON DUPLICATE KEY UPDATE rule_type = %s, created_at = %d, expiration = %d",
+				$ip,
+				'blocked',
+				$now,
+				$expiration,
+				'blocked',
+				$now,
+				$expiration
 			)
 		);
 		// phpcs:enable
-
-		if ( $existing_id ) {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
-			$result = $this->wpdb->update(
-				$this->ip_rules_table,
-				array(
-					'rule_type'  => 'blocked',
-					'created_at' => time(),
-					'expiration' => $expiration,
-				),
-				array( 'id' => $existing_id ),
-				array( '%s', '%d', '%d' ),
-				array( '%d' )
-			);
-		} else {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
-			$result = $this->wpdb->insert(
-				$this->ip_rules_table,
-				array(
-					'ip'         => $ip,
-					'rule_type'  => 'blocked',
-					'created_at' => time(),
-					'expiration' => $expiration,
-				),
-				array( '%s', '%s', '%d', '%d' )
-			);
-		}
 
 		$this->invalidate_cache_for_ip( $ip );
 		\wp_cache_delete( 'securefusion_bf_whitelisted_' . md5( $ip ), self::CACHE_GROUP );
@@ -1299,39 +1281,21 @@ class BruteForceDB {
 			return true;
 		}
 
+		$now = time();
 		// phpcs:disable
-		$existing_id = $this->wpdb->get_var(
+		$result = $this->wpdb->query(
 			$this->wpdb->prepare(
-				"SELECT id FROM {$this->ip_rules_table} WHERE ip = %s LIMIT 1",
-				$ip
+				"INSERT INTO {$this->ip_rules_table} (ip, rule_type, created_at, expiration)
+				 VALUES (%s, %s, %d, 0)
+				 ON DUPLICATE KEY UPDATE rule_type = %s, created_at = %d, expiration = 0",
+				$ip,
+				'whitelisted',
+				$now,
+				'whitelisted',
+				$now
 			)
 		);
-		 // phpcs:enable
-
-		if ( $existing_id ) {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
-			$result = $this->wpdb->update(
-				$this->ip_rules_table,
-				array(
-					'rule_type'  => 'whitelisted',
-					'created_at' => time(),
-				),
-				array( 'id' => $existing_id ),
-				array( '%s', '%d' ),
-				array( '%d' )
-			);
-		} else {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
-			$result = $this->wpdb->insert(
-				$this->ip_rules_table,
-				array(
-					'ip'         => $ip,
-					'rule_type'  => 'whitelisted',
-					'created_at' => time(),
-				),
-				array( '%s', '%s', '%d' )
-			);
-		}
+		// phpcs:enable
 
 		$this->invalidate_cache_for_ip( $ip );
 		\wp_cache_delete( 'securefusion_bf_blocked_' . md5( $ip ), self::CACHE_GROUP );
