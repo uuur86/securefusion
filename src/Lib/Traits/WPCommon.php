@@ -254,6 +254,99 @@ trait WPCommon {
 
 
 	/**
+	 * Check if IP is in a CIDR range
+	 *
+	 * @param string $ip   IP address.
+	 * @param string $cidr CIDR block.
+	 *
+	 * @return bool
+	 */
+	public function ip_in_cidr( $ip, $cidr ) {
+		if ( strpos( $cidr, '/' ) === false ) {
+			$cidr .= ( strpos( $cidr, ':' ) === false ? '/32' : '/128' );
+		}
+		list( $subnet, $bits ) = explode( '/', $cidr );
+
+		$ip_bytes     = inet_pton( $ip );
+		$subnet_bytes = inet_pton( $subnet );
+
+		if ( $ip_bytes === false || $subnet_bytes === false ) {
+			return false;
+		}
+
+		if ( strlen( $ip_bytes ) !== strlen( $subnet_bytes ) ) {
+			return false;
+		}
+
+		$ip_bin = '';
+		foreach ( str_split( $ip_bytes ) as $char ) {
+			$ip_bin .= str_pad( decbin( ord( $char ) ), 8, '0', STR_PAD_LEFT );
+		}
+
+		$subnet_bin = '';
+		foreach ( str_split( $subnet_bytes ) as $char ) {
+			$subnet_bin .= str_pad( decbin( ord( $char ) ), 8, '0', STR_PAD_LEFT );
+		}
+
+		return substr( $ip_bin, 0, (int) $bits ) === substr( $subnet_bin, 0, (int) $bits );
+	}
+
+
+
+	/**
+	 * Check if IP is a known trusted proxy (like Cloudflare, Sucuri)
+	 *
+	 * @param string $ip The IP to check.
+	 *
+	 * @return bool True if trusted, false otherwise.
+	 */
+	public function is_trusted_proxy_ip( $ip ) {
+		$trusted_proxies = [
+			// Cloudflare IPv4.
+			'173.245.48.0/20',
+			'103.21.244.0/22',
+			'103.22.200.0/22',
+			'103.31.4.0/22',
+			'141.101.64.0/18',
+			'108.162.192.0/18',
+			'190.93.240.0/20',
+			'188.114.96.0/20',
+			'197.234.240.0/22',
+			'198.41.128.0/17',
+			'162.158.0.0/15',
+			'104.16.0.0/13',
+			'104.24.0.0/14',
+			'172.64.0.0/13',
+			'131.0.72.0/22',
+			// Cloudflare IPv6.
+			'2400:cb00::/32',
+			'2606:4700::/32',
+			'2803:f800::/32',
+			'2405:b500::/32',
+			'2405:8100::/32',
+			'2a06:98c0::/29',
+			'2c0f:f248::/32',
+			// Sucuri IPv4.
+			'192.88.134.0/23',
+			'185.93.228.0/22',
+			'66.248.200.0/22',
+			'208.109.0.0/22',
+			// Sucuri IPv6.
+			'2a02:fe80::/29',
+		];
+
+		foreach ( $trusted_proxies as $proxy ) {
+			if ( $this->ip_in_cidr( $ip, $proxy ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+
+
+	/**
 	 * Get client IP
 	 *
 	 * @return string Client IP.
@@ -262,15 +355,22 @@ trait WPCommon {
 		$server_var  = wp_unslash( $_SERVER );
 		$remote_addr = isset( $server_var['REMOTE_ADDR'] ) ? trim( $server_var['REMOTE_ADDR'] ) : '';
 
-		// If REMOTE_ADDR is a public IP, trust it directly to prevent spoofing via custom headers.
-		if ( ! empty( $remote_addr ) && $this->is_public_ip( $remote_addr ) ) {
+		// If REMOTE_ADDR is a known trusted proxy (e.g. Cloudflare, Sucuri), we should check forwarding headers.
+		$is_trusted_proxy = $this->is_trusted_proxy_ip( $remote_addr );
+
+		// If REMOTE_ADDR is a public IP and NOT a trusted proxy, trust it directly to prevent spoofing via custom headers.
+		if ( ! empty( $remote_addr ) && $this->is_public_ip( $remote_addr ) && ! $is_trusted_proxy ) {
 			return $remote_addr;
 		}
 
-		// Otherwise, if REMOTE_ADDR is a private IP (e.g. Docker proxy, local env), check forwarding headers.
+		// Otherwise, if REMOTE_ADDR is a private IP (e.g. Docker proxy, local env) OR a trusted proxy, check forwarding headers.
 		$ipaddress = '';
 
-		if ( isset( $server_var['HTTP_CLIENT_IP'] ) ) {
+		if ( isset( $server_var['HTTP_CF_CONNECTING_IP'] ) ) {
+			$ipaddress = $server_var['HTTP_CF_CONNECTING_IP'];
+		} elseif ( isset( $server_var['HTTP_TRUE_CLIENT_IP'] ) ) {
+			$ipaddress = $server_var['HTTP_TRUE_CLIENT_IP'];
+		} elseif ( isset( $server_var['HTTP_CLIENT_IP'] ) ) {
 			$ipaddress = $server_var['HTTP_CLIENT_IP'];
 		} elseif ( isset( $server_var['HTTP_X_FORWARDED_FOR'] ) ) {
 			$ipaddress = $server_var['HTTP_X_FORWARDED_FOR'];
