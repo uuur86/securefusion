@@ -870,6 +870,7 @@ class BruteForceDB {
 		\wp_cache_delete( 'securefusion_bf_total_rows', self::CACHE_GROUP );
 		\wp_cache_delete( 'securefusion_bf_total_ip_ranges', self::CACHE_GROUP );
 		\wp_cache_delete( 'securefusion_bf_blocked_rules', self::CACHE_GROUP );
+		\wp_cache_delete( 'securefusion_bf_whitelisted_rules', self::CACHE_GROUP );
 	}
 
 
@@ -1305,6 +1306,46 @@ class BruteForceDB {
 
 
 	/**
+	 * Get all whitelisted IP and range rules.
+	 *
+	 * Uses caching to avoid repeated DB queries on every request.
+	 *
+	 * @return array Array of IP/Range strings.
+	 */
+	public function get_whitelisted_rules() {
+		$cache_key = 'securefusion_bf_whitelisted_rules';
+		$cached    = \wp_cache_get( $cache_key, self::CACHE_GROUP );
+
+		if ( false !== $cached ) {
+			return $cached;
+		}
+
+		// phpcs:disable
+		$rows = $this->wpdb->get_results(
+			$this->wpdb->prepare(
+				"SELECT ip FROM {$this->ip_rules_table} WHERE rule_type = %s",
+				'whitelisted'
+			),
+			ARRAY_A
+		);
+		// phpcs:enable
+
+		if ( ! is_array( $rows ) ) {
+			$rows = [];
+		}
+
+		$rules = [];
+		foreach ( $rows as $row ) {
+			$rules[] = $row['ip'];
+		}
+
+		\wp_cache_set( $cache_key, $rules, self::CACHE_GROUP, self::CACHE_TTL );
+
+		return $rules;
+	}
+
+
+	/**
 	 * Check if an IP address is whitelisted.
 	 *
 	 * @param string $ip The IP address to check.
@@ -1318,16 +1359,31 @@ class BruteForceDB {
 			return (bool) $cached;
 		}
 
-		// phpcs:disable
-		$rule_type = $this->wpdb->get_var(
-			$this->wpdb->prepare(
-				"SELECT rule_type FROM {$this->ip_rules_table} WHERE ip = %s LIMIT 1",
-				$ip
-			)
-		);
-		 // phpcs:enable
+		$whitelisted_rules = $this->get_whitelisted_rules();
+		$exact_rules       = [];
+		$cidr_rules        = [];
 
-		$result = ( $rule_type === 'whitelisted' );
+		foreach ( $whitelisted_rules as $rule ) {
+			if ( strpos( $rule, '/' ) === false ) {
+				$exact_rules[ $rule ] = true;
+			} else {
+				$cidr_rules[] = $rule;
+			}
+		}
+
+		$result = false;
+
+		if ( isset( $exact_rules[ $ip ] ) ) {
+			$result = true;
+		} else {
+			foreach ( $cidr_rules as $rule ) {
+				if ( $this->ip_in_range( $ip, $rule ) ) {
+					$result = true;
+					break;
+				}
+			}
+		}
+
 		\wp_cache_set( $cache_key, $result ? 1 : 0, self::CACHE_GROUP, self::CACHE_TTL );
 
 		return $result;

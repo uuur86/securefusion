@@ -3,7 +3,7 @@ Contributors: codeplusdev, ugurbicer
 Tags: firewall, security, anti-spam, ssl, xml-rpc
 Requires at least: 5.3
 Tested up to: 7.0
-Stable tag: 2.0.2
+Stable tag: 2.0.3
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 Requires PHP: 7.4
@@ -92,6 +92,14 @@ If you have any questions, you can post [a support request](https://wordpress.or
 
 
 == Changelog ==
+
+= 2.0.3 =
+* Fixed: Google reCAPTCHA not displaying and preventing login on custom login paths.
+* Fixed: WP-CLI warning and redirect loops during plugin deactivation and initialization.
+* Fixed: CSP settings input validation to allow wildcard (`*`) and wildcard subdomains.
+* Fixed: Removed automatic `www` and apex domain normalizations from CSP sources.
+* Fixed: Excluded whitelisted IPs and authenticated API requests (with credentials/cookies) from the Max Payload Size limit.
+* Improved: Added CIDR range checks for whitelisted IPs in the firewall database.
 
 = 2.0.2 =
 * Added: Google reCAPTCHA Integration supporting v2 Checkbox, v2 Invisible, and v3 versions.

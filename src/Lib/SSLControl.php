@@ -26,6 +26,10 @@ class SSLControl {
 	 * Initialize SSL control.
 	 */
 	public function init() {
+		if ( defined( 'WP_CLI' ) && \WP_CLI ) {
+			return;
+		}
+
 		if ( ! is_admin() && $this->get_settings( 'enable_https' ) !== 'https' ) {
 			return;
 		}

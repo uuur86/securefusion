@@ -135,6 +135,8 @@ class Login {
 			// if url is equal to new login page.
 			if ( $this->is_login_page( false ) ) {
 				global $error, $pagenow, $interim_login;
+				// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+				$pagenow = 'wp-login.php';
 				require_once ABSPATH . 'wp-login.php';
 				exit;
 			}

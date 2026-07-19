@@ -155,8 +155,54 @@
 
 			function validateUrl(value) {
 				if (!value) return false;
-				if (value === "'self'" || value === "'none'" || value.indexOf('data:') === 0) return true;
-				return /^(https?:\/\/)?[\w\-\.]+(\.?\w{2,})+$/.test(value);
+
+				// CSP quoted keywords.
+				var csp_keywords = [
+					"'self'",
+					"'unsafe-inline'",
+					"'unsafe-eval'",
+					"'none'",
+					"'strict-dynamic'",
+					"'unsafe-hashes'",
+					"'report-sample'",
+					"'wasm-unsafe-eval'"
+				];
+				if (csp_keywords.indexOf(value) !== -1) {
+					return true;
+				}
+
+				// Wildcard.
+				if (value === '*') {
+					return true;
+				}
+
+				// Nonces.
+				if (/^'nonce-[A-Za-z0-9+\/=]+'$/.test(value)) {
+					return true;
+				}
+
+				// Hashes.
+				if (/^'sha(256|384|512)-[A-Za-z0-9+\/=]+'$/.test(value)) {
+					return true;
+				}
+
+				// Scheme-only.
+				if (/^[a-z][a-z0-9+\-.]*:$/i.test(value)) {
+					return true;
+				}
+
+				// Full URL with scheme (including potential wildcard in host: e.g. https://*.example.com)
+				if (/^https?:\/\/.+/i.test(value)) {
+					return true;
+				}
+
+				// Host source with optional wildcard subdomain: example.com, *.example.com.
+				// Must not contain whitespace or semicolons.
+				if (!/[\s;]/.test(value) && /^(\*\.)?[a-z0-9][a-z0-9.\-]*[a-z0-9]$/i.test(value)) {
+					return true;
+				}
+
+				return false;
 			}
 
 			function validateRegex(value) {

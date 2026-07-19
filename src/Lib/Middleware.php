@@ -37,6 +37,10 @@ class Middleware {
 	 * @return void
 	 */
 	public function init() {
+		if ( defined( 'WP_CLI' ) && \WP_CLI ) {
+			return;
+		}
+
 		global $wp;
 
 		$this->brute_force_db = new BruteForceDB();
@@ -103,6 +107,47 @@ class Middleware {
 
 		if ( $max_payload_size <= 0 ) {
 			return;
+		}
+
+		// Skip if IP is whitelisted (exact or range).
+		if ( $this->brute_force_db->is_ip_whitelisted( $ip ) ) {
+			return;
+		}
+
+		// Skip if it is an API request sent with credentials.
+		// 1. Check HTTP Authorization headers (Basic Auth, Application Passwords, Bearer/OAuth tokens).
+		$has_credentials = ! empty( $_SERVER['HTTP_AUTHORIZATION'] ) || ! empty( $_SERVER['PHP_AUTH_USER'] ) || ! empty( $_SERVER['PHP_AUTH_PW'] );
+
+		// 2. Check WooCommerce API key parameters.
+		// Use filter_input() to avoid direct superglobal processing while still
+		// detecting API credential requests.
+		if ( ! $has_credentials ) {
+			$consumer_key_get  = filter_input( INPUT_GET, 'consumer_key', FILTER_UNSAFE_RAW );
+			$consumer_key_post = filter_input( INPUT_POST, 'consumer_key', FILTER_UNSAFE_RAW );
+
+			if ( ! empty( $consumer_key_get ) || ! empty( $consumer_key_post ) ) {
+				$has_credentials = true;
+			}
+		}
+
+		// 3. Check WordPress authentication cookies
+		if ( ! $has_credentials && ! empty( $_COOKIE ) ) {
+			foreach ( $_COOKIE as $cookie_name => $cookie_value ) {
+				if ( strpos( $cookie_name, 'wordpress_logged_in_' ) === 0 ) {
+					$has_credentials = true;
+					break;
+				}
+			}
+		}
+
+		if ( $has_credentials ) {
+			// Only skip if it's an API request (wp-json, xmlrpc.php, or admin-ajax.php).
+			$request_uri    = isset( $_SERVER['REQUEST_URI'] ) ? sanitize_url( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
+			$is_api_request = ( strpos( $request_uri, '/wp-json/' ) !== false ) || ( strpos( $request_uri, 'xmlrpc.php' ) !== false ) || ( strpos( $request_uri, 'admin-ajax.php' ) !== false );
+
+			if ( $is_api_request ) {
+				return;
+			}
 		}
 
 		// Skip multipart uploads entirely.
@@ -694,7 +739,7 @@ class Middleware {
 		}
 
 		// 2. Allow internal WordPress executions (Admin dashboard, AJAX, Cron, WP-CLI).
-		if ( is_admin() || ( defined( 'DOING_AJAX' ) && DOING_AJAX ) || ( defined( 'DOING_CRON' ) && DOING_CRON ) || ( defined( 'WP_CLI' ) && WP_CLI ) ) {
+		if ( is_admin() || ( defined( 'DOING_AJAX' ) && DOING_AJAX ) || ( defined( 'DOING_CRON' ) && DOING_CRON ) || ( defined( 'WP_CLI' ) && \WP_CLI ) ) {
 			return true;
 		}
 

@@ -99,62 +99,12 @@ class CSP {
 		$sources    = preg_split( '/\s+/', trim( $sources_string ) );
 		$normalized = [];
 
-		// Keywords and schemes to ignore.
-		$keywords = [
-			"'self'",
-			"'unsafe-inline'",
-			"'unsafe-eval'",
-			"'none'",
-			"'strict-dynamic'",
-			"'unsafe-hashes'",
-			"'report-sample'",
-			"'wasm-unsafe-eval'",
-			'*',
-			'data:',
-			'blob:',
-			'mediastream:',
-			'filesystem:',
-			'https:',
-			'http:',
-		];
-
 		foreach ( $sources as $source ) {
 			if ( empty( $source ) ) {
 				continue;
 			}
 
-			// Add the original source.
 			$normalized[] = $source;
-
-			// Skip keywords, nonces, and hashes.
-			if ( in_array( strtolower( $source ), $keywords, true ) ) {
-				continue;
-			}
-			if ( strpos( $source, "'nonce-" ) === 0 || strpos( $source, "'sha" ) === 0 ) {
-				continue;
-			}
-
-			// Parse scheme if present.
-			$scheme      = '';
-			$domain_part = $source;
-			if ( preg_match( '#^([a-z][a-z0-9+\-.]*://)(.+)#i', $source, $matches ) ) {
-				$scheme      = $matches[1];
-				$domain_part = $matches[2];
-			}
-
-			// Process domain part.
-			if ( strpos( $domain_part, 'www.' ) === 0 ) {
-				// www.example.com -> example.com.
-				$apex         = substr( $domain_part, 4 );
-				$normalized[] = $scheme . $apex;
-			} elseif ( strpos( $domain_part, '*.' ) === 0 ) {
-				// *.example.com -> example.com.
-				$apex         = substr( $domain_part, 2 );
-				$normalized[] = $scheme . $apex;
-			} elseif ( ! preg_match( '/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}(:\d+)?$/', $domain_part ) && strpos( $domain_part, '.' ) !== false ) {
-				// example.com -> www.example.com.
-				$normalized[] = $scheme . 'www.' . $domain_part;
-			}
 		}
 
 		// Remove duplicates while keeping order.

@@ -6,15 +6,14 @@
 
 	$(document).ready(
 		function() {
-            $( '#wp-submit' ).on( 'click',
-                function( event ) {
-                event.preventDefault();
-                let parent  = $( '#wp-submit' ).parents( 'form' );
-
-                parent.attr( 'action',
-                    parent.attr( 'action' ).replace( 'wp-login.php' , new_url ) ).submit();
-                }
-            );
-        }
+			if ( typeof new_url !== 'undefined' && new_url ) {
+				$( 'form' ).each( function() {
+					let action = $( this ).attr( 'action' );
+					if ( action && action.indexOf( 'wp-login.php' ) !== -1 ) {
+						$( this ).attr( 'action', action.replace( 'wp-login.php', new_url ) );
+					}
+				});
+			}
+		}
 	);
 } )(jQuery);
