@@ -98,6 +98,7 @@ If you have any questions, you can post [a support request](https://wordpress.or
 * Improved: Removed a DNS lookup that ran on every REST API request from visitors.
 * Added: `securefusion_rest_protected_services` and `securefusion_rest_allow_request` filters.
 * Added: "Hide Usernames from Visitors" (on by default). `?author=N` answers 404 instead of redirecting to the author archive, anonymous visitors cannot read the REST users endpoint (also through `_embed`), administrators are left out of the users sitemap, and oEmbed author data and comment CSS classes no longer reveal login names. Author archives keep working.
+* Improved: Settings page redesign. On network sub-sites every setting shows the network value; changing a value customizes it for this site and "Use network setting" brings the network value back. Clearer names and descriptions for every setting.
 
 = 2.0.3 =
 * Fixed: Google reCAPTCHA not displaying and preventing login on custom login paths.

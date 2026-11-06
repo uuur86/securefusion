@@ -68,6 +68,13 @@ class Admin {
 	 */
 	protected $layered = false;
 
+	/**
+	 * Setting keys of every settings section, keyed by section name.
+	 *
+	 * @var array<string,string[]>
+	 */
+	protected $section_keys = array();
+
 	use WPCommon;
 
 
@@ -430,7 +437,7 @@ class Admin {
 					esc_html__( 'Redirects the front page protocol from HTTP to HTTPS.', 'secuplug' )
 				);
 				$this->add_status_box(
-					esc_html__( 'Filter Bad Requests', 'secuplug' ),
+					esc_html__( 'Filter malicious requests', 'secuplug' ),
 					$filter_bad_requests,
 					esc_html__( 'Helps secure your site against attacks like XSS, CSRF, and Code Injections.', 'secuplug' )
 				);
@@ -501,43 +508,47 @@ class Admin {
 	 * @return void
 	 */
 	public function get_settings_html() {
-		$ssl_cond  = empty( get_transient( 'securefusion_ssl_cert_data' ) );
-		$ssl_error = esc_html__( 'Only use this if you have an SSL certificate; otherwise, it cannot be enabled.', 'secuplug' );
+		$has_ssl     = ! empty( get_transient( 'securefusion_ssl_cert_data' ) );
+		$sub_site    = $this->layered && 'site' === $this->context;
+		$customized  = $this->customized_counts();
+		$total       = array_sum( $customized );
+		$allowed_ssl = array(
+			'a'      => array(
+				'href'   => array(),
+				'target' => array(),
+				'rel'    => array(),
+			),
+			'strong' => array(),
+		);
 
-		if ( $ssl_cond ) {
-			$ssl_error = '<p style="color:red">' .
-					esc_html__( 'ERROR! You don’t have any valid SSL certificate. ', 'secuplug' ) .
-				'</p>' .
+		if ( $has_ssl ) {
+			$ssl_notice = esc_html__( 'Turn these on only after your site opens without warnings at https://.', 'secuplug' );
+		} else {
+			$ssl_notice = '<strong>' . esc_html__( 'No valid SSL certificate was found for this site, so HTTPS options cannot be turned on.', 'secuplug' ) . '</strong> ' .
+				esc_html__( 'Many hosts install a free certificate for you. Free providers:', 'secuplug' ) . ' ' .
+				'<a href="https://letsencrypt.org/" target="_blank" rel="noopener">Let&#8217;s Encrypt</a>, ' .
+				'<a href="https://www.cloudflare.com/" target="_blank" rel="noopener">Cloudflare</a>. ' .
+				esc_html__( 'Paid providers:', 'secuplug' ) . ' ' .
+				'<a href="https://sectigo.com/" target="_blank" rel="noopener">Sectigo</a>, ' .
+				'<a href="https://www.digicert.com/" target="_blank" rel="noopener">DigiCert</a>.';
+		}
 
-				'<p>' .
+		$tabs = array(
+			'xmlrpc'            => array( 'xmlrpc_settings', esc_html__( 'XML-RPC', 'secuplug' ) ),
+			'login'             => array( 'login_settings', esc_html__( 'Login', 'secuplug' ) ),
+			'ssl'               => array( 'ssl_settings', esc_html__( 'HTTPS', 'secuplug' ) ),
+			'active_guard'      => array( 'active_guard_settings', esc_html__( 'Firewall', 'secuplug' ) ),
+			'security_policies' => array( 'security_policies_settings', esc_html__( 'Content Security Policy', 'secuplug' ) ),
+			'recaptcha'         => array( 'recaptcha_settings', esc_html__( 'reCAPTCHA', 'secuplug' ) ),
+			'advanced'          => array( 'advanced_settings', esc_html__( 'Advanced', 'secuplug' ) ),
+		);
 
-					'<b>' . esc_html__( 'Free SSL certificate providers', 'secuplug' ) . '</b> : ' .
-
-					'<a href="https://letsencrypt.org/" target="_blank">' .
-					esc_html__( 'Let’s Encrypt', 'secuplug' ) .
-					'</a>' .
-
-					' or <a href="https://www.cloudflare.com/" target="_blank">' .
-					esc_html__( 'Cloudflare', 'secuplug' ) .
-					'</a>' .
-
-					'<br />' .
-
-					'<b>Paid SSL certificate providers</b> : ' .
-
-					'<a href="https://sectigo.com/" target="_blank">' .
-					esc_html__( 'Comodo / Sectigo', 'secuplug' ) .
-					'</a>' .
-
-					' or <a href="https://www.digicert.com" target="_blank">' .
-					esc_html__( 'Digicert', 'secuplug' ) .
-					'</a>' .
-
-				'</p>';
+		if ( 'network' === $this->context ) {
+			$tabs['network_policy'] = array( 'network_policy_settings', esc_html__( 'Network policy', 'secuplug' ) );
 		}
 
 		?>
-		<div class="wrap fynd-sf-settings">
+		<div class="wrap fynd-sf-settings fsf">
 
 			<?php
 			/*
@@ -546,116 +557,120 @@ class Admin {
 			 * outside our styled header component.
 			 */
 			?>
-			<h1 class="fynd-sf-sr-only"><?php esc_html_e( 'SecureFusion Security Settings', 'secuplug' ); ?></h1>
+			<h1 class="fynd-sf-sr-only"><?php esc_html_e( 'SecureFusion settings', 'secuplug' ); ?></h1>
 
 			<?php
 			if ( 'network' === $this->context ) {
 				$this->render_header(
-					esc_html__( 'SecureFusion Network Settings', 'secuplug' ),
-					esc_html__( 'Defaults for every site in the network. Sites can customize single settings if the network policy allows it.', 'secuplug' )
+					esc_html__( 'Network security settings', 'secuplug' ),
+					esc_html__( 'Defaults for every site in the network.', 'secuplug' )
 				);
 			} else {
 				$this->render_header(
-					esc_html__( 'SecureFusion Security Settings', 'secuplug' ),
-					esc_html__( 'You can manage your WordPress security settings.', 'secuplug' )
+					esc_html__( 'Security settings', 'secuplug' ),
+					esc_html__( 'Choose which protections run on this site.', 'secuplug' )
 				);
 			}
 
-			if ( $this->layered && 'site' === $this->context ) {
+			if ( $sub_site ) {
 				?>
-				<div class="notice notice-info inline">
-					<p><?php esc_html_e( 'This site uses the network settings. Turn on "Customize for this site" next to a setting to change it only here. Turn it off to go back to the network value.', 'secuplug' ); ?></p>
+				<div class="fsf-context" role="note">
+					<span class="fsf-context__title"><?php esc_html_e( 'This site follows the network settings.', 'secuplug' ); ?></span>
+					<span class="fsf-context__text">
+						<?php
+						if ( $total > 0 ) {
+							/* translators: %s: number of settings customized for this site. */
+							echo esc_html( sprintf( _n( '%s setting is customized for this site.', '%s settings are customized for this site.', $total, 'secuplug' ), number_format_i18n( $total ) ) ) . ' ';
+						}
+						esc_html_e( 'Change a value to customize it for this site only. "Use network setting" brings the network value back.', 'secuplug' );
+						?>
+					</span>
+				</div>
+				<?php
+			}
+
+			if ( $this->settings_page->is_ready() ) {
+				?>
+				<div class="fsf-panel">
+					<h2 class="nav-tab-wrapper fsf-tabs">
+						<?php foreach ( $tabs as $tab_id => $tab ) : ?>
+							<a href="#<?php echo esc_attr( $tab_id ); ?>" class="nav-tab">
+								<?php echo esc_html( $tab[1] ); ?>
+								<?php if ( ! empty( $customized[ $tab[0] ] ) ) : ?>
+									<span class="fsf-tab__count" title="<?php esc_attr_e( 'Customized for this site', 'secuplug' ); ?>">
+										<?php echo esc_html( number_format_i18n( $customized[ $tab[0] ] ) ); ?>
+										<span class="screen-reader-text"><?php esc_html_e( 'customized for this site', 'secuplug' ); ?></span>
+									</span>
+								<?php endif; ?>
+							</a>
+						<?php endforeach; ?>
+					</h2>
+
+					<div class="content-box">
+						<?php $this->settings_page->form_start(); ?>
+						<div class="content-tab-wrapper">
+							<?php foreach ( $tabs as $tab_id => $tab ) : ?>
+								<div class="tab-content hidden" id="fynd-sf-<?php echo esc_attr( $tab_id ); ?>">
+									<?php $this->settings_page->run_section( $tab[0] ); ?>
+
+									<?php if ( 'ssl' === $tab_id ) : ?>
+										<div class="<?php echo esc_attr( $has_ssl ? 'fynd-sf-tab-notice' : 'fynd-sf-tab-notice fynd-sf-tab-notice-error' ); ?>">
+											<p><?php echo wp_kses( $ssl_notice, $allowed_ssl ); ?></p>
+										</div>
+									<?php elseif ( 'advanced' === $tab_id ) : ?>
+										<div class="fynd-sf-tab-notice fynd-sf-tab-notice-error">
+											<p><?php esc_html_e( 'Wrong patterns can block normal visitors or let attacks through. Change them only if you know regular expressions.', 'secuplug' ); ?></p>
+										</div>
+									<?php endif; ?>
+								</div>
+							<?php endforeach; ?>
+						</div>
+
+						<div class="fsf-foot">
+							<button type="submit" name="submit" id="submit" class="fsf-btn fsf-btn--primary"><?php esc_html_e( 'Save settings', 'secuplug' ); ?></button>
+							<span class="fsf-foot__hint">
+								<?php
+								if ( $sub_site ) {
+									esc_html_e( 'Saves every tab. Settings that follow the network are not stored for this site.', 'secuplug' );
+								} else {
+									esc_html_e( 'Saves every tab.', 'secuplug' );
+								}
+								?>
+							</span>
+						</div>
+						</form>
+					</div>
 				</div>
 				<?php
 			}
 			?>
-			<?php
-			if ( $this->settings_page->is_ready() ) {
-				?>
-				<h2 class="nav-tab-wrapper">
-					<a href="#xmlrpc" class="nav-tab">
-						<span class="dashicons dashicons-networking"></span>
-						<?php esc_html_e( 'XMLRPC', 'secuplug' ); ?>
-					</a>
-					<a href="#login" class="nav-tab">
-						<span class="dashicons dashicons-admin-users"></span>
-						<?php esc_html_e( 'Login', 'secuplug' ); ?>
-					</a>
-					<a href="#ssl" class="nav-tab">
-						<span class="dashicons dashicons-admin-network"></span>
-						<?php esc_html_e( 'SSL', 'secuplug' ); ?>
-					</a>
-					<a href="#active_guard" class="nav-tab">
-						<span class="dashicons dashicons-shield"></span>
-						<?php esc_html_e( 'Active Guard', 'secuplug' ); ?>
-					</a>
-					<a href="#security_policies" class="nav-tab">
-						<span class="dashicons dashicons-clipboard"></span>
-						<?php esc_html_e( 'Security Policies', 'secuplug' ); ?>
-					</a>
-					<a href="#recaptcha" class="nav-tab">
-						<span class="dashicons dashicons-google"></span>
-						<?php esc_html_e( 'reCAPTCHA', 'secuplug' ); ?>
-					</a>
-					<a href="#advanced" class="nav-tab">
-						<span class="dashicons dashicons-warning"></span>
-						<?php esc_html_e( 'Advanced', 'secuplug' ); ?>
-					</a>
-					<?php if ( 'network' === $this->context ) : ?>
-						<a href="#network_policy" class="nav-tab">
-							<span class="dashicons dashicons-admin-multisite"></span>
-							<?php esc_html_e( 'Network Policy', 'secuplug' ); ?>
-						</a>
-					<?php endif; ?>
-				</h2>
-				<div class="content-box">
-					<?php $this->settings_page->form_start(); ?>
-					<div class="content-tab-wrapper">
-						<div class="tab-content" id="fynd-sf-xmlrpc">
-							<?php $this->settings_page->run_section( 'xmlrpc_settings' ); ?>
-						</div>
-						<div class="tab-content hidden" id="fynd-sf-login">
-							<?php $this->settings_page->run_section( 'login_settings' ); ?>
-						</div>
-						<div class="tab-content hidden" id="fynd-sf-ssl">
-							<?php $this->settings_page->run_section( 'ssl_settings' ); ?>
-							<div class="fynd-sf-tab-notice fynd-sf-tab-notice-error">
-								<p><?php echo wp_kses_post( $ssl_error ); ?></p>
-							</div>
-						</div>
-						<div class="tab-content hidden" id="fynd-sf-active_guard">
-							<?php $this->settings_page->run_section( 'active_guard_settings' ); ?>
-						</div>
-						<div class="tab-content hidden" id="fynd-sf-security_policies">
-							<?php $this->settings_page->run_section( 'security_policies_settings' ); ?>
-						</div>
-						<div class="tab-content hidden" id="fynd-sf-recaptcha">
-							<?php $this->settings_page->run_section( 'recaptcha_settings' ); ?>
-						</div>
-						<div class="tab-content hidden" id="fynd-sf-advanced">
-							<?php $this->settings_page->run_section( 'advanced_settings' ); ?>
-							<div class="fynd-sf-tab-notice fynd-sf-tab-notice-error">
-								<p>
-									<?php esc_html_e( "If you don't have experience in cybersecurity or regular expressions, do not modify these areas.", 'secuplug' ); ?>
-								</p>
-							</div>
-						</div>
-						<?php if ( 'network' === $this->context ) : ?>
-							<div class="tab-content hidden" id="fynd-sf-network_policy">
-								<?php $this->settings_page->run_section( 'network_policy_settings' ); ?>
-							</div>
-						<?php endif; ?>
-					<?php
-					$submit_text = esc_html__( 'Save Settings', 'secuplug' );
-					?>
-					<p class="submit">
-						<input type="submit" name="submit" id="submit" class="fynd-sf-btn fynd-sf-btn-primary" value="<?php echo esc_attr( $submit_text ); ?>" style="height: auto; padding: 8px 20px; font-size: 14px;">
-					</p>
-					</form>
-				</div>
-			</div>
-				<?php
-			}
+		</div>
+		<?php
+	}
+
+
+	/**
+	 * Number of settings this site customizes, per settings section.
+	 *
+	 * Only meaningful on a sub-site of a network; empty otherwise. Bounded by the
+	 * number of settings (a few dozen keys).
+	 *
+	 * @return array<string,int> Section name => count.
+	 */
+	protected function customized_counts() {
+		$counts = array();
+
+		if ( ! $this->layered || 'site' !== $this->context ) {
+			return $counts;
+		}
+
+		$own = array_diff( array_keys( Settings::site_values() ), Settings::NETWORK_ONLY );
+
+		foreach ( $this->section_keys as $section => $keys ) {
+			$counts[ $section ] = count( array_intersect( $keys, $own ) );
+		}
+
+		return $counts;
 	}
 
 
@@ -701,15 +716,15 @@ class Admin {
 			[
 				// Section info.
 				'name'  => 'xmlrpc_settings',
-				'title' => esc_html__( 'XML-RPC SETTINGS', 'secuplug' ),
-				'desc'  => esc_html__( 'You can prevent XML-RPC attacks.', 'secuplug' ),
+				'title' => esc_html__( 'XML-RPC', 'secuplug' ),
+				'desc'  => esc_html__( 'XML-RPC is an older remote publishing interface. Attackers use it to try many passwords in a single request. Most sites do not need it.', 'secuplug' ),
 				// Form items.
 				'items' => [
 					[
 						'type'    => 'radio',
 						'name'    => 'disable_xmlrpc',
 						'default' => '0',
-						'label'   => esc_html__( 'Disable All XML-RPC Services', 'secuplug' ),
+						'label'   => esc_html__( 'Turn off XML-RPC completely', 'secuplug' ),
 						'options' => [
 							[
 								'value' => '0',
@@ -720,13 +735,13 @@ class Admin {
 								'label' => esc_html__( 'Yes', 'secuplug' ),
 							],
 						],
-						'after'   => '<p class="description">' . esc_html__( 'Enabling this option will completely disable XML-RPC functionality, which can prevent certain types of attacks but may affect integrations with other systems and applications.', 'secuplug' ) . '</p>',
+						'after'   => '<p class="description">' . esc_html__( 'Blocks every XML-RPC request. Apps that publish through XML-RPC (older mobile apps, some Jetpack features) stop working.', 'secuplug' ) . '</p>',
 					],
 					[
 						'type'    => 'radio',
 						'name'    => 'disable_xmlrpc_user_login',
 						'default' => '0',
-						'label'   => esc_html__( 'Disable XML-RPC Login Service', 'secuplug' ),
+						'label'   => esc_html__( 'Block logins through XML-RPC', 'secuplug' ),
 						'options' => [
 							[
 								'value' => '0',
@@ -737,13 +752,13 @@ class Admin {
 								'label' => esc_html__( 'Yes', 'secuplug' ),
 							],
 						],
-						'after'   => '<p class="description">' . esc_html__( 'If checked, this will disable login capability through XML-RPC. This helps prevent brute force attacks but may affect some legitimate XML-RPC uses.', 'secuplug' ) . '</p>',
+						'after'   => '<p class="description">' . esc_html__( 'Stops password guessing through XML-RPC. Leave this on unless an app signs in to your site through XML-RPC.', 'secuplug' ) . '</p>',
 					],
 					[
 						'type'    => 'radio',
 						'name'    => 'disable_xmlrpc_pingback',
 						'default' => '0',
-						'label'   => esc_html__( 'Disable XML-RPC Pingback Service', 'secuplug' ),
+						'label'   => esc_html__( 'Block pingbacks', 'secuplug' ),
 						'options' => [
 							[
 								'value' => '0',
@@ -754,13 +769,13 @@ class Admin {
 								'label' => esc_html__( 'Yes', 'secuplug' ),
 							],
 						],
-						'after'   => '<p class="description">' . esc_html__( 'Pingbacks can be abused for DDoS attacks. Disabling this will prevent pingbacks, improving security.', 'secuplug' ) . '</p>',
+						'after'   => '<p class="description">' . esc_html__( 'Attackers can use pingbacks to make your site send traffic floods to other sites.', 'secuplug' ) . '</p>',
 					],
 					[
 						'type'    => 'radio',
 						'name'    => 'disable_self_pingback',
 						'default' => '0',
-						'label'   => esc_html__( 'Disable Self Pingback Service', 'secuplug' ),
+						'label'   => esc_html__( 'Block pingbacks to your own posts', 'secuplug' ),
 						'options' => [
 							[
 								'value' => '0',
@@ -771,22 +786,23 @@ class Admin {
 								'label' => esc_html__( 'Yes', 'secuplug' ),
 							],
 						],
-						'after'   => '<p class="description">' . esc_html__( 'WordPress generates pingbacks to its own posts by default. This option disables such self-pingbacks.', 'secuplug' ) . '</p>',
+						'after'   => '<p class="description">' . esc_html__( 'WordPress pings your own posts when you link between them. This only adds noise to your comments.', 'secuplug' ) . '</p>',
 					],
 				],
 			],
 			[
 				// Section info.
 				'name'  => 'active_guard_settings',
-				'title' => esc_html__( 'ACTIVE GUARD SETTINGS', 'secuplug' ),
-				'desc'  => esc_html__( 'Active guard and firewall settings. (Beta)', 'secuplug' ),
+				'title' => esc_html__( 'Firewall', 'secuplug' ),
+				'desc'  => esc_html__( 'Checks requests before WordPress handles them and hides details that attackers look for. The request filter is in beta.', 'secuplug' ),
 				// Form items.
 				'items' => [
 					[
 						'type'    => 'radio',
 						'name'    => 'filter_bad_requests',
 						'default' => '0',
-						'label'   => esc_html__( 'Filter Bad Requests', 'secuplug' ),
+						'label'   => esc_html__( 'Filter malicious requests', 'secuplug' ),
+						'after'   => '<p class="description">' . esc_html__( 'Blocks requests that contain common attack patterns such as code injection and cross-site scripting. The patterns are on the Advanced tab.', 'secuplug' ) . '</p>',
 						'options' => [
 							[
 								'value' => '0',
@@ -802,7 +818,8 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'disable_rest_api',
 						'default' => '0',
-						'label'   => esc_html__( 'Disable Rest API for Visitors', 'secuplug' ),
+						'label'   => esc_html__( 'Close the REST API to visitors', 'secuplug' ),
+						'after'   => '<p class="description">' . esc_html__( 'Visitors who are not logged in cannot read posts, pages, users or settings through /wp-json/wp/v2/. The API index and the endpoints of other plugins stay open.', 'secuplug' ) . '</p>',
 						'options' => [
 							[
 								'value' => '0',
@@ -818,7 +835,8 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'hide_usernames',
 						'default' => '1',
-						'label'   => esc_html__( 'Hide Usernames from Visitors', 'secuplug' ),
+						'label'   => esc_html__( 'Hide usernames from visitors', 'secuplug' ),
+						'after'   => '<p class="description">' . esc_html__( 'Stops the common ways to find login names: ?author=1 links, the REST users list, administrators in the users sitemap and oEmbed author data. Author pages keep working.', 'secuplug' ) . '</p>',
 						'options' => [
 							[
 								'value' => '0',
@@ -834,7 +852,8 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'hide_versions',
 						'default' => '0',
-						'label'   => esc_html__( 'Hide apache and PHP version', 'secuplug' ),
+						'label'   => esc_html__( 'Hide server and PHP versions', 'secuplug' ),
+						'after'   => '<p class="description">' . esc_html__( 'Removes the Server and X-Powered-By response headers that reveal software versions.', 'secuplug' ) . '</p>',
 						'options' => [
 							[
 								'value' => '0',
@@ -851,6 +870,7 @@ class Admin {
 						'name'    => 'bad_bots',
 						'default' => '0',
 						'label'   => esc_html__( 'Block bad bots', 'secuplug' ),
+						'after'   => '<p class="description">' . esc_html__( 'Blocks requests whose user agent matches the bad bot list (by default libwww-perl).', 'secuplug' ) . '</p>',
 						'options' => [
 							[
 								'value' => '0',
@@ -866,7 +886,8 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'http_headers',
 						'default' => '0',
-						'label'   => esc_html__( 'Add HTTP Headers for Browser Security', 'secuplug' ),
+						'label'   => esc_html__( 'Send browser security headers', 'secuplug' ),
+						'after'   => '<p class="description">' . esc_html__( 'Sends X-Frame-Options, X-Content-Type-Options, Referrer-Policy and HSTS (2 years). HSTS makes browsers refuse plain HTTP for your domain, so turn this on only if HTTPS works on your site.', 'secuplug' ) . '</p>',
 						'options' => [
 							[
 								'value' => '0',
@@ -882,8 +903,8 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'enable_coop',
 						'default' => '0',
-						'label'   => esc_html__( 'Enable Cross-Origin-Opener-Policy (COOP)', 'secuplug' ),
-						'after'   => '<p class="description">' . esc_html__( 'Sets COOP to same-origin. This mitigates cross-origin leaks, but can break pop-up OAuth flows (like Google/Facebook login). Disable if you use external login popups.', 'secuplug' ) . '</p>',
+						'label'   => esc_html__( 'Isolate pages from other windows (COOP)', 'secuplug' ),
+						'after'   => '<p class="description">' . esc_html__( 'Sends Cross-Origin-Opener-Policy: same-origin. This blocks some cross-site leaks but breaks sign-in pop-ups such as "Sign in with Google". Leave it off if you use them.', 'secuplug' ) . '</p>',
 						'options' => [
 							[
 								'value' => '0',
@@ -899,8 +920,8 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'enable_hsts_subdomains',
 						'default' => '0',
-						'label'   => esc_html__( 'HSTS: Include Subdomains', 'secuplug' ),
-						'after'   => '<p class="description">' . esc_html__( 'Appends the includeSubDomains directive to the HSTS header. WARNING: Ensure all subdomains support HTTPS before enabling!', 'secuplug' ) . '</p>',
+						'label'   => esc_html__( 'HSTS: include subdomains', 'secuplug' ),
+						'after'   => '<p class="description">' . esc_html__( 'Tells browsers to use HTTPS on every subdomain too. Turn this on only if all your subdomains work over HTTPS.', 'secuplug' ) . '</p>',
 						'options' => [
 							[
 								'value' => '0',
@@ -916,8 +937,8 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'enable_hsts_preload',
 						'default' => '0',
-						'label'   => esc_html__( 'HSTS: Preload', 'secuplug' ),
-						'after'   => '<p class="description">' . esc_html__( 'Appends the preload directive to the HSTS header. WARNING: Once preloaded, the site must remain HTTPS-only permanently.', 'secuplug' ) . '</p>',
+						'label'   => esc_html__( 'HSTS: allow preloading', 'secuplug' ),
+						'after'   => '<p class="description">' . esc_html__( 'Adds the preload directive. Once your domain is on the browser preload lists, removal takes months and the site must stay HTTPS-only.', 'secuplug' ) . '</p>',
 						'options' => [
 							[
 								'value' => '0',
@@ -932,9 +953,9 @@ class Admin {
 					[
 						'type'   => 'text_input',
 						'name'   => 'max_payload_size',
-						'label'  => esc_html__( 'Max Payload Size (Bytes)', 'secuplug' ),
+						'label'  => esc_html__( 'Maximum request size', 'secuplug' ),
 						'before' => '',
-						'after'  => esc_html__( ' bytes', 'secuplug' ) . '<span class="field-tip"> ' . esc_html__( 'Maximum allowed request payload size (excluding file uploads). IPs exceeding this limit will be permanently blocked. Set 0 to disable. Default: 4096.', 'secuplug' ) . '</span>',
+						'after'  => esc_html__( ' bytes', 'secuplug' ) . '<span class="field-tip"> ' . esc_html__( 'Requests with a larger body (file uploads excluded) are rejected and their IP is blocked permanently. 0 turns the check off. Default: 4096.', 'secuplug' ) . '</span>',
 					],
 				],
 
@@ -942,15 +963,15 @@ class Admin {
 			[
 				// Section info.
 				'name'  => 'security_policies_settings',
-				'title' => esc_html__( 'SECURITY POLICIES', 'secuplug' ),
-				'desc'  => esc_html__( 'Content Security Policy (CSP) configurations.', 'secuplug' ),
+				'title' => esc_html__( 'Content Security Policy', 'secuplug' ),
+				'desc'  => esc_html__( 'Tells browsers which sources may load styles, scripts, fonts, images and frames on your pages. Needs "Send browser security headers" on the Firewall tab. Test a policy in report-only mode before you enforce it.', 'secuplug' ),
 				// Form items.
 				'items' => [
 					[
 						'type'    => 'radio',
 						'name'    => 'enable_csp_style',
 						'default' => $this->default_settings['enable_csp_style'] ?? '0',
-						'label'   => esc_html__( 'Enable CSP Style Sources', 'secuplug' ),
+						'label'   => esc_html__( 'Limit style sources', 'secuplug' ),
 						'options' => [
 							[
 								'value' => '0',
@@ -965,7 +986,7 @@ class Admin {
 					[
 						'type'              => 'taginput',
 						'name'              => 'csp_allowed_style_sources',
-						'label'             => esc_html__( 'CSP Allowed Style Sources', 'secuplug' ),
+						'label'             => esc_html__( 'Allowed style sources', 'secuplug' ),
 						'placeholder'       => 'fonts.googleapis.com',
 						'field_type'        => 'url',
 						'sanitize_callback' => [ CSP::class, 'validate_csp_source' ],
@@ -975,7 +996,7 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'enable_csp_script',
 						'default' => $this->default_settings['enable_csp_script'] ?? '0',
-						'label'   => esc_html__( 'Enable CSP Script Sources', 'secuplug' ),
+						'label'   => esc_html__( 'Limit script sources', 'secuplug' ),
 						'options' => [
 							[
 								'value' => '0',
@@ -990,7 +1011,7 @@ class Admin {
 					[
 						'type'              => 'taginput',
 						'name'              => 'csp_allowed_script_sources',
-						'label'             => esc_html__( 'CSP Allowed Script Sources', 'secuplug' ),
+						'label'             => esc_html__( 'Allowed script sources', 'secuplug' ),
 						'placeholder'       => 'googletagmanager.com',
 						'field_type'        => 'url',
 						'sanitize_callback' => [ CSP::class, 'validate_csp_source' ],
@@ -1000,7 +1021,7 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'enable_csp_font',
 						'default' => $this->default_settings['enable_csp_font'] ?? '0',
-						'label'   => esc_html__( 'Enable CSP Font Sources', 'secuplug' ),
+						'label'   => esc_html__( 'Limit font sources', 'secuplug' ),
 						'options' => [
 							[
 								'value' => '0',
@@ -1015,7 +1036,7 @@ class Admin {
 					[
 						'type'              => 'taginput',
 						'name'              => 'csp_allowed_font_sources',
-						'label'             => esc_html__( 'CSP Allowed Font Sources', 'secuplug' ),
+						'label'             => esc_html__( 'Allowed font sources', 'secuplug' ),
 						'placeholder'       => 'fonts.gstatic.com',
 						'field_type'        => 'url',
 						'sanitize_callback' => [ CSP::class, 'validate_csp_source' ],
@@ -1025,7 +1046,7 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'enable_csp_frame',
 						'default' => $this->default_settings['enable_csp_frame'] ?? '0',
-						'label'   => esc_html__( 'Enable CSP Frame Sources', 'secuplug' ),
+						'label'   => esc_html__( 'Limit frame sources (embeds)', 'secuplug' ),
 						'options' => [
 							[
 								'value' => '0',
@@ -1040,7 +1061,7 @@ class Admin {
 					[
 						'type'              => 'taginput',
 						'name'              => 'csp_allowed_frame_sources',
-						'label'             => esc_html__( 'CSP Frame Sources (iframe embed)', 'secuplug' ),
+						'label'             => esc_html__( 'Allowed frame sources', 'secuplug' ),
 						'placeholder'       => 'youtube.com',
 						'field_type'        => 'url',
 						'sanitize_callback' => [ CSP::class, 'validate_csp_source' ],
@@ -1050,7 +1071,7 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'enable_csp_worker',
 						'default' => $this->default_settings['enable_csp_worker'] ?? '0',
-						'label'   => esc_html__( 'Enable CSP Worker Sources', 'secuplug' ),
+						'label'   => esc_html__( 'Limit worker sources', 'secuplug' ),
 						'options' => [
 							[
 								'value' => '0',
@@ -1065,7 +1086,7 @@ class Admin {
 					[
 						'type'              => 'taginput',
 						'name'              => 'csp_allowed_worker_sources',
-						'label'             => esc_html__( 'CSP Worker Sources', 'secuplug' ),
+						'label'             => esc_html__( 'Allowed worker sources', 'secuplug' ),
 						'placeholder'       => 'blob:',
 						'field_type'        => 'url',
 						'sanitize_callback' => [ CSP::class, 'validate_csp_source' ],
@@ -1075,7 +1096,7 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'enable_csp_img',
 						'default' => $this->default_settings['enable_csp_img'] ?? '0',
-						'label'   => esc_html__( 'Enable CSP Image Sources', 'secuplug' ),
+						'label'   => esc_html__( 'Limit image sources', 'secuplug' ),
 						'options' => [
 							[
 								'value' => '0',
@@ -1090,7 +1111,7 @@ class Admin {
 					[
 						'type'              => 'taginput',
 						'name'              => 'csp_allowed_img_sources',
-						'label'             => esc_html__( 'CSP Image Sources', 'secuplug' ),
+						'label'             => esc_html__( 'Allowed image sources', 'secuplug' ),
 						'placeholder'       => 'example.com',
 						'field_type'        => 'url',
 						'sanitize_callback' => [ CSP::class, 'validate_csp_source' ],
@@ -1100,8 +1121,8 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'csp_upgrade_insecure_requests',
 						'default' => $this->default_settings['csp_upgrade_insecure_requests'] ?? '0',
-						'label'   => esc_html__( 'Upgrade Insecure Requests', 'secuplug' ),
-						'after'   => '<p class="description">' . esc_html__( 'Instructs the browser to upgrade all HTTP requests to HTTPS.', 'secuplug' ) . '</p>',
+						'label'   => esc_html__( 'Upgrade HTTP requests to HTTPS', 'secuplug' ),
+						'after'   => '<p class="description">' . esc_html__( 'Browsers load every http:// resource on your pages over https:// instead.', 'secuplug' ) . '</p>',
 						'options' => [
 							[
 								'value' => '0',
@@ -1117,8 +1138,8 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'csp_block_all_mixed_content',
 						'default' => $this->default_settings['csp_block_all_mixed_content'] ?? '0',
-						'label'   => esc_html__( 'Block All Mixed Content', 'secuplug' ),
-						'after'   => '<p class="description">' . esc_html__( 'Prevents loading any HTTP content on an HTTPS page.', 'secuplug' ) . '</p>',
+						'label'   => esc_html__( 'Block mixed content', 'secuplug' ),
+						'after'   => '<p class="description">' . esc_html__( 'Browsers refuse to load http:// resources on https:// pages.', 'secuplug' ) . '</p>',
 						'options' => [
 							[
 								'value' => '0',
@@ -1134,8 +1155,8 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'csp_sandbox',
 						'default' => $this->default_settings['csp_sandbox'] ?? '0',
-						'label'   => esc_html__( 'Sandbox', 'secuplug' ),
-						'after'   => '<p class="description">' . esc_html__( 'Enables a sandbox for the requested resource similar to the iframe sandbox attribute. This can block some features of your website (like payment gateway integration). Use with caution!', 'secuplug' ) . '</p>',
+						'label'   => esc_html__( 'Sandbox pages', 'secuplug' ),
+						'after'   => '<p class="description">' . esc_html__( 'Applies the restrictions of a sandboxed iframe to your pages. This breaks forms, pop-ups and payment gateways on most sites. Use it only if you know you need it.', 'secuplug' ) . '</p>',
 						'options' => [
 							[
 								'value' => '0',
@@ -1151,7 +1172,7 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'enable_csp_connect',
 						'default' => $this->default_settings['enable_csp_connect'] ?? '0',
-						'label'   => esc_html__( 'Enable CSP Connect Sources', 'secuplug' ),
+						'label'   => esc_html__( 'Limit connection sources', 'secuplug' ),
 						'options' => [
 							[
 								'value' => '0',
@@ -1166,7 +1187,7 @@ class Admin {
 					[
 						'type'              => 'taginput',
 						'name'              => 'csp_allowed_connect_sources',
-						'label'             => esc_html__( 'CSP Allowed Connect Sources', 'secuplug' ),
+						'label'             => esc_html__( 'Allowed connection sources', 'secuplug' ),
 						'placeholder'       => 'google-analytics.com',
 						'field_type'        => 'url',
 						'sanitize_callback' => [ CSP::class, 'validate_csp_source' ],
@@ -1176,7 +1197,7 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'enable_csp_media',
 						'default' => $this->default_settings['enable_csp_media'] ?? '0',
-						'label'   => esc_html__( 'Enable CSP Media Sources', 'secuplug' ),
+						'label'   => esc_html__( 'Limit audio and video sources', 'secuplug' ),
 						'options' => [
 							[
 								'value' => '0',
@@ -1191,7 +1212,7 @@ class Admin {
 					[
 						'type'              => 'taginput',
 						'name'              => 'csp_allowed_media_sources',
-						'label'             => esc_html__( 'CSP Allowed Media Sources', 'secuplug' ),
+						'label'             => esc_html__( 'Allowed media sources', 'secuplug' ),
 						'placeholder'       => 'youtube.com',
 						'field_type'        => 'url',
 						'sanitize_callback' => [ CSP::class, 'validate_csp_source' ],
@@ -1201,7 +1222,7 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'enable_csp_form_action',
 						'default' => $this->default_settings['enable_csp_form_action'] ?? '0',
-						'label'   => esc_html__( 'Enable CSP Form Action', 'secuplug' ),
+						'label'   => esc_html__( 'Limit form targets', 'secuplug' ),
 						'options' => [
 							[
 								'value' => '0',
@@ -1216,7 +1237,7 @@ class Admin {
 					[
 						'type'              => 'taginput',
 						'name'              => 'csp_allowed_form_action_sources',
-						'label'             => esc_html__( 'CSP Allowed Form Action Sources', 'secuplug' ),
+						'label'             => esc_html__( 'Allowed form targets', 'secuplug' ),
 						'placeholder'       => '\'self\'',
 						'field_type'        => 'url',
 						'sanitize_callback' => [ CSP::class, 'validate_csp_source' ],
@@ -1226,7 +1247,7 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'enable_csp_base_uri',
 						'default' => $this->default_settings['enable_csp_base_uri'] ?? '0',
-						'label'   => esc_html__( 'Enable CSP Base URI', 'secuplug' ),
+						'label'   => esc_html__( 'Limit the base URL', 'secuplug' ),
 						'options' => [
 							[
 								'value' => '0',
@@ -1241,7 +1262,7 @@ class Admin {
 					[
 						'type'              => 'taginput',
 						'name'              => 'csp_allowed_base_uri_sources',
-						'label'             => esc_html__( 'CSP Allowed Base URI Sources', 'secuplug' ),
+						'label'             => esc_html__( 'Allowed base URLs', 'secuplug' ),
 						'placeholder'       => '\'self\'',
 						'field_type'        => 'url',
 						'sanitize_callback' => [ CSP::class, 'validate_csp_source' ],
@@ -1251,8 +1272,8 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'enable_csp_report_only',
 						'default' => $this->default_settings['enable_csp_report_only'] ?? '0',
-						'label'   => esc_html__( 'CSP Report-Only Mode (Test/Monitor)', 'secuplug' ),
-						'after'   => '<p class="description">' . esc_html__( 'Enabling this will log violations to the console/server but will not block any assets from loading. Recommended for initial testing.', 'secuplug' ) . '</p>',
+						'label'   => esc_html__( 'Report-only mode', 'secuplug' ),
+						'after'   => '<p class="description">' . esc_html__( 'Browsers report policy violations in the console (and to the report URL) but block nothing. Use it to test a policy before you enforce it.', 'secuplug' ) . '</p>',
 						'options' => [
 							[
 								'value' => '0',
@@ -1267,70 +1288,71 @@ class Admin {
 					[
 						'type'        => 'text_input',
 						'name'        => 'csp_report_uri',
-						'label'       => esc_html__( 'CSP Report URI', 'secuplug' ),
+						'label'       => esc_html__( 'Report URL', 'secuplug' ),
 						'placeholder' => 'https://report-uri.com/example',
-						'after'       => '<p class="description">' . esc_html__( 'URL where browsers should send report JSON payloads when CSP is violated.', 'secuplug' ) . '</p>',
+						'after'       => '<p class="description">' . esc_html__( 'Address where browsers send violation reports as JSON. Leave it empty to skip reporting.', 'secuplug' ) . '</p>',
 					],
 				],
 			],
 			[
 				// Section info.
 				'name'  => 'login_settings',
-				'title' => esc_html__( 'LOGIN SETTINGS - BE CAREFUL!', 'secuplug' ),
-				'desc'  => esc_html__( 'You can hide or secure your login page against attackers. Please save your new login url before you change it.', 'secuplug' ),
+				'title' => esc_html__( 'Login', 'secuplug' ),
+				'desc'  => esc_html__( 'Limits password guessing and can move the login page to an address only you know. Write down a new login address before you save it.', 'secuplug' ),
 				// Form items.
 				'items' => [
 					[
 						'type'   => 'text_input',
 						'name'   => 'ip_time_limit',
-						'label'  => esc_html__( 'Min. Wait Time', 'secuplug' ),
+						'label'  => esc_html__( 'Lockout duration', 'secuplug' ),
 						'before' => '',
-						'after'  => esc_html__( ' hour(s)', 'secuplug' ) . '<span class="field-tip"> ' . esc_html__( 'Minimum Wait Time After Failed Attempt', 'secuplug' ) . '</span>',
+						'after'  => esc_html__( ' hour(s)', 'secuplug' ) . '<span class="field-tip"> ' . esc_html__( 'How long an IP stays blocked after too many failed logins.', 'secuplug' ) . '</span>',
 					],
 					[
 						'type'   => 'text_input',
 						'name'   => 'ip_attempt_window',
-						'label'  => esc_html__( 'Attempt Tracking Window', 'secuplug' ),
+						'label'  => esc_html__( 'Counting window', 'secuplug' ),
 						'before' => '',
-						'after'  => esc_html__( ' minute(s)', 'secuplug' ) . '<span class="field-tip"> ' . esc_html__( 'Time frame to track failed login attempts', 'secuplug' ) . '</span>',
+						'after'  => esc_html__( ' minute(s)', 'secuplug' ) . '<span class="field-tip"> ' . esc_html__( 'Failed logins are counted within this period.', 'secuplug' ) . '</span>',
 					],
 					[
 						'type'   => 'text_input',
 						'name'   => 'ip_login_limit',
-						'label'  => esc_html__( 'Max. Attempt Limit', 'secuplug' ),
+						'label'  => esc_html__( 'Failed logins allowed', 'secuplug' ),
 						'before' => '',
-						'after'  => esc_html__( ' time(s)', 'secuplug' ) . '<span class="field-tip"> ' . esc_html__( 'Maximum Failed Login Attempt Limit', 'secuplug' ) . '</span>',
+						'after'  => esc_html__( ' attempts', 'secuplug' ) . '<span class="field-tip"> ' . esc_html__( 'An IP is blocked after this many failed logins within the counting window.', 'secuplug' ) . '</span>',
 					],
 					[
 						'type'   => 'text_input',
 						'name'   => 'cleanup_ip_days',
-						'label'  => esc_html__( 'Auto-Delete IPs: Older Than', 'secuplug' ),
+						'label'  => esc_html__( 'Forget IPs after', 'secuplug' ),
 						'before' => '',
-						'after'  => esc_html__( ' day(s)', 'secuplug' ) . '<span class="field-tip"> ' . esc_html__( 'Delete IPs inactive for this many days (0 to disable).', 'secuplug' ) . '</span>',
+						'after'  => esc_html__( ' day(s)', 'secuplug' ) . '<span class="field-tip"> ' . esc_html__( 'Removes IP records that were inactive for this many days. 0 keeps them.', 'secuplug' ) . '</span>',
 					],
 					[
 						'type'   => 'text_input',
 						'name'   => 'cleanup_ip_attempts',
-						'label'  => esc_html__( 'Auto-Delete IPs: Fewer Than', 'secuplug' ),
+						'label'  => esc_html__( 'Forget only IPs with fewer than', 'secuplug' ),
 						'before' => '',
-						'after'  => esc_html__( ' attempt(s)', 'secuplug' ) . '<span class="field-tip"> ' . esc_html__( 'Only delete IPs that have fewer than this many total attempts.', 'secuplug' ) . '</span>',
+						'after'  => esc_html__( ' failed logins', 'secuplug' ) . '<span class="field-tip"> ' . esc_html__( 'IPs with this many failed logins or more are kept.', 'secuplug' ) . '</span>',
 					],
 					[
 						'type'   => 'text_input',
 						'name'   => 'custom_login_url',
-						'label'  => esc_html__( 'Custom Login Path', 'secuplug' ),
+						'label'  => esc_html__( 'Login page address', 'secuplug' ),
 						'before' => '<span class="url-text">' . ( 'network' === $this->context ? esc_html__( '(site address)', 'secuplug' ) : esc_html( \get_home_url() ) ) . '/</span>',
-						'after'  => '<span class="field-tip">/ (For exam. : hidden-login)</span>',
+						'after'  => '<span class="url-text">/</span><span class="field-tip">' . esc_html__( 'Example: hidden-login. Leave it empty to keep the standard wp-login.php address.', 'secuplug' ) . '</span>',
 					],
 					[
 						'type'  => 'text_input',
 						'name'  => 'change_login_error',
-						'label' => esc_html__( 'Custom Login Error Message', 'secuplug' ),
+						'label' => esc_html__( 'Login error message', 'secuplug' ),
+						'after' => '<p class="description">' . esc_html__( 'Shown instead of the WordPress message, which tells attackers whether a username exists. Leave it empty to keep the WordPress message.', 'secuplug' ) . '</p>',
 					],
 					[
 						'type'   => 'text_input',
 						'name'   => 'change_admin_id',
-						'label'  => esc_html__( 'Your Admin ID', 'secuplug' ),
+						'label'  => esc_html__( 'Administrator user ID', 'secuplug' ),
 						'before' => 'Your current ID is ',
 						'after'  => ' for "' . $current_user->user_login . '". ' .
 							'<span class="field-tip">' .
@@ -1342,8 +1364,8 @@ class Admin {
 			[
 				// Section info.
 				'name'  => 'ssl_settings',
-				'title' => esc_html__( 'SSL SETTINGS', 'secuplug' ),
-				'desc'  => esc_html__( 'HTTPS/SSL security settings.', 'secuplug' ),
+				'title' => esc_html__( 'HTTPS', 'secuplug' ),
+				'desc'  => esc_html__( 'Moves logins, the admin area and visitors to HTTPS.', 'secuplug' ),
 				// Form items.
 				'items' => [
 					[
@@ -1351,7 +1373,8 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'enable_https',
 						'default' => '',
-						'label'   => esc_html__( 'HTTPS Support', 'secuplug' ),
+						'label'   => esc_html__( 'HTTPS support', 'secuplug' ),
+						'after'   => '<p class="description">' . esc_html__( 'Turn this on after your SSL certificate works. The options below need it.', 'secuplug' ) . '</p>',
 						'options' => [
 							[
 								'label' => esc_html__( 'Disabled', 'secuplug' ),
@@ -1368,7 +1391,7 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'force_login_https',
 						'default' => '',
-						'label'   => esc_html__( 'Force HTTPS on login page', 'secuplug' ),
+						'label'   => esc_html__( 'Use HTTPS on the login page', 'secuplug' ),
 						'options' => [
 							[
 								'label' => esc_html__( 'Disabled', 'secuplug' ),
@@ -1385,7 +1408,7 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'force_admin_https',
 						'default' => '',
-						'label'   => esc_html__( 'Force HTTPS on admin page', 'secuplug' ),
+						'label'   => esc_html__( 'Use HTTPS in the admin area', 'secuplug' ),
 						'options' => [
 							[
 								'label' => esc_html__( 'Disabled', 'secuplug' ),
@@ -1402,7 +1425,7 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'force_front_https',
 						'default' => '',
-						'label'   => esc_html__( 'Force HTTPS on front page', 'secuplug' ),
+						'label'   => esc_html__( 'Use HTTPS on the front page', 'secuplug' ),
 						'options' => [
 							[
 								'label' => esc_html__( 'Disabled', 'secuplug' ),
@@ -1419,7 +1442,7 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'force_site_https',
 						'default' => '',
-						'label'   => esc_html__( 'Force HTTPS site-wide', 'secuplug' ),
+						'label'   => esc_html__( 'Use HTTPS on the whole site', 'secuplug' ),
 						'options' => [
 							[
 								'label' => esc_html__( 'Disabled', 'secuplug' ),
@@ -1436,15 +1459,16 @@ class Admin {
 			[
 				// Section info.
 				'name'  => 'recaptcha_settings',
-				'title' => esc_html__( 'GOOGLE reCAPTCHA', 'secuplug' ),
-				'desc'  => esc_html__( 'Configure Google reCAPTCHA with lazy-loading for better PageSpeed performance.', 'secuplug' ),
+				'title' => esc_html__( 'reCAPTCHA', 'secuplug' ),
+				'desc'  => esc_html__( 'Adds a Google reCAPTCHA check to the forms you choose. The script loads lazily to keep pages fast.', 'secuplug' ),
 				// Form items.
 				'items' => [
 					[
 						'type'    => 'radio',
 						'name'    => 'recaptcha_enable',
 						'default' => $this->default_settings['recaptcha_enable'] ?? '0',
-						'label'   => esc_html__( 'Enable Google reCAPTCHA', 'secuplug' ),
+						'label'   => esc_html__( 'Use reCAPTCHA', 'secuplug' ),
+						'after'   => '<p class="description">' . esc_html__( 'Create the site key and the secret key in the Google reCAPTCHA admin console for this domain.', 'secuplug' ) . '</p>',
 						'options' => [
 							[
 								'value' => '0',
@@ -1459,20 +1483,20 @@ class Admin {
 					[
 						'type'        => 'text_input',
 						'name'        => 'recaptcha_site_key',
-						'label'       => esc_html__( 'Site Key', 'secuplug' ),
-						'placeholder' => esc_html__( 'Enter reCAPTCHA Site Key', 'secuplug' ),
+						'label'       => esc_html__( 'Site key', 'secuplug' ),
+						'placeholder' => esc_html__( 'reCAPTCHA site key', 'secuplug' ),
 					],
 					[
 						'type'        => 'text_input',
 						'name'        => 'recaptcha_secret_key',
-						'label'       => esc_html__( 'Secret Key', 'secuplug' ),
-						'placeholder' => esc_html__( 'Enter reCAPTCHA Secret Key', 'secuplug' ),
+						'label'       => esc_html__( 'Secret key', 'secuplug' ),
+						'placeholder' => esc_html__( 'reCAPTCHA secret key', 'secuplug' ),
 					],
 					[
 						'type'    => 'radio',
 						'name'    => 'recaptcha_version',
 						'default' => $this->default_settings['recaptcha_version'] ?? 'v2_checkbox',
-						'label'   => esc_html__( 'reCAPTCHA Version', 'secuplug' ),
+						'label'   => esc_html__( 'reCAPTCHA type', 'secuplug' ),
 						'options' => [
 							[
 								'value' => 'v2_checkbox',
@@ -1492,7 +1516,7 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'recaptcha_login',
 						'default' => $this->default_settings['recaptcha_login'] ?? '0',
-						'label'   => esc_html__( 'Enable on WordPress Login Form', 'secuplug' ),
+						'label'   => esc_html__( 'Login form', 'secuplug' ),
 						'options' => [
 							[
 								'value' => '0',
@@ -1508,7 +1532,7 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'recaptcha_register',
 						'default' => $this->default_settings['recaptcha_register'] ?? '0',
-						'label'   => esc_html__( 'Enable on WordPress Registration Form', 'secuplug' ),
+						'label'   => esc_html__( 'Registration form', 'secuplug' ),
 						'options' => [
 							[
 								'value' => '0',
@@ -1524,7 +1548,7 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'recaptcha_lostpassword',
 						'default' => $this->default_settings['recaptcha_lostpassword'] ?? '0',
-						'label'   => esc_html__( 'Enable on WordPress Lost Password Form', 'secuplug' ),
+						'label'   => esc_html__( 'Lost password form', 'secuplug' ),
 						'options' => [
 							[
 								'value' => '0',
@@ -1540,7 +1564,7 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'recaptcha_comment',
 						'default' => $this->default_settings['recaptcha_comment'] ?? '0',
-						'label'   => esc_html__( 'Enable on WordPress Comments Form', 'secuplug' ),
+						'label'   => esc_html__( 'Comment form', 'secuplug' ),
 						'options' => [
 							[
 								'value' => '0',
@@ -1556,7 +1580,7 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'recaptcha_cf7',
 						'default' => $this->default_settings['recaptcha_cf7'] ?? '0',
-						'label'   => esc_html__( 'Enable on Contact Form 7 Forms', 'secuplug' ),
+						'label'   => esc_html__( 'Contact Form 7 forms', 'secuplug' ),
 						'options' => [
 							[
 								'value' => '0',
@@ -1572,7 +1596,7 @@ class Admin {
 						'type'    => 'radio',
 						'name'    => 'recaptcha_mc4wp',
 						'default' => $this->default_settings['recaptcha_mc4wp'] ?? '0',
-						'label'   => esc_html__( 'Enable on Mailchimp for WP Forms', 'secuplug' ),
+						'label'   => esc_html__( 'Mailchimp for WP forms', 'secuplug' ),
 						'options' => [
 							[
 								'value' => '0',
@@ -1589,14 +1613,14 @@ class Admin {
 			[
 				// Section info.
 				'name'  => 'advanced_settings',
-				'title' => esc_html__( 'ADVANCED SETTINGS', 'secuplug' ),
-				'desc'  => esc_html__( 'Advanced security settings. `Filter Bad Requests` must be active for it to work.', 'secuplug' ),
+				'title' => esc_html__( 'Advanced', 'secuplug' ),
+				'desc'  => esc_html__( 'Patterns used by "Filter malicious requests" on the Firewall tab.', 'secuplug' ),
 				// Form items.
 				'items' => [
 					[
 						'type'              => 'taginput',
 						'name'              => 'cookie_patterns',
-						'label'             => esc_html__( 'Cookie Regex Patterns', 'secuplug' ),
+						'label'             => esc_html__( 'Cookie patterns', 'secuplug' ),
 						'placeholder'       => '[a-z0-9]+',
 						'field_type'        => 'regex',
 						'sanitize_callback' => function ( $value ) {
@@ -1608,7 +1632,7 @@ class Admin {
 					[
 						'type'              => 'taginput',
 						'name'              => 'request_patterns',
-						'label'             => esc_html__( 'Get/Post Request Regex Patterns', 'secuplug' ),
+						'label'             => esc_html__( 'Request patterns (GET and POST)', 'secuplug' ),
 						'placeholder'       => '(union|select|insert)\s+\w+',
 						'field_type'        => 'regex',
 						'sanitize_callback' => function ( $value ) {
@@ -1628,13 +1652,23 @@ class Admin {
 			$this->settings_page->set_fallback_values(
 				Settings::inherited_values(),
 				[
-					'locked'       => Settings::NETWORK_ONLY,
-					'label'        => esc_html__( 'Customize for this site', 'secuplug' ),
-					'source_label' => esc_html__( 'Network', 'secuplug' ),
-					'locked_label' => esc_html__( 'Set by the network administrator', 'secuplug' ),
-					'empty_label'  => esc_html__( '(empty)', 'secuplug' ),
+					'locked'        => Settings::NETWORK_ONLY,
+					'label'         => esc_html__( 'Customize for this site', 'secuplug' ),
+					'source_label'  => esc_html__( 'Network setting', 'secuplug' ),
+					'locked_label'  => esc_html__( 'Set by the network administrator', 'secuplug' ),
+					'empty_label'   => esc_html__( '(empty)', 'secuplug' ),
+					'revert_label'  => esc_html__( 'Use network setting', 'secuplug' ),
+					'auto_override' => true,
 				]
 			);
+		}
+
+		foreach ( $conf as $section ) {
+			if ( empty( $section['name'] ) || empty( $section['items'] ) || ! is_array( $section['items'] ) ) {
+				continue;
+			}
+
+			$this->section_keys[ $section['name'] ] = array_values( array_filter( wp_list_pluck( $section['items'], 'name' ) ) );
 		}
 
 		$this->settings_page->load_form( $conf );
@@ -1651,7 +1685,7 @@ class Admin {
 	protected function get_network_policy_section() {
 		return [
 			'name'  => 'network_policy_settings',
-			'title' => esc_html__( 'NETWORK POLICY', 'secuplug' ),
+			'title' => esc_html__( 'Network policy', 'secuplug' ),
 			'desc'  => esc_html__( 'Settings on this page are the defaults for every site in the network.', 'secuplug' ),
 			'items' => [
 				[
@@ -1760,6 +1794,7 @@ class Admin {
 	 */
 	public function admin_theme_styles() {
 		\wp_enqueue_style( 'securefusion-admin-theme-main-css', \plugins_url( 'assets/css/admin.css', SECUREFUSION_BASENAME ), array(), SECUREFUSION_VERSION );
+		\wp_enqueue_style( 'securefusion-bastion', \plugins_url( 'assets/css/bastion.css', SECUREFUSION_BASENAME ), array( 'securefusion-admin-theme-main-css' ), SECUREFUSION_VERSION );
 		\wp_enqueue_script( 'securefusion-admin-js', \plugins_url( 'assets/js/admin.js', SECUREFUSION_BASENAME ), array(), SECUREFUSION_VERSION, true );
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Non-state-changing query parameter check.
@@ -1966,18 +2001,25 @@ class Admin {
 		}
 
 		if ( $this->settings_page instanceof Wasp ) {
+			// Bastion templates; field types the theme does not list use wasp's defaults.
+			if ( method_exists( $this->settings_page, 'set_theme' ) ) {
+				$this->settings_page->set_theme( SECUREFUSION_PATH . 'assets/wasp/bastion.wasp.php' );
+			}
+
 			$this->settings_page->wp_form_init( [ $this, 'load' ] );
 
-			// Enable reset feature with factory defaults.
-			$this->settings_page->enable_reset(
-				[
-					'confirm_message' => esc_html__( 'Are you sure you want to reset this field to its default value?', 'secuplug' ),
-					'button_text'     => esc_html__( 'Reset', 'secuplug' ),
-					'button_class'    => 'fynd-sf-btn fynd-sf-btn-secondary',
-					'wrapper_class'   => 'wasp-reset-wrapper',
-				],
-				$this->default_settings
-			);
+			// On a sub-site "Use network setting" is the way back, so there is no factory reset.
+			if ( ! ( $this->layered && 'site' === $this->context ) ) {
+				$this->settings_page->enable_reset(
+					[
+						'confirm_message' => esc_html__( 'Restore the default value of this setting?', 'secuplug' ),
+						'button_text'     => esc_html__( 'Restore default', 'secuplug' ),
+						'button_class'    => 'fsf-link',
+						'wrapper_class'   => 'wasp-reset-wrapper',
+					],
+					$this->default_settings
+				);
+			}
 		}
 
 		\add_action( 'admin_menu', array( $this, 'admin_menu' ) );

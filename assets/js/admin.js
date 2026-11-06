@@ -107,28 +107,40 @@
 			var $inputRow = $wrapper.find('.taginput-input-row');
 			var $input = $wrapper.find('.taginput-input');
 			var $addBtn = $wrapper.find('.taginput-add-btn');
-			$addBtn.addClass('fynd-sf-btn fynd-sf-btn-primary fynd-sf-taginput-add-btn');
 			var $tags = $wrapper.find('.taginput-tags');
 			var $hidden = $wrapper.find('.taginput-hidden');
 			var $error = $wrapper.find('.taginput-error');
 			var $presets = $wrapper.find('.taginput-presets');
 
 			var fieldType = $wrapper.data('field-type') || 'url';
-			var currentValue = $hidden.val() || '';
-			// Replace pipe separator back to actual newline for tag display
-			// Also handle legacy &#10; HTML entities for backwards compatibility
-			currentValue = currentValue.replace(/\|/g, '\n').replace(/&#10;/g, '\n');
-			var tags = currentValue ? currentValue.split("\n") : [];
+			// The hidden value separates tags with "|" (legacy: &#10;); see renderFromHidden().
+			var tags = [];
 
-			// Render existing tags
-			tags.forEach(function (tag) {
-				if (tag.trim()) {
-					appendTag(tag.trim());
-				}
-			});
+			// Render the tags stored in the hidden field.
+			function renderFromHidden() {
+				var value = ($hidden.val() || '').replace(/\|/g, '\n').replace(/&#10;/g, '\n');
+
+				tags = [];
+				$tags.empty();
+
+				value.split('\n').forEach(function (tag) {
+					tag = tag.trim();
+					if (tag && tags.indexOf(tag) === -1) {
+						tags.push(tag);
+						appendTag(tag);
+					}
+				});
+			}
+
+			renderFromHidden();
+
+			// "Use network setting" restored the hidden value: show the restored tags.
+			$wrapper.closest('.wasp-inheritable').on('wasp:inherit-revert', renderFromHidden);
 
 			function appendTag(tag) {
-				var $tag = $('<span class="taginput-tag">' + tag + '<span class="taginput-remove" title="Remove">&times;</span></span>');
+				// Build the tag with text nodes: values come from settings and must not become markup.
+				var $tag = $('<span class="taginput-tag"></span>').text(tag);
+				$tag.append($('<span class="taginput-remove"></span>').attr('title', 'Remove').text('\u00d7'));
 				$tag.find('.taginput-remove').on('click', function () {
 					removeTag(tag);
 					$(this).parent().remove();
@@ -151,6 +163,9 @@
 				var unique = tags.filter(function (t, i, arr) { return arr.indexOf(t) === i; });
 				tags = unique;
 				$hidden.val(tags.join("|"));
+
+				// Let listeners (wasp auto override) know the value changed.
+				$hidden[0].dispatchEvent(new Event('change', { bubbles: true }));
 			}
 
 			function validateUrl(value) {
