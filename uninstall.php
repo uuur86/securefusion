@@ -49,6 +49,8 @@ function securefusion_uninstall_site_data() {
 	$wasp->remove_settings();
 
 	delete_option( 'securefusion_db_version' );
+	delete_option( 'securefusion_settings_layer' );
+	delete_option( 'securefusion_settings_backup_premultisite' );
 
 	// ──────────────────────────────────────────────
 	// 2. Per-site Transients.
@@ -137,6 +139,11 @@ function securefusion_uninstall_network_data() {
 	$wasp->remove_settings();
 
 	delete_site_option( 'securefusion_db_version' );
+
+	// Network defaults (network-activated multisite).
+	delete_site_option( 'securefusion_network_settings' );
+	delete_site_option( 'securefusion_network_settings_form_updated' );
+	delete_site_option( 'securefusion_network_settings_form_errors' );
 
 	// ──────────────────────────────────────────────
 	// 2. Network-wide site transients.

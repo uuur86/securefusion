@@ -174,6 +174,12 @@ class Main {
 
 		$this->default_settings = $default_settings;
 
+		// Settings must be resolvable before any module reads them.
+		Settings::boot( $default_settings );
+
+		// Network mode: convert this site's stored copy to overrides once (bounded: one site).
+		Settings::maybe_migrate_site();
+
 		$this->admin       = new Sources\Admin( $default_settings );
 		$this->login       = new Sources\Login();
 		$this->ssl_control = new Sources\SSLControl();
@@ -255,7 +261,7 @@ class Main {
 	 * Cron callback to clean up old IP records.
 	 */
 	public function cron_cleanup_old_ips() {
-		$settings = get_option( 'securefusion_settings', array() );
+		$settings = Settings::all();
 		$days     = isset( $settings['cleanup_ip_days'] ) ? absint( $settings['cleanup_ip_days'] ) : 0;
 		$attempts = isset( $settings['cleanup_ip_attempts'] ) ? absint( $settings['cleanup_ip_attempts'] ) : 0;
 
@@ -269,9 +275,9 @@ class Main {
 	/**
 	 * Activate plugin.
 	 */
-	public function activate() {
+	public function activate( $network_wide = false ) {
 		$old_settings = get_option( 'secuplug_settings' );
-		$new_settings = get_option( 'securefusion_settings', array() );
+		$new_settings = get_option( Settings::SITE_OPTION, array() );
 
 		// Update new slug in option table.
 		if ( $old_settings !== false ) {
@@ -281,11 +287,29 @@ class Main {
 
 		}
 
-		// Override existing settings.
-		$new_settings = array_merge( $this->default_settings, $new_settings );
+		if ( ! is_array( $new_settings ) ) {
+			$new_settings = array();
+		}
 
-		// Update final settings.
-		update_option( 'securefusion_settings', $new_settings );
+		if ( $network_wide && is_multisite() ) {
+			// WordPress records the plugin as network-active only after this hook runs.
+			Settings::set_network_mode( true );
+
+			if ( ! empty( $new_settings ) ) {
+				update_option( Settings::SITE_OPTION, $new_settings );
+			}
+
+			// Seeds network settings from the main site and converts this site to overrides.
+			// Other sites convert themselves on their next request.
+			Settings::maybe_seed_network();
+			Settings::maybe_migrate_site();
+		} else {
+			// Override existing settings.
+			$new_settings = array_merge( $this->default_settings, $new_settings );
+
+			// Update final settings.
+			update_option( Settings::SITE_OPTION, $new_settings );
+		}
 
 		// Database schema operations via centralized service.
 		$brute_force_db = new BruteForceDB();
@@ -312,10 +336,20 @@ class Main {
 	public function maybe_update_plugin() {
 		$installed_version = get_option( 'securefusion_db_version' );
 		if ( $installed_version !== SECUREFUSION_VERSION ) {
-			// Merge default settings to ensure new options exist.
-			$settings = get_option( 'securefusion_settings', array() );
-			$settings = array_merge( $this->default_settings, $settings );
-			update_option( 'securefusion_settings', $settings );
+			if ( Settings::is_network_mode() ) {
+				// New keys are added to the network layer; sites keep only their overrides.
+				$network = Settings::maybe_seed_network();
+				$merged  = array_merge( $this->default_settings, $network );
+
+				if ( $merged !== $network ) {
+					update_site_option( Settings::NETWORK_OPTION, $merged );
+				}
+			} else {
+				// Merge default settings to ensure new options exist.
+				$settings = get_option( Settings::SITE_OPTION, array() );
+				$settings = array_merge( $this->default_settings, is_array( $settings ) ? $settings : array() );
+				update_option( Settings::SITE_OPTION, $settings );
+			}
 
 			// Run database schema updates.
 			$brute_force_db = new BruteForceDB();

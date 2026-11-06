@@ -54,6 +54,20 @@ class Admin {
 	 */
 	protected $default_settings;
 
+	/**
+	 * Which settings form this request uses: 'site' or 'network'.
+	 *
+	 * @var string
+	 */
+	protected $context = 'site';
+
+	/**
+	 * Whether network defaults with per-site overrides are active.
+	 *
+	 * @var bool
+	 */
+	protected $layered = false;
+
 	use WPCommon;
 
 
@@ -119,7 +133,7 @@ class Admin {
 			'secuplug',
 			esc_html__( 'SecureFusion Settings', 'secuplug' ),
 			esc_html__( 'Settings', 'secuplug' ),
-			'manage_options',
+			$this->layered ? Settings::site_capability() : 'manage_options',
 			'securefusion-settings',
 			array( $this, 'get_settings_html' )
 		);
@@ -161,21 +175,20 @@ class Admin {
 	public function get_dashboard_html() {
 		global $wp_version;
 
-		$settings = $this->settings_page;
 
-		$disable_all_xmlrpc = $settings->get_setting( 'disable_xmlrpc', false );
-		$force_all_https    = $settings->get_setting( 'force_site_https', false );
+		$disable_all_xmlrpc = $this->get_settings( 'disable_xmlrpc' );
+		$force_all_https    = $this->get_settings( 'force_site_https' );
 
-		$enable_https = $settings->get_setting( 'enable_https', null );
+		$enable_https = $this->get_settings( 'enable_https' );
 
 		// login.
-		$login_url          = $settings->get_setting( 'custom_login_url', null );
-		$change_admin_id    = $settings->get_setting( 'change_admin_id', null ) > 1 ? 1 : 0;
-		$change_login_error = empty( $settings->get_setting( 'change_login_error', null ) ) ? 0 : 1;
+		$login_url          = $this->get_settings( 'custom_login_url' );
+		$change_admin_id    = $this->get_settings( 'change_admin_id' ) > 1 ? 1 : 0;
+		$change_login_error = empty( $this->get_settings( 'change_login_error' ) ) ? 0 : 1;
 
 		// firewall.
-		$filter_bad_requests = $settings->get_setting( 'filter_bad_requests', null );
-		$disable_rest_api    = $settings->get_setting( 'disable_rest_api', null );
+		$filter_bad_requests = $this->get_settings( 'filter_bad_requests' );
+		$disable_rest_api    = $this->get_settings( 'disable_rest_api' );
 
 		if ( $disable_all_xmlrpc ) {
 			$xmlrpc_login    = 1;
@@ -183,9 +196,9 @@ class Admin {
 			$self_pingback   = 1;
 		} else {
 			// Gets xml-rpc settings when all xml-rpc services are disabled.
-			$xmlrpc_login    = $settings->get_setting( 'disable_xmlrpc_user_login', null );
-			$xmlrpc_pingback = $settings->get_setting( 'disable_xmlrpc_pingback', null );
-			$self_pingback   = $settings->get_setting( 'disable_self_pingback', null );
+			$xmlrpc_login    = $this->get_settings( 'disable_xmlrpc_user_login' );
+			$xmlrpc_pingback = $this->get_settings( 'disable_xmlrpc_pingback' );
+			$self_pingback   = $this->get_settings( 'disable_self_pingback' );
 		}
 
 		if ( $force_all_https ) {
@@ -193,9 +206,9 @@ class Admin {
 			$force_admin_https = 1;
 			$force_login_https = 1;
 		} else {
-			$force_front_https = $settings->get_setting( 'force_front_https', null );
-			$force_admin_https = $settings->get_setting( 'force_admin_https', null );
-			$force_login_https = $settings->get_setting( 'force_login_https', null );
+			$force_front_https = $this->get_settings( 'force_front_https' );
+			$force_admin_https = $this->get_settings( 'force_admin_https' );
+			$force_login_https = $this->get_settings( 'force_login_https' );
 		}
 
 		$security_pass = true;
@@ -537,10 +550,25 @@ class Admin {
 			<h1 class="fynd-sf-sr-only"><?php esc_html_e( 'SecureFusion Security Settings', 'secuplug' ); ?></h1>
 
 			<?php
-			$this->render_header(
-				esc_html__( 'SecureFusion Security Settings', 'secuplug' ),
-				esc_html__( 'You can manage your WordPress security settings.', 'secuplug' )
-			);
+			if ( 'network' === $this->context ) {
+				$this->render_header(
+					esc_html__( 'SecureFusion Network Settings', 'secuplug' ),
+					esc_html__( 'Defaults for every site in the network. Sites can customize single settings if the network policy allows it.', 'secuplug' )
+				);
+			} else {
+				$this->render_header(
+					esc_html__( 'SecureFusion Security Settings', 'secuplug' ),
+					esc_html__( 'You can manage your WordPress security settings.', 'secuplug' )
+				);
+			}
+
+			if ( $this->layered && 'site' === $this->context ) {
+				?>
+				<div class="notice notice-info inline">
+					<p><?php esc_html_e( 'This site uses the network settings. Turn on "Customize for this site" next to a setting to change it only here. Turn it off to go back to the network value.', 'secuplug' ); ?></p>
+				</div>
+				<?php
+			}
 			?>
 			<?php
 			if ( $this->settings_page->is_ready() ) {
@@ -574,6 +602,12 @@ class Admin {
 						<span class="dashicons dashicons-warning"></span>
 						<?php esc_html_e( 'Advanced', 'secuplug' ); ?>
 					</a>
+					<?php if ( 'network' === $this->context ) : ?>
+						<a href="#network_policy" class="nav-tab">
+							<span class="dashicons dashicons-admin-multisite"></span>
+							<?php esc_html_e( 'Network Policy', 'secuplug' ); ?>
+						</a>
+					<?php endif; ?>
 				</h2>
 				<div class="content-box">
 					<?php $this->settings_page->form_start(); ?>
@@ -607,6 +641,11 @@ class Admin {
 								</p>
 							</div>
 						</div>
+						<?php if ( 'network' === $this->context ) : ?>
+							<div class="tab-content hidden" id="fynd-sf-network_policy">
+								<?php $this->settings_page->run_section( 'network_policy_settings' ); ?>
+							</div>
+						<?php endif; ?>
 					<?php
 					$submit_text = esc_html__( 'Save Settings', 'secuplug' );
 					?>
@@ -1265,7 +1304,7 @@ class Admin {
 						'type'   => 'text_input',
 						'name'   => 'custom_login_url',
 						'label'  => esc_html__( 'Custom Login Path', 'secuplug' ),
-						'before' => '<span class="url-text">' . \get_home_url() . '/</span>',
+						'before' => '<span class="url-text">' . ( 'network' === $this->context ? esc_html__( '(site address)', 'secuplug' ) : esc_html( \get_home_url() ) ) . '/</span>',
 						'after'  => '<span class="field-tip">/ (For exam. : hidden-login)</span>',
 					],
 					[
@@ -1567,8 +1606,107 @@ class Admin {
 			],
 		];
 
-		$this->settings_page->loadForm( $conf );
+		if ( 'network' === $this->context ) {
+			$conf[] = $this->get_network_policy_section();
+		} elseif ( $this->layered ) {
+			// Sub-site: show network values, save only what this site customizes.
+			$this->settings_page->set_fallback_values(
+				Settings::inherited_values(),
+				[
+					'locked'       => Settings::NETWORK_ONLY,
+					'label'        => esc_html__( 'Customize for this site', 'secuplug' ),
+					'source_label' => esc_html__( 'Network', 'secuplug' ),
+					'locked_label' => esc_html__( 'Set by the network administrator', 'secuplug' ),
+					'empty_label'  => esc_html__( '(empty)', 'secuplug' ),
+				]
+			);
+		}
+
+		$this->settings_page->load_form( $conf );
 		$this->settings_page->register();
+	}
+
+
+
+	/**
+	 * Network-only settings section.
+	 *
+	 * @return array
+	 */
+	protected function get_network_policy_section() {
+		return [
+			'name'  => 'network_policy_settings',
+			'title' => esc_html__( 'NETWORK POLICY', 'secuplug' ),
+			'desc'  => esc_html__( 'Settings on this page are the defaults for every site in the network.', 'secuplug' ),
+			'items' => [
+				[
+					'type'    => 'radio',
+					'name'    => Settings::POLICY_SITE_ADMINS,
+					'label'   => esc_html__( 'Site administrators can customize their site', 'secuplug' ),
+					'options' => [
+						[
+							'value' => '0',
+							'label' => esc_html__( 'No', 'secuplug' ),
+						],
+						[
+							'value' => '1',
+							'label' => esc_html__( 'Yes', 'secuplug' ),
+						],
+					],
+					'after'   => '<p class="description">' . esc_html__( 'When off, only network administrators can change settings for a single site. Brute-force limits are always set here, for all sites.', 'secuplug' ) . '</p>',
+				],
+			],
+		];
+	}
+
+
+
+	/**
+	 * Network admin menu (network-activated multisite).
+	 *
+	 * @return void
+	 */
+	public function network_admin_menu() {
+		$hook = \add_menu_page(
+			esc_html__( 'SecureFusion Network Settings', 'secuplug' ),
+			esc_html__( 'SecureFusion', 'secuplug' ),
+			'manage_network_options',
+			'securefusion-network-settings',
+			array( $this, 'get_settings_html' ),
+			'dashicons-shield'
+		);
+
+		// Network admin screen IDs carry a "-network" suffix.
+		$this->menu_pages['network_settings'] = $hook . '-network';
+	}
+
+
+
+	/**
+	 * Settings link on the network Plugins screen.
+	 *
+	 * @param array $links Links.
+	 * @return array
+	 */
+	public function add_network_settings_link( $links ) {
+		$links[] = '<a href="' . esc_url( \network_admin_url( 'admin.php?page=securefusion-network-settings' ) ) . '">' . esc_html__( 'Network Settings', 'secuplug' ) . '</a>';
+
+		return $links;
+	}
+
+
+
+	/**
+	 * Notice shown when an older wasp library (loaded by another plugin) lacks network support.
+	 *
+	 * @return void
+	 */
+	public function old_wasp_notice() {
+		if ( ! \current_user_can( 'manage_network_options' ) ) {
+			return;
+		}
+
+		echo '<div class="notice notice-warning"><p>' . esc_html__( 'SecureFusion: another plugin loads an older version of the wasp settings library, so network defaults are not available. Each site uses its own settings until that plugin is updated.', 'secuplug' ) . '</p></div>';
 	}
 
 
@@ -1583,7 +1721,7 @@ class Admin {
 		} else {
 			// Only show the welcome notice on the main WordPress Dashboard page.
 			$screen = get_current_screen();
-			if ( $screen && $screen->id === 'dashboard' ) {
+			if ( $screen && $screen->id === 'dashboard' && \current_user_can( $this->layered ? Settings::site_capability() : 'manage_options' ) ) {
 				\add_action( 'admin_notices', [ $this, 'welcome_notice' ] );
 			}
 		}
@@ -1774,12 +1912,43 @@ class Admin {
 		$filter_name = 'plugin_action_links_' . \plugin_basename( SECUREFUSION_BASENAME );
 		\add_filter( $filter_name, array( $this, 'add_settings_link' ) );
 
+		// Network defaults need wasp 3.1+. Another plugin may have loaded an older copy first.
+		$wasp_supports_layers = method_exists( Wasp::class, 'set_fallback_values' );
+		$this->layered        = Settings::is_network_mode() && $wasp_supports_layers;
+
+		if ( Settings::is_network_mode() && ! $wasp_supports_layers ) {
+			\add_action( 'network_admin_notices', array( $this, 'old_wasp_notice' ) );
+		}
+
+		$this->context = ( $this->layered && \is_network_admin() ) ? 'network' : 'site';
+
 		// Settings Page Form.
-		$this->settings_page = new Wasp(
-			'securefusion-settings',
-			'securefusion',
-			'secuplug'
-		);
+		if ( 'network' === $this->context ) {
+			$this->settings_page = new Wasp(
+				'securefusion-network-settings',
+				'securefusion_network',
+				'secuplug',
+				null,
+				[ 'storage' => 'network' ]
+			);
+
+			\add_action( 'network_admin_menu', array( $this, 'network_admin_menu' ) );
+			\add_filter( 'network_admin_plugin_action_links_' . \plugin_basename( SECUREFUSION_BASENAME ), array( $this, 'add_network_settings_link' ) );
+		} elseif ( $this->layered ) {
+			$this->settings_page = new Wasp(
+				'securefusion-settings',
+				'securefusion',
+				'secuplug',
+				null,
+				[ 'capability' => Settings::site_capability() ]
+			);
+		} else {
+			$this->settings_page = new Wasp(
+				'securefusion-settings',
+				'securefusion',
+				'secuplug'
+			);
+		}
 
 		if ( $this->settings_page instanceof Wasp ) {
 			$this->settings_page->wp_form_init( [ $this, 'load' ] );

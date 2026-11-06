@@ -28,7 +28,9 @@ class Login {
 	public function __construct() {
 		$admin_id = $this->get_settings( 'change_admin_id' );
 
-		if ( $admin_id > 1 ) {
+		// Never on multisite: wp_users is shared by every site, but posts and
+		// comments would only be updated on the current site.
+		if ( $admin_id > 1 && ! is_multisite() ) {
 			add_action( 'plugins_loaded', [ $this, 'change_admin_id' ] );
 		}
 	}
@@ -46,7 +48,7 @@ class Login {
 		$admin_id = (int) get_current_user_id();
 		$new_id   = (int) $this->get_settings( 'change_admin_id' );
 
-		if ( ! \current_user_can( 'manage_options' ) || $admin_id < 1 ) {
+		if ( is_multisite() || ! \current_user_can( 'manage_options' ) || $admin_id < 1 ) {
 			return;
 		}
 

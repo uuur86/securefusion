@@ -13,6 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Exception;
+use SecureFusion\Lib\Settings;
 
 
 /**
@@ -21,12 +22,6 @@ use Exception;
 trait WPCommon {
 
 
-	/**
-	 * WP settings
-	 *
-	 * @var array
-	 */
-	protected $wp_settings = false;
 
 
 	/**
@@ -55,43 +50,38 @@ trait WPCommon {
 	/**
 	 * Get plugin settings
 	 *
+	 * Values are resolved by Settings: on a network-activated multisite this is
+	 * defaults + network settings + this site's overrides.
+	 *
 	 * @param string|null $name Plugin setting name.
 	 *
 	 * @return array|string|null Plugin settings or specific setting value.
 	 */
 	public function get_settings( $name = null ) {
-		$value = null;
-
-		if ( $this->wp_settings === false ) {
-			$this->wp_settings = get_option( 'securefusion_settings', null );
-		}
-
 		if ( ! empty( $name ) ) {
-			if ( isset( $this->wp_settings[ $name ] ) ) {
-				$value = $this->wp_settings[ $name ];
-			}
-		} else {
-			$value = $this->wp_settings;
+			return Settings::get( $name );
 		}
 
-		return $value;
+		return Settings::all();
 	}
 
 
 
 	/**
-	 * Set plugin settings
+	 * Set a plugin setting for the current site.
 	 *
-	 * @param string|array $name   Plugin setting name or array of settings.
-	 * @param mixed        $value  Plugin setting value if $name is a string.
+	 * In network mode this stores a site override.
+	 *
+	 * @param string $name  Plugin setting name.
+	 * @param mixed  $value Plugin setting value.
 	 *
 	 * @return bool True if settings were updated, false otherwise.
 	 */
 	public function set_settings( $name, $value ) {
-		$settings          = $this->get_settings();
+		$settings          = Settings::site_values();
 		$settings[ $name ] = $value;
 
-		return update_option( 'securefusion_settings', $settings );
+		return update_option( Settings::SITE_OPTION, $settings );
 	}
 
 
