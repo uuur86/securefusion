@@ -1,7 +1,7 @@
 === SecureFusion - Security and Firewall by Fyndsoft ===
 Contributors: codeplusdev, ugurbicer
 Tags: firewall, security, anti-spam, ssl, xml-rpc
-Requires at least: 5.3
+Requires at least: 6.6
 Tested up to: 7.0
 Stable tag: 2.0.3
 License: GPLv3 or later

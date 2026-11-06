@@ -38,11 +38,12 @@
 	<!-- Check files in the current directory and below -->
 	<file>.</file>
 
-	<!-- Set minimum supported PHP version to 7.0 to match composer.json -->
-	<config name="testVersion" value="7.0-"/>
+	<!-- PHP compatibility: must match "Requires PHP" in secuplug.php and readme.txt. -->
+	<config name="testVersion" value="7.4-"/>
+	<rule ref="PHPCompatibilityWP"/>
 
 	<!-- Additional WordPress specific settings -->
-	<config name="minimum_supported_wp_version" value="6.0"/>
+	<config name="minimum_supported_wp_version" value="6.6"/>
 	<rule ref="WordPress.WP.I18n">
 		<properties>
 			<property name="text_domain" type="array">
