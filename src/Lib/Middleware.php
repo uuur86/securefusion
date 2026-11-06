@@ -320,6 +320,12 @@ class Middleware {
 			}
 		}
 
+		// Output already started (another plugin, WP-CLI, cron, tests): header() would only add
+		// "headers already sent" warnings to the log.
+		if ( headers_sent() ) {
+			return;
+		}
+
 		if ( $hide_versions ) {
 			header( 'Server: ' );
 			header_remove( 'X-Powered-By' );
