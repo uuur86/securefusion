@@ -735,7 +735,7 @@ class Admin {
 								'label' => esc_html__( 'Yes', 'secuplug' ),
 							],
 						],
-						'after'   => '<p class="description">' . esc_html__( 'Blocks every XML-RPC request. Apps that publish through XML-RPC (older mobile apps, some Jetpack features) stop working.', 'secuplug' ) . '</p>',
+						'after'   => '<span class="description">' . esc_html__( 'Blocks every XML-RPC request. Apps that publish through XML-RPC (older mobile apps, some Jetpack features) stop working.', 'secuplug' ) . '</span>',
 					],
 					[
 						'type'    => 'radio',
@@ -752,7 +752,7 @@ class Admin {
 								'label' => esc_html__( 'Yes', 'secuplug' ),
 							],
 						],
-						'after'   => '<p class="description">' . esc_html__( 'Stops password guessing through XML-RPC. Leave this on unless an app signs in to your site through XML-RPC.', 'secuplug' ) . '</p>',
+						'after'   => '<span class="description">' . esc_html__( 'Stops password guessing through XML-RPC. Leave this on unless an app signs in to your site through XML-RPC.', 'secuplug' ) . '</span>',
 					],
 					[
 						'type'    => 'radio',
@@ -769,7 +769,7 @@ class Admin {
 								'label' => esc_html__( 'Yes', 'secuplug' ),
 							],
 						],
-						'after'   => '<p class="description">' . esc_html__( 'Attackers can use pingbacks to make your site send traffic floods to other sites.', 'secuplug' ) . '</p>',
+						'after'   => '<span class="description">' . esc_html__( 'Attackers can use pingbacks to make your site send traffic floods to other sites.', 'secuplug' ) . '</span>',
 					],
 					[
 						'type'    => 'radio',
@@ -786,7 +786,7 @@ class Admin {
 								'label' => esc_html__( 'Yes', 'secuplug' ),
 							],
 						],
-						'after'   => '<p class="description">' . esc_html__( 'WordPress pings your own posts when you link between them. This only adds noise to your comments.', 'secuplug' ) . '</p>',
+						'after'   => '<span class="description">' . esc_html__( 'WordPress pings your own posts when you link between them. This only adds noise to your comments.', 'secuplug' ) . '</span>',
 					],
 				],
 			],
@@ -802,7 +802,7 @@ class Admin {
 						'name'    => 'filter_bad_requests',
 						'default' => '0',
 						'label'   => esc_html__( 'Filter malicious requests', 'secuplug' ),
-						'after'   => '<p class="description">' . esc_html__( 'Blocks requests that contain common attack patterns such as code injection and cross-site scripting. The patterns are on the Advanced tab.', 'secuplug' ) . '</p>',
+						'after'   => '<span class="description">' . esc_html__( 'Blocks requests that contain common attack patterns such as code injection and cross-site scripting. The patterns are on the Advanced tab.', 'secuplug' ) . '</span>',
 						'options' => [
 							[
 								'value' => '0',
@@ -819,7 +819,7 @@ class Admin {
 						'name'    => 'disable_rest_api',
 						'default' => '0',
 						'label'   => esc_html__( 'Close the REST API to visitors', 'secuplug' ),
-						'after'   => '<p class="description">' . esc_html__( 'Visitors who are not logged in cannot read posts, pages, users or settings through /wp-json/wp/v2/. The API index and the endpoints of other plugins stay open.', 'secuplug' ) . '</p>',
+						'after'   => '<span class="description">' . esc_html__( 'Visitors who are not logged in cannot read posts, pages, users or settings through /wp-json/wp/v2/. The API index and the endpoints of other plugins stay open.', 'secuplug' ) . '</span>',
 						'options' => [
 							[
 								'value' => '0',
@@ -836,7 +836,7 @@ class Admin {
 						'name'    => 'hide_usernames',
 						'default' => '1',
 						'label'   => esc_html__( 'Hide usernames from visitors', 'secuplug' ),
-						'after'   => '<p class="description">' . esc_html__( 'Stops the common ways to find login names: ?author=1 links, the REST users list, administrators in the users sitemap and oEmbed author data. Author pages keep working.', 'secuplug' ) . '</p>',
+						'after'   => '<span class="description">' . esc_html__( 'Stops the common ways to find login names: ?author=1 links, the REST users list, administrators in the users sitemap and oEmbed author data. Author pages keep working.', 'secuplug' ) . '</span>',
 						'options' => [
 							[
 								'value' => '0',
@@ -853,7 +853,7 @@ class Admin {
 						'name'    => 'hide_versions',
 						'default' => '0',
 						'label'   => esc_html__( 'Hide server and PHP versions', 'secuplug' ),
-						'after'   => '<p class="description">' . esc_html__( 'Removes the Server and X-Powered-By response headers that reveal software versions.', 'secuplug' ) . '</p>',
+						'after'   => '<span class="description">' . esc_html__( 'Removes the Server and X-Powered-By response headers that reveal software versions.', 'secuplug' ) . '</span>',
 						'options' => [
 							[
 								'value' => '0',
@@ -870,7 +870,7 @@ class Admin {
 						'name'    => 'bad_bots',
 						'default' => '0',
 						'label'   => esc_html__( 'Block bad bots', 'secuplug' ),
-						'after'   => '<p class="description">' . esc_html__( 'Blocks requests whose user agent matches the bad bot list (by default libwww-perl).', 'secuplug' ) . '</p>',
+						'after'   => '<span class="description">' . esc_html__( 'Blocks requests whose user agent matches the bad bot list (by default libwww-perl).', 'secuplug' ) . '</span>',
 						'options' => [
 							[
 								'value' => '0',
@@ -887,7 +887,7 @@ class Admin {
 						'name'    => 'http_headers',
 						'default' => '0',
 						'label'   => esc_html__( 'Send browser security headers', 'secuplug' ),
-						'after'   => '<p class="description">' . esc_html__( 'Sends X-Frame-Options, X-Content-Type-Options, Referrer-Policy and HSTS (2 years). HSTS makes browsers refuse plain HTTP for your domain, so turn this on only if HTTPS works on your site.', 'secuplug' ) . '</p>',
+						'after'   => '<span class="description">' . esc_html__( 'Sends X-Frame-Options, X-Content-Type-Options, Referrer-Policy and HSTS (2 years). HSTS makes browsers refuse plain HTTP for your domain, so turn this on only if HTTPS works on your site.', 'secuplug' ) . '</span>',
 						'options' => [
 							[
 								'value' => '0',
@@ -904,7 +904,7 @@ class Admin {
 						'name'    => 'enable_coop',
 						'default' => '0',
 						'label'   => esc_html__( 'Isolate pages from other windows (COOP)', 'secuplug' ),
-						'after'   => '<p class="description">' . esc_html__( 'Sends Cross-Origin-Opener-Policy: same-origin. This blocks some cross-site leaks but breaks sign-in pop-ups such as "Sign in with Google". Leave it off if you use them.', 'secuplug' ) . '</p>',
+						'after'   => '<span class="description">' . esc_html__( 'Sends Cross-Origin-Opener-Policy: same-origin. This blocks some cross-site leaks but breaks sign-in pop-ups such as "Sign in with Google". Leave it off if you use them.', 'secuplug' ) . '</span>',
 						'options' => [
 							[
 								'value' => '0',
@@ -921,7 +921,7 @@ class Admin {
 						'name'    => 'enable_hsts_subdomains',
 						'default' => '0',
 						'label'   => esc_html__( 'HSTS: include subdomains', 'secuplug' ),
-						'after'   => '<p class="description">' . esc_html__( 'Tells browsers to use HTTPS on every subdomain too. Turn this on only if all your subdomains work over HTTPS.', 'secuplug' ) . '</p>',
+						'after'   => '<span class="description">' . esc_html__( 'Tells browsers to use HTTPS on every subdomain too. Turn this on only if all your subdomains work over HTTPS.', 'secuplug' ) . '</span>',
 						'options' => [
 							[
 								'value' => '0',
@@ -938,7 +938,7 @@ class Admin {
 						'name'    => 'enable_hsts_preload',
 						'default' => '0',
 						'label'   => esc_html__( 'HSTS: allow preloading', 'secuplug' ),
-						'after'   => '<p class="description">' . esc_html__( 'Adds the preload directive. Once your domain is on the browser preload lists, removal takes months and the site must stay HTTPS-only.', 'secuplug' ) . '</p>',
+						'after'   => '<span class="description">' . esc_html__( 'Adds the preload directive. Once your domain is on the browser preload lists, removal takes months and the site must stay HTTPS-only.', 'secuplug' ) . '</span>',
 						'options' => [
 							[
 								'value' => '0',
@@ -1122,7 +1122,7 @@ class Admin {
 						'name'    => 'csp_upgrade_insecure_requests',
 						'default' => $this->default_settings['csp_upgrade_insecure_requests'] ?? '0',
 						'label'   => esc_html__( 'Upgrade HTTP requests to HTTPS', 'secuplug' ),
-						'after'   => '<p class="description">' . esc_html__( 'Browsers load every http:// resource on your pages over https:// instead.', 'secuplug' ) . '</p>',
+						'after'   => '<span class="description">' . esc_html__( 'Browsers load every http:// resource on your pages over https:// instead.', 'secuplug' ) . '</span>',
 						'options' => [
 							[
 								'value' => '0',
@@ -1139,7 +1139,7 @@ class Admin {
 						'name'    => 'csp_block_all_mixed_content',
 						'default' => $this->default_settings['csp_block_all_mixed_content'] ?? '0',
 						'label'   => esc_html__( 'Block mixed content', 'secuplug' ),
-						'after'   => '<p class="description">' . esc_html__( 'Browsers refuse to load http:// resources on https:// pages.', 'secuplug' ) . '</p>',
+						'after'   => '<span class="description">' . esc_html__( 'Browsers refuse to load http:// resources on https:// pages.', 'secuplug' ) . '</span>',
 						'options' => [
 							[
 								'value' => '0',
@@ -1156,7 +1156,7 @@ class Admin {
 						'name'    => 'csp_sandbox',
 						'default' => $this->default_settings['csp_sandbox'] ?? '0',
 						'label'   => esc_html__( 'Sandbox pages', 'secuplug' ),
-						'after'   => '<p class="description">' . esc_html__( 'Applies the restrictions of a sandboxed iframe to your pages. This breaks forms, pop-ups and payment gateways on most sites. Use it only if you know you need it.', 'secuplug' ) . '</p>',
+						'after'   => '<span class="description">' . esc_html__( 'Applies the restrictions of a sandboxed iframe to your pages. This breaks forms, pop-ups and payment gateways on most sites. Use it only if you know you need it.', 'secuplug' ) . '</span>',
 						'options' => [
 							[
 								'value' => '0',
@@ -1273,7 +1273,7 @@ class Admin {
 						'name'    => 'enable_csp_report_only',
 						'default' => $this->default_settings['enable_csp_report_only'] ?? '0',
 						'label'   => esc_html__( 'Report-only mode', 'secuplug' ),
-						'after'   => '<p class="description">' . esc_html__( 'Browsers report policy violations in the console (and to the report URL) but block nothing. Use it to test a policy before you enforce it.', 'secuplug' ) . '</p>',
+						'after'   => '<span class="description">' . esc_html__( 'Browsers report policy violations in the console (and to the report URL) but block nothing. Use it to test a policy before you enforce it.', 'secuplug' ) . '</span>',
 						'options' => [
 							[
 								'value' => '0',
@@ -1290,7 +1290,7 @@ class Admin {
 						'name'        => 'csp_report_uri',
 						'label'       => esc_html__( 'Report URL', 'secuplug' ),
 						'placeholder' => 'https://report-uri.com/example',
-						'after'       => '<p class="description">' . esc_html__( 'Address where browsers send violation reports as JSON. Leave it empty to skip reporting.', 'secuplug' ) . '</p>',
+						'after'       => '<span class="description">' . esc_html__( 'Address where browsers send violation reports as JSON. Leave it empty to skip reporting.', 'secuplug' ) . '</span>',
 					],
 				],
 			],
@@ -1347,7 +1347,7 @@ class Admin {
 						'type'  => 'text_input',
 						'name'  => 'change_login_error',
 						'label' => esc_html__( 'Login error message', 'secuplug' ),
-						'after' => '<p class="description">' . esc_html__( 'Shown instead of the WordPress message, which tells attackers whether a username exists. Leave it empty to keep the WordPress message.', 'secuplug' ) . '</p>',
+						'after' => '<span class="description">' . esc_html__( 'Shown instead of the WordPress message, which tells attackers whether a username exists. Leave it empty to keep the WordPress message.', 'secuplug' ) . '</span>',
 					],
 					[
 						'type'   => 'text_input',
@@ -1374,7 +1374,7 @@ class Admin {
 						'name'    => 'enable_https',
 						'default' => '',
 						'label'   => esc_html__( 'HTTPS support', 'secuplug' ),
-						'after'   => '<p class="description">' . esc_html__( 'Turn this on after your SSL certificate works. The options below need it.', 'secuplug' ) . '</p>',
+						'after'   => '<span class="description">' . esc_html__( 'Turn this on after your SSL certificate works. The options below need it.', 'secuplug' ) . '</span>',
 						'options' => [
 							[
 								'label' => esc_html__( 'Disabled', 'secuplug' ),
@@ -1468,7 +1468,7 @@ class Admin {
 						'name'    => 'recaptcha_enable',
 						'default' => $this->default_settings['recaptcha_enable'] ?? '0',
 						'label'   => esc_html__( 'Use reCAPTCHA', 'secuplug' ),
-						'after'   => '<p class="description">' . esc_html__( 'Create the site key and the secret key in the Google reCAPTCHA admin console for this domain.', 'secuplug' ) . '</p>',
+						'after'   => '<span class="description">' . esc_html__( 'Create the site key and the secret key in the Google reCAPTCHA admin console for this domain.', 'secuplug' ) . '</span>',
 						'options' => [
 							[
 								'value' => '0',
@@ -1702,7 +1702,7 @@ class Admin {
 							'label' => esc_html__( 'Yes', 'secuplug' ),
 						],
 					],
-					'after'   => '<p class="description">' . esc_html__( 'When off, only network administrators can change settings for a single site. Brute-force limits are always set here, for all sites.', 'secuplug' ) . '</p>',
+					'after'   => '<span class="description">' . esc_html__( 'When off, only network administrators can change settings for a single site. Brute-force limits are always set here, for all sites.', 'secuplug' ) . '</span>',
 				],
 			],
 		];
@@ -1961,6 +1961,12 @@ class Admin {
 		// Settings link.
 		$filter_name = 'plugin_action_links_' . \plugin_basename( SECUREFUSION_BASENAME );
 		\add_filter( $filter_name, array( $this, 'add_settings_link' ) );
+
+		// wasp serves its scripts from its own folder; tell it the URL, which plugins_url()
+		// cannot work out when vendor/ is a symlink or junction (development setups).
+		if ( method_exists( Wasp::class, 'set_assets_url' ) && is_dir( SECUREFUSION_PATH . 'vendor/uuur86/wasp/assets' ) ) {
+			Wasp::set_assets_url( SECUREFUSION_URL . 'vendor/uuur86/wasp/' );
+		}
 
 		// Network defaults need wasp 3.1+. Another plugin may have loaded an older copy first.
 		$wasp_supports_layers = method_exists( Wasp::class, 'set_fallback_values' );

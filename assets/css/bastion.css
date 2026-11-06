@@ -2,7 +2,8 @@
  * Bastion — SecureFusion admin design language.
  *
  * Everything is scoped under .fsf (the page wrapper), so nothing leaks into wp-admin
- * or other plugins. Colors come from the tokens below only.
+ * or other plugins. Colors come from the tokens below only; the palette is taken from
+ * the SecureFusion logo: teal lens (brand), copper wings (accent), steel body (ink).
  *
  * @package securefusion
  */
@@ -12,18 +13,25 @@
 /* -------------------------------------------------------------------------- */
 
 .fsf {
-	--fsf-ink: #13171c;
-	--fsf-ink-2: #3c434a;
-	--fsf-ink-3: #5b6470;
-	--fsf-line: #dcdfe3;
-	--fsf-line-strong: #b8bec6;
+	/* Steel (logo body): text and lines. */
+	--fsf-ink: #1f2a2e;
+	--fsf-ink-2: #3b4a50;
+	--fsf-ink-3: #5d6b71;
+	--fsf-line: #d9e2e3;
+	--fsf-line-strong: #b3c1c3;
 	--fsf-surface: #fff;
-	--fsf-surface-2: #f6f7f7;
+	--fsf-surface-2: #f3f7f7;
 	--fsf-on-ink: #fff;
 
-	--fsf-brand: #01b9ba;
-	--fsf-brand-ink: #00737a;
-	--fsf-brand-wash: #e8f8f8;
+	/* Teal (logo lens): the one interactive color. */
+	--fsf-brand: #1e928b;        /* rails, underlines, focus: never text */
+	--fsf-brand-strong: #0a7e78; /* filled controls with white text, 4.9:1 */
+	--fsf-brand-ink: #036d69;    /* links and teal text on white, 6.2:1 */
+	--fsf-brand-wash: #e8f5f6;
+
+	/* Copper (logo wings): marks what this site changed. */
+	--fsf-accent: #a84723;       /* 5.9:1 on white */
+	--fsf-accent-wash: #fbefe8;
 
 	--fsf-critical: #b42318;
 	--fsf-critical-wash: #fdf0ef;
@@ -48,8 +56,8 @@
 	--fsf-6: 24px;
 	--fsf-8: 32px;
 
-	--fsf-radius: 2px;
-	--fsf-radius-box: 4px;
+	--fsf-radius: 4px;
+	--fsf-radius-box: 6px;
 	--fsf-focus: 0 0 0 2px var(--fsf-surface), 0 0 0 4px var(--fsf-brand);
 	--fsf-ease: 120ms cubic-bezier(0.2, 0, 0, 1);
 
@@ -112,14 +120,14 @@
 }
 
 .fsf .fsf-btn--primary {
-	background: var(--fsf-ink);
-	border-color: var(--fsf-ink);
+	background: var(--fsf-brand-strong);
+	border-color: var(--fsf-brand-strong);
 	color: var(--fsf-on-ink);
 }
 
 .fsf .fsf-btn--primary:hover {
-	background: var(--fsf-ink-2);
-	border-color: var(--fsf-ink-2);
+	background: var(--fsf-brand-ink);
+	border-color: var(--fsf-brand-ink);
 	color: var(--fsf-on-ink);
 }
 
@@ -150,8 +158,8 @@
 }
 
 .fsf .fynd-sf-log-logo {
-	width: 32px;
-	height: 32px;
+	width: 48px;
+	height: 48px;
 }
 
 .fsf .fynd-sf-log-title {
@@ -301,9 +309,10 @@
 .fsf .fsf-tab__count {
 	min-width: 18px;
 	padding: 0 5px;
-	border: 1px solid var(--fsf-line-strong);
+	border: 1px solid var(--fsf-accent);
 	border-radius: var(--fsf-radius);
-	color: var(--fsf-ink-2);
+	background: var(--fsf-accent-wash);
+	color: var(--fsf-accent);
 	font-size: var(--fsf-text-xs);
 	font-weight: 500;
 	line-height: 16px;
@@ -365,12 +374,14 @@
 	vertical-align: top;
 }
 
-/* A rail marks rows customized for this site. */
+/* A copper rail marks rows customized for this site. */
 .fsf .form-table tr:has(.wasp-inheritable[data-wasp-state="overridden"]) th {
-	box-shadow: inset 3px 0 0 var(--fsf-brand);
+	box-shadow: inset 3px 0 0 var(--fsf-accent);
 }
 
-.fsf .form-table p.description {
+/* Field help (wasp keeps <span> in "after" markup, so help text is a block-level span). */
+.fsf .form-table .description {
+	display: block;
 	max-width: 64ch;
 	margin: var(--fsf-2) 0 0;
 	color: var(--fsf-ink-2);
@@ -477,7 +488,7 @@
 }
 
 .fsf .fsf-seg input[type="radio"]:checked + label {
-	background: var(--fsf-ink);
+	background: var(--fsf-brand-strong);
 	color: var(--fsf-on-ink);
 	font-weight: 600;
 }
@@ -491,12 +502,27 @@
 	cursor: default;
 }
 
-/* While a value comes from the network, the chosen segment is shown outlined, not filled. */
+/* While a value comes from the network, the chosen segment is tinted, not filled. */
 .fsf .wasp-inheritable[data-wasp-state="inherited"] .fsf-seg input[type="radio"]:checked + label,
 .fsf .wasp-inheritable[data-wasp-state="locked"] .fsf-seg input[type="radio"]:checked + label {
+	background: var(--fsf-brand-wash);
+	box-shadow: inset 0 0 0 1px var(--fsf-brand);
+	color: var(--fsf-brand-ink);
+}
+
+/* Locked fields: read-only look even before (or without) the script. */
+.fsf .wasp-inheritable[data-wasp-state="locked"] .wasp-inheritable-field input,
+.fsf .wasp-inheritable[data-wasp-state="locked"] .wasp-inheritable-field select,
+.fsf .wasp-inheritable[data-wasp-state="locked"] .wasp-inheritable-field textarea,
+.fsf .wasp-inheritable[data-wasp-state="locked"] .wasp-inheritable-field label {
+	pointer-events: none;
+}
+
+.fsf .wasp-inheritable[data-wasp-state="locked"] .wasp-inheritable-field input[type="text"],
+.fsf .wasp-inheritable[data-wasp-state="locked"] .wasp-inheritable-field textarea {
+	border-style: dashed;
 	background: var(--fsf-surface-2);
-	box-shadow: inset 0 0 0 1px var(--fsf-ink-3);
-	color: var(--fsf-ink);
+	color: var(--fsf-ink-2);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -546,8 +572,13 @@
 	content: "";
 }
 
+.fsf .fsf-source__state--overridden {
+	color: var(--fsf-accent);
+	font-weight: 600;
+}
+
 .fsf .fsf-source__state--overridden::before {
-	background: var(--fsf-brand);
+	background: var(--fsf-accent);
 }
 
 .fsf .fsf-source__state--locked::before {
@@ -586,10 +617,9 @@
 /* -------------------------------------------------------------------------- */
 
 .fsf .wasp-reset-wrapper {
-	display: inline-flex;
+	display: flex;
 	align-items: center;
-	margin: 0 0 0 var(--fsf-3);
-	vertical-align: middle;
+	margin: var(--fsf-2) 0 0;
 }
 
 .fsf .wasp-reset-wrapper .wasp-reset-btn {
