@@ -95,6 +95,7 @@ class Main {
 			'change_admin_id'                 => '',
 			'filter_bad_requests'             => '1',
 			'disable_rest_api'                => '1',
+			'hide_usernames'                  => '1',
 			'hide_versions'                   => '1',
 			'bad_bots'                        => '1',
 			'http_headers'                    => '1',
@@ -187,11 +188,15 @@ class Main {
 		$this->middleware  = new Sources\Middleware();
 		$this->recaptcha   = new Sources\ReCaptcha();
 		$comments_block    = new Sources\CommentsBlock();
+		$user_enumeration  = new Sources\UserEnumeration();
 
 		add_action( 'admin_init', array( 'PAnD', 'init' ) );
 
 		// COMMENTS BLOCK.
 		add_action( 'init', array( $comments_block, 'init' ) );
+
+		// USER ENUMERATION.
+		add_action( 'init', array( $user_enumeration, 'init' ) );
 
 		// ADMIN.
 		add_action( 'init', array( $this->admin, 'init' ) );
@@ -274,6 +279,8 @@ class Main {
 
 	/**
 	 * Activate plugin.
+	 *
+	 * @param bool $network_wide Whether to activate the plugin network-wide.
 	 */
 	public function activate( $network_wide = false ) {
 		$old_settings = get_option( 'secuplug_settings' );

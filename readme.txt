@@ -97,6 +97,7 @@ If you have any questions, you can post [a support request](https://wordpress.or
 * Fixed: "Disable REST API for Visitors" could be bypassed on multisite sub-directory sites (`/site/wp-json/wp/v2/users`) and with `?rest_route=/wp/v2/users`. Requests are now checked by REST route.
 * Improved: Removed a DNS lookup that ran on every REST API request from visitors.
 * Added: `securefusion_rest_protected_services` and `securefusion_rest_allow_request` filters.
+* Added: "Hide Usernames from Visitors" (on by default). `?author=N` answers 404 instead of redirecting to the author archive, anonymous visitors cannot read the REST users endpoint (also through `_embed`), administrators are left out of the users sitemap, and oEmbed author data and comment CSS classes no longer reveal login names. Author archives keep working.
 
 = 2.0.3 =
 * Fixed: Google reCAPTCHA not displaying and preventing login on custom login paths.

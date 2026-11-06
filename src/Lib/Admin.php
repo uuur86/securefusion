@@ -175,7 +175,6 @@ class Admin {
 	public function get_dashboard_html() {
 		global $wp_version;
 
-
 		$disable_all_xmlrpc = $this->get_settings( 'disable_xmlrpc' );
 		$force_all_https    = $this->get_settings( 'force_site_https' );
 
@@ -804,6 +803,22 @@ class Admin {
 						'name'    => 'disable_rest_api',
 						'default' => '0',
 						'label'   => esc_html__( 'Disable Rest API for Visitors', 'secuplug' ),
+						'options' => [
+							[
+								'value' => '0',
+								'label' => esc_html__( 'No', 'secuplug' ),
+							],
+							[
+								'value' => '1',
+								'label' => esc_html__( 'Yes', 'secuplug' ),
+							],
+						],
+					],
+					[
+						'type'    => 'radio',
+						'name'    => 'hide_usernames',
+						'default' => '1',
+						'label'   => esc_html__( 'Hide Usernames from Visitors', 'secuplug' ),
 						'options' => [
 							[
 								'value' => '0',
