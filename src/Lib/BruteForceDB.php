@@ -171,17 +171,19 @@ class BruteForceDB {
 	 * @return int Number of failed login attempts.
 	 */
 	public function get_failed_login_attempts_in_window( $ip, $window_seconds ) {
+		$wpdb = $this->wpdb;
+
 		$cutoff = time() - absint( $window_seconds );
-		// phpcs:disable
-		$attempts = $this->wpdb->get_var(
-			$this->wpdb->prepare(
-				"SELECT COUNT(*) FROM {$this->table_name} WHERE ip = %s AND log_type = %s AND last_attempt >= %d",
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom security tables have no WordPress CRUD API. Fresh security decisions, live reports or schema checks must not use stale cached results.
+		$attempts = $wpdb->get_var(
+			$wpdb->prepare(
+				'SELECT COUNT(*) FROM %i WHERE ip = %s AND log_type = %s AND last_attempt >= %d',
+				$this->table_name,
 				$ip,
 				self::TYPE_FAILED_LOGIN,
 				$cutoff
 			)
 		);
-		// phpcs:enable
 
 		return (int) $attempts;
 	}
@@ -195,20 +197,22 @@ class BruteForceDB {
 	 * @return int The total number of failed attempts.
 	 */
 	public function get_total_attempts() {
+		$wpdb = $this->wpdb;
+
 		$cached = \wp_cache_get( 'securefusion_bf_total_attempts', self::CACHE_GROUP );
 
 		if ( false !== $cached ) {
 			return (int) $cached;
 		}
 
-		// phpcs:disable
-		$total = $this->wpdb->get_var(
-			$this->wpdb->prepare(
-				"SELECT SUM(attempts) FROM {$this->table_name} WHERE log_type != %s",
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom security tables have no WordPress CRUD API.
+		$total = $wpdb->get_var(
+			$wpdb->prepare(
+				'SELECT SUM(attempts) FROM %i WHERE log_type != %s',
+				$this->table_name,
 				self::TYPE_SUCCESSFUL_LOGIN
 			)
 		);
-		// phpcs:enable
 
 		$total = (int) $total;
 		\wp_cache_set( 'securefusion_bf_total_attempts', $total, self::CACHE_GROUP, self::CACHE_TTL );
@@ -226,6 +230,8 @@ class BruteForceDB {
 	 * @return int Total number of attempts for this type.
 	 */
 	public function get_total_attempts_by_type( $type ) {
+		$wpdb = $this->wpdb;
+
 		$type      = self::normalize_log_type( $type );
 		$cache_key = 'securefusion_bf_total_attempts_' . $type;
 		$cached    = \wp_cache_get( $cache_key, self::CACHE_GROUP );
@@ -234,14 +240,14 @@ class BruteForceDB {
 			return (int) $cached;
 		}
 
-		// phpcs:disable
-		$total = $this->wpdb->get_var(
-			$this->wpdb->prepare(
-				"SELECT SUM(attempts) FROM {$this->table_name} WHERE log_type = %s",
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom security tables have no WordPress CRUD API.
+		$total = $wpdb->get_var(
+			$wpdb->prepare(
+				'SELECT SUM(attempts) FROM %i WHERE log_type = %s',
+				$this->table_name,
 				$type
 			)
 		);
-		// phpcs:enable
 
 		$total = (int) $total;
 		\wp_cache_set( $cache_key, $total, self::CACHE_GROUP, self::CACHE_TTL );
@@ -258,20 +264,22 @@ class BruteForceDB {
 	 * @return int The count of unique IP addresses.
 	 */
 	public function get_unique_ips_count() {
+		$wpdb = $this->wpdb;
+
 		$cached = \wp_cache_get( 'securefusion_bf_unique_ips', self::CACHE_GROUP );
 
 		if ( false !== $cached ) {
 			return (int) $cached;
 		}
 
-		// phpcs:disable
-		$count = $this->wpdb->get_var(
-			$this->wpdb->prepare(
-				"SELECT COUNT(DISTINCT ip) FROM {$this->table_name} WHERE log_type != %s",
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom security tables have no WordPress CRUD API.
+		$count = $wpdb->get_var(
+			$wpdb->prepare(
+				'SELECT COUNT(DISTINCT ip) FROM %i WHERE log_type != %s',
+				$this->table_name,
 				self::TYPE_SUCCESSFUL_LOGIN
 			)
 		);
-		// phpcs:enable
 
 		$count = (int) $count;
 		\wp_cache_set( 'securefusion_bf_unique_ips', $count, self::CACHE_GROUP, self::CACHE_TTL );
@@ -292,6 +300,10 @@ class BruteForceDB {
 	 * @return array Array of row objects.
 	 */
 	public function get_all_rows( $per_page = 20, $offset = 0, $orderby = 'last_attempt', $order = 'DESC', $type_filter = '' ) {
+		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- ORDER BY expressions come only from the local allowlist; ASC/DESC is normalized. SQL expressions cannot be value placeholders.
+
+		$wpdb = $this->wpdb;
+
 		$allowed_columns = [ 'id', 'ip', 'attempts', 'last_attempt', 'log_type' ];
 		$orderby         = \in_array( $orderby, $allowed_columns, true ) ? $orderby : 'last_attempt';
 		$order           = strtoupper( $order ) === 'ASC' ? 'ASC' : 'DESC';
@@ -306,11 +318,11 @@ class BruteForceDB {
 				$orderby_sql = 'MIN(r.id)';
 			}
 
-			// phpcs:disable
-			return $this->wpdb->get_results(
-				$this->wpdb->prepare(
-					"SELECT 
-						MIN(r.id) AS id, 
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom security tables have no WordPress CRUD API. Fresh security decisions, live reports or schema checks must not use stale cached results.
+			return $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT
+						MIN(r.id) AS id,
 						r.ip AS ip,
 						COALESCE(SUM(l.attempts), 0) AS attempts,
 						COALESCE(MAX(l.last_attempt), MAX(r.created_at)) AS last_attempt,
@@ -319,17 +331,18 @@ class BruteForceDB {
 						MAX(l.payload) AS payload,
 						1 AS is_blocked,
 						0 AS is_whitelisted
-					FROM {$this->ip_rules_table} r
-					LEFT JOIN {$this->table_name} l ON r.ip = l.ip
+					FROM %i r
+					LEFT JOIN %i l ON r.ip = l.ip
 					WHERE r.rule_type = 'blocked'
 					GROUP BY r.ip
 					ORDER BY {$orderby_sql} {$order}
 					LIMIT %d OFFSET %d",
+					$this->ip_rules_table,
+					$this->table_name,
 					$per_page,
 					$offset
 				)
 			);
-			// phpcs:enable
 		}
 
 		$orderby_sql = 'l.' . $orderby;
@@ -337,35 +350,35 @@ class BruteForceDB {
 			$orderby_sql = 'INET_ATON(l.ip)';
 		}
 
-		$where = '';
-		if ( ! empty( $type_filter ) ) {
-			$type_filter = self::normalize_log_type( $type_filter );
-			$where       = $this->wpdb->prepare( ' WHERE l.log_type = %s', $type_filter );
-		}
+		$type_filter = empty( $type_filter ) ? '' : self::normalize_log_type( $type_filter );
 
-		// phpcs:disable
-		return $this->wpdb->get_results(
-			$this->wpdb->prepare(
-				"SELECT 
-					l.id, 
-					l.ip, 
-					l.attempts, 
-					l.last_attempt, 
-					l.log_type, 
-					l.user_agent, 
-					l.payload, 
-					IF(r.rule_type = 'blocked', 1, 0) AS is_blocked, 
-					IF(r.rule_type = 'whitelisted', 1, 0) AS is_whitelisted 
-				FROM {$this->table_name} l
-				LEFT JOIN {$this->ip_rules_table} r ON l.ip = r.ip
-				{$where}
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom security tables have no WordPress CRUD API. Fresh security decisions, live reports or schema checks must not use stale cached results.
+		return $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT
+					l.id,
+					l.ip,
+					l.attempts,
+					l.last_attempt,
+					l.log_type,
+					l.user_agent,
+					l.payload,
+					IF(r.rule_type = 'blocked', 1, 0) AS is_blocked,
+					IF(r.rule_type = 'whitelisted', 1, 0) AS is_whitelisted
+				FROM %i l
+				LEFT JOIN %i r ON l.ip = r.ip
+				WHERE (%s = '' OR l.log_type = %s)
 				ORDER BY {$orderby_sql} {$order}
 				LIMIT %d OFFSET %d",
+				$this->table_name,
+				$this->ip_rules_table,
+				$type_filter,
+				$type_filter,
 				$per_page,
 				$offset
 			)
 		);
-		// phpcs:enable
+		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 	}
 
 
@@ -377,35 +390,36 @@ class BruteForceDB {
 	 * @return int Total row count.
 	 */
 	public function get_total_rows( $type_filter = '' ) {
+		$wpdb = $this->wpdb;
+
 		if ( $type_filter === 'blocked' ) {
-			// phpcs:disable
-			$count = $this->wpdb->get_var(
-				$this->wpdb->prepare(
-					"SELECT COUNT(*) FROM {$this->ip_rules_table} WHERE rule_type = %s",
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom security tables have no WordPress CRUD API. Fresh security decisions, live reports or schema checks must not use stale cached results.
+			$count = $wpdb->get_var(
+				$wpdb->prepare(
+					'SELECT COUNT(*) FROM %i WHERE rule_type = %s',
+					$this->ip_rules_table,
 					'blocked'
 				)
 			);
-			// phpcs:enable
 
 			return (int) $count;
 		}
 
 		if ( ! empty( $type_filter ) ) {
 			$type_filter = self::normalize_log_type( $type_filter );
-			// phpcs:disable
-			$count       = $this->wpdb->get_var(
-				$this->wpdb->prepare(
-					"SELECT COUNT(*) FROM {$this->table_name} WHERE log_type = %s",
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom security tables have no WordPress CRUD API. Fresh security decisions, live reports or schema checks must not use stale cached results.
+			$count = $wpdb->get_var(
+				$wpdb->prepare(
+					'SELECT COUNT(*) FROM %i WHERE log_type = %s',
+					$this->table_name,
 					$type_filter
 				)
 			);
-			// phpcs:enable
 		} else {
-			// phpcs:disable
-			$count       = $this->wpdb->get_var(
-				"SELECT COUNT(*) FROM {$this->table_name}"
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom security tables have no WordPress CRUD API. Fresh security decisions, live reports or schema checks must not use stale cached results.
+			$count = $wpdb->get_var(
+				$wpdb->prepare( 'SELECT COUNT(*) FROM %i', $this->table_name )
 			);
-			// phpcs:enable
 		}
 
 		return (int) $count;
@@ -420,10 +434,13 @@ class BruteForceDB {
 	 * @return array Array of row objects.
 	 */
 	public function get_all_rows_for_export( $type_filter = '' ) {
+		$wpdb = $this->wpdb;
+
 		if ( $type_filter === 'blocked' ) {
-			// phpcs:disable
-			return $this->wpdb->get_results(
-				"SELECT 
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom security tables have no WordPress CRUD API. Fresh security decisions, live reports or schema checks must not use stale cached results.
+			return $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT
 					r.ip AS ip,
 					COALESCE(SUM(l.attempts), 0) AS attempts,
 					COALESCE(MAX(l.last_attempt), MAX(r.created_at)) AS last_attempt,
@@ -432,38 +449,41 @@ class BruteForceDB {
 					MAX(l.payload) AS payload,
 					1 AS is_blocked,
 					0 AS is_whitelisted
-				FROM {$this->ip_rules_table} r
-				LEFT JOIN {$this->table_name} l ON r.ip = l.ip
+				FROM %i r
+				LEFT JOIN %i l ON r.ip = l.ip
 				WHERE r.rule_type = 'blocked'
 				GROUP BY r.ip
-				ORDER BY last_attempt DESC"
+				ORDER BY last_attempt DESC",
+					$this->ip_rules_table,
+					$this->table_name
+				)
 			);
-			// phpcs:enable
 		}
 
-		$where = '';
-		if ( ! empty( $type_filter ) ) {
-			$type_filter = self::normalize_log_type( $type_filter );
-			$where       = $this->wpdb->prepare( ' WHERE l.log_type = %s', $type_filter );
-		}
+		$type_filter = empty( $type_filter ) ? '' : self::normalize_log_type( $type_filter );
 
-		// phpcs:disable
-		return $this->wpdb->get_results(
-			"SELECT 
-				l.ip, 
-				l.attempts, 
-				l.last_attempt, 
-				l.log_type, 
-				l.user_agent, 
-				l.payload, 
-				IF(r.rule_type = 'blocked', 1, 0) AS is_blocked, 
-				IF(r.rule_type = 'whitelisted', 1, 0) AS is_whitelisted 
-			FROM {$this->table_name} l
-			LEFT JOIN {$this->ip_rules_table} r ON l.ip = r.ip
-			{$where}
-			ORDER BY l.last_attempt DESC"
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom security tables have no WordPress CRUD API. Fresh security decisions, live reports or schema checks must not use stale cached results.
+		return $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT
+				l.ip,
+				l.attempts,
+				l.last_attempt,
+				l.log_type,
+				l.user_agent,
+				l.payload,
+				IF(r.rule_type = 'blocked', 1, 0) AS is_blocked,
+				IF(r.rule_type = 'whitelisted', 1, 0) AS is_whitelisted
+			FROM %i l
+			LEFT JOIN %i r ON l.ip = r.ip
+			WHERE (%s = '' OR l.log_type = %s)
+			ORDER BY l.last_attempt DESC",
+				$this->table_name,
+				$this->ip_rules_table,
+				$type_filter,
+				$type_filter
+			)
 		);
-		// phpcs:enable
 	}
 
 
@@ -476,25 +496,30 @@ class BruteForceDB {
 	 * @return array Array of objects with range_prefix, ip_count, total_attempts.
 	 */
 	public function get_ip_ranges() {
+		$wpdb = $this->wpdb;
+
 		$cached = \wp_cache_get( 'securefusion_bf_ip_ranges', self::CACHE_GROUP );
 
 		if ( false !== $cached ) {
 			return $cached;
 		}
 
-		// phpcs:disable
-		$rows = $this->wpdb->get_results(
-			"SELECT SUBSTRING_INDEX(ip, '.', 3) AS range_prefix,
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom security tables have no WordPress CRUD API.
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT SUBSTRING_INDEX(ip, '.', 3) AS range_prefix,
 				COUNT(DISTINCT ip) AS ip_count,
 				SUM(attempts) AS total_attempts,
 				MIN(CAST(SUBSTRING_INDEX(ip, '.', -1) AS UNSIGNED)) AS min_last_octet,
 				MAX(CAST(SUBSTRING_INDEX(ip, '.', -1) AS UNSIGNED)) AS max_last_octet
-			FROM {$this->table_name}
-			WHERE ip LIKE '%.%.%.%'
+			FROM %i
+			WHERE ip LIKE %s
 			GROUP BY range_prefix
-			ORDER BY INET_ATON(CONCAT(SUBSTRING_INDEX(ip, '.', 3), '.0')) ASC"
+			ORDER BY INET_ATON(CONCAT(SUBSTRING_INDEX(ip, '.', 3), '.0')) ASC",
+				$this->table_name,
+				'%.%.%.%'
+			)
 		);
-		// phpcs:enable
 
 		// Cache for 5 minutes.
 		\wp_cache_set( 'securefusion_bf_ip_ranges', $rows, self::CACHE_GROUP, self::CACHE_TTL );
@@ -514,6 +539,10 @@ class BruteForceDB {
 	 * @return array Array of objects.
 	 */
 	public function get_paginated_ip_ranges( $per_page = 20, $offset = 0, $orderby = 'ip_count', $order = 'DESC' ) {
+		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- ORDER BY expressions come only from the local allowlist; ASC/DESC is normalized. SQL expressions cannot be value placeholders.
+
+		$wpdb = $this->wpdb;
+
 		$allowed_columns = [ 'range_prefix', 'ip_count', 'total_attempts' ];
 		$orderby         = in_array( $orderby, $allowed_columns, true ) ? $orderby : 'ip_count';
 		$order           = strtoupper( $order ) === 'ASC' ? 'ASC' : 'DESC';
@@ -526,24 +555,26 @@ class BruteForceDB {
 			$orderby_sql = $orderby;
 		}
 
-		// phpcs:disable
-		return $this->wpdb->get_results(
-			$this->wpdb->prepare(
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom security tables have no WordPress CRUD API. Fresh security decisions, live reports or schema checks must not use stale cached results.
+		return $wpdb->get_results(
+			$wpdb->prepare(
 				"SELECT SUBSTRING_INDEX(ip, '.', 3) AS range_prefix,
 					COUNT(DISTINCT ip) AS ip_count,
 					SUM(attempts) AS total_attempts,
 					MIN(CAST(SUBSTRING_INDEX(ip, '.', -1) AS UNSIGNED)) AS min_last_octet,
 					MAX(CAST(SUBSTRING_INDEX(ip, '.', -1) AS UNSIGNED)) AS max_last_octet
-				FROM {$this->table_name}
-				WHERE ip LIKE '%.%.%.%'
+				FROM %i
+				WHERE ip LIKE %s
 				GROUP BY range_prefix
 				ORDER BY {$orderby_sql} {$order}
 				LIMIT %d OFFSET %d",
+				$this->table_name,
+				'%.%.%.%',
 				$per_page,
 				$offset
 			)
 		);
-		// phpcs:enable
+		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 	}
 
 
@@ -553,19 +584,24 @@ class BruteForceDB {
 	 * @return int Total number of unique /24 ranges.
 	 */
 	public function get_total_ip_ranges() {
+		$wpdb = $this->wpdb;
+
 		$cached = \wp_cache_get( 'securefusion_bf_total_ip_ranges', self::CACHE_GROUP );
 
 		if ( false !== $cached ) {
 			return (int) $cached;
 		}
 
-		// phpcs:disable
-		$count = $this->wpdb->get_var(
-			"SELECT COUNT(DISTINCT SUBSTRING_INDEX(ip, '.', 3))
-			FROM {$this->table_name}
-			WHERE ip LIKE '%.%.%.%'"
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom security tables have no WordPress CRUD API.
+		$count = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COUNT(DISTINCT SUBSTRING_INDEX(ip, '.', 3))
+			FROM %i
+			WHERE ip LIKE %s",
+				$this->table_name,
+				'%.%.%.%'
+			)
 		);
-		// phpcs:enable
 
 		$count = (int) $count;
 		\wp_cache_set( 'securefusion_bf_total_ip_ranges', $count, self::CACHE_GROUP, self::CACHE_TTL );
@@ -581,14 +617,16 @@ class BruteForceDB {
 	 * @return array Array of row objects with ip property.
 	 */
 	public function get_ips_by_range_prefix( $range_prefix ) {
-		// phpcs:disable
-		$query = $this->wpdb->prepare(
-			"SELECT DISTINCT ip FROM {$this->table_name} WHERE ip LIKE %s ORDER BY CAST(SUBSTRING_INDEX(ip, '.', -1) AS UNSIGNED) ASC",
-			$this->wpdb->esc_like( $range_prefix ) . '.%'
-		);
+		$wpdb = $this->wpdb;
 
-		return $this->wpdb->get_results( $query );
-		// phpcs:enable
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom security tables have no WordPress CRUD API. Fresh security decisions, live reports or schema checks must not use stale cached results.
+		return $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT DISTINCT ip FROM %i WHERE ip LIKE %s ORDER BY CAST(SUBSTRING_INDEX(ip, '.', -1) AS UNSIGNED) ASC",
+				$this->table_name,
+				$wpdb->esc_like( $range_prefix ) . '.%'
+			)
+		);
 	}
 
 
@@ -605,6 +643,10 @@ class BruteForceDB {
 	 * @return array Array of row objects.
 	 */
 	public function get_rows_by_range( $range_prefix, $per_page = 20, $offset = 0, $orderby = 'last_attempt', $order = 'DESC', $type_filter = '' ) {
+		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- ORDER BY expressions come only from the local allowlist; ASC/DESC is normalized. SQL expressions cannot be value placeholders.
+
+		$wpdb = $this->wpdb;
+
 		$allowed_columns = [ 'id', 'ip', 'attempts', 'last_attempt', 'log_type' ];
 		$orderby         = in_array( $orderby, $allowed_columns, true ) ? $orderby : 'last_attempt';
 		$order           = strtoupper( $order ) === 'ASC' ? 'ASC' : 'DESC';
@@ -618,13 +660,13 @@ class BruteForceDB {
 			} elseif ( $orderby === 'id' ) {
 				$orderby_sql = 'MIN(r.id)';
 			}
-			$range_esc = $this->wpdb->esc_like( $range_prefix ) . '.%';
+			$range_esc = $wpdb->esc_like( $range_prefix ) . '.%';
 
-			// phpcs:disable
-			return $this->wpdb->get_results(
-				$this->wpdb->prepare(
-					"SELECT 
-						MIN(r.id) AS id, 
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom security tables have no WordPress CRUD API. Fresh security decisions, live reports or schema checks must not use stale cached results.
+			return $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT
+						MIN(r.id) AS id,
 						r.ip AS ip,
 						COALESCE(SUM(l.attempts), 0) AS attempts,
 						COALESCE(MAX(l.last_attempt), MAX(r.created_at)) AS last_attempt,
@@ -633,18 +675,19 @@ class BruteForceDB {
 						MAX(l.payload) AS payload,
 						1 AS is_blocked,
 						0 AS is_whitelisted
-					FROM {$this->ip_rules_table} r
-					LEFT JOIN {$this->table_name} l ON r.ip = l.ip
+					FROM %i r
+					LEFT JOIN %i l ON r.ip = l.ip
 					WHERE r.rule_type = 'blocked' AND r.ip LIKE %s
 					GROUP BY r.ip
 					ORDER BY {$orderby_sql} {$order}
 					LIMIT %d OFFSET %d",
+					$this->ip_rules_table,
+					$this->table_name,
 					$range_esc,
 					$per_page,
 					$offset
 				)
 			);
-			// phpcs:enable
 		}
 
 		$orderby_sql = 'l.' . $orderby;
@@ -652,38 +695,38 @@ class BruteForceDB {
 			$orderby_sql = 'INET_ATON(l.ip)';
 		}
 
-		$type_where = '';
-		if ( ! empty( $type_filter ) ) {
-			$type_filter = self::normalize_log_type( $type_filter );
-			$type_where  = $this->wpdb->prepare( ' AND l.log_type = %s', $type_filter );
-		}
+		$type_filter = empty( $type_filter ) ? '' : self::normalize_log_type( $type_filter );
 
-		$range_esc = $this->wpdb->esc_like( $range_prefix ) . '.%';
+		$range_esc = $wpdb->esc_like( $range_prefix ) . '.%';
 
-		// phpcs:disable
-		$query = $this->wpdb->prepare(
-			"SELECT 
-				l.id, 
-				l.ip, 
-				l.attempts, 
-				l.last_attempt, 
-				l.log_type, 
-				l.user_agent, 
-				l.payload, 
-				IF(r.rule_type = 'blocked', 1, 0) AS is_blocked, 
-				IF(r.rule_type = 'whitelisted', 1, 0) AS is_whitelisted 
-			FROM {$this->table_name} l
-			LEFT JOIN {$this->ip_rules_table} r ON l.ip = r.ip
-			WHERE l.ip LIKE %s{$type_where}
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom security tables have no WordPress CRUD API. Fresh security decisions, live reports or schema checks must not use stale cached results.
+		return $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT
+				l.id,
+				l.ip,
+				l.attempts,
+				l.last_attempt,
+				l.log_type,
+				l.user_agent,
+				l.payload,
+				IF(r.rule_type = 'blocked', 1, 0) AS is_blocked,
+				IF(r.rule_type = 'whitelisted', 1, 0) AS is_whitelisted
+			FROM %i l
+			LEFT JOIN %i r ON l.ip = r.ip
+			WHERE l.ip LIKE %s AND (%s = '' OR l.log_type = %s)
 			ORDER BY {$orderby_sql} {$order}
 			LIMIT %d OFFSET %d",
-			$range_esc,
-			$per_page,
-			$offset
+				$this->table_name,
+				$this->ip_rules_table,
+				$range_esc,
+				$type_filter,
+				$type_filter,
+				$per_page,
+				$offset
+			)
 		);
-
-		return $this->wpdb->get_results( $query );
-		// phpcs:enable
+		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 	}
 
 
@@ -696,40 +739,44 @@ class BruteForceDB {
 	 * @return int Total row count for the range.
 	 */
 	public function get_total_rows_by_range( $range_prefix, $type_filter = '' ) {
+		$wpdb = $this->wpdb;
+
 		if ( $type_filter === 'blocked' ) {
-			$range_prefix = $this->wpdb->esc_like( $range_prefix );
-			// phpcs:disable
-			$count = $this->wpdb->get_var(
-				$this->wpdb->prepare(
-					"SELECT COUNT(*) FROM {$this->ip_rules_table} WHERE rule_type = %s AND ip LIKE %s",
+			$range_prefix = $wpdb->esc_like( $range_prefix );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom security tables have no WordPress CRUD API. Fresh security decisions, live reports or schema checks must not use stale cached results.
+			$count = $wpdb->get_var(
+				$wpdb->prepare(
+					'SELECT COUNT(*) FROM %i WHERE rule_type = %s AND ip LIKE %s',
+					$this->ip_rules_table,
 					'blocked',
 					$range_prefix . '%'
 				)
 			);
-			// phpcs:enable
 
 			return (int) $count;
 		}
 
-		$range_prefix = $this->wpdb->esc_like( $range_prefix );
+		$range_prefix = $wpdb->esc_like( $range_prefix );
 		$table_name   = $this->table_name;
 
 		if ( ! empty( $type_filter ) ) {
 			$type_filter = self::normalize_log_type( $type_filter );
-			$query       = $this->wpdb->prepare(
-				'SELECT COUNT(*) FROM ' . \esc_sql( $table_name ) . ' WHERE ip LIKE %s AND log_type = %s',
+			$query       = $wpdb->prepare(
+				'SELECT COUNT(*) FROM %i WHERE ip LIKE %s AND log_type = %s',
+				$table_name,
 				$range_prefix . '%',
 				$type_filter
 			);
 		} else {
-			$query = $this->wpdb->prepare(
-				'SELECT COUNT(*) FROM ' . \esc_sql( $table_name ) . ' WHERE ip LIKE %s',
+			$query = $wpdb->prepare(
+				'SELECT COUNT(*) FROM %i WHERE ip LIKE %s',
+				$table_name,
 				$range_prefix . '%'
 			);
 		}
 
-		// phpcs:ignore
-		return (int) $this->wpdb->get_var( $query );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared -- Both branches assign this query exclusively from wpdb::prepare with bound values and identifiers.
+		return (int) $wpdb->get_var( $query );
 	}
 
 
@@ -741,18 +788,20 @@ class BruteForceDB {
 	 * @return int|false Number of deleted rows, or false on failure.
 	 */
 	public function cleanup_old_ips( $days, $max_attempts ) {
+		$wpdb = $this->wpdb;
+
 		$cutoff_time = time() - ( absint( $days ) * DAY_IN_SECONDS );
 		$table_name  = $this->table_name;
 
-		// phpcs:disable
-		$result      = $this->wpdb->query(
-			$this->wpdb->prepare(
-				"DELETE FROM {$table_name} WHERE attempts < %d AND last_attempt < %d",
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom security tables have no WordPress CRUD API. Fresh security decisions, live reports or schema checks must not use stale cached results.
+		$result = $wpdb->query(
+			$wpdb->prepare(
+				'DELETE FROM %i WHERE attempts < %d AND last_attempt < %d',
+				$table_name,
 				absint( $max_attempts ),
 				absint( $cutoff_time )
 			)
 		);
-		// phpcs:enable
 
 		if ( $result !== false && $result > 0 ) {
 			$this->invalidate_all_cache();
@@ -768,8 +817,9 @@ class BruteForceDB {
 	 * @return bool Whether the operation succeeded.
 	 */
 	public function truncate_table() {
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name from validated $wpdb->prefix constant.
-		$result = $this->wpdb->query( "TRUNCATE TABLE {$this->table_name}" );
+		$wpdb = $this->wpdb;
+
+		$result = $wpdb->query( $wpdb->prepare( 'TRUNCATE TABLE %i', $this->table_name ) );
 
 		$this->invalidate_all_cache();
 
@@ -786,6 +836,8 @@ class BruteForceDB {
 	 * @return int Number of rows successfully inserted.
 	 */
 	public function bulk_insert( $rows ) {
+		$wpdb = $this->wpdb;
+
 		$inserted = 0;
 
 		foreach ( $rows as $row ) {
@@ -803,8 +855,8 @@ class BruteForceDB {
 			$user_agent = isset( $row['user_agent'] ) ? mb_substr( sanitize_text_field( $row['user_agent'] ), 0, self::MAX_USER_AGENT_LENGTH ) : '';
 			$payload    = isset( $row['payload'] ) ? mb_substr( sanitize_textarea_field( $row['payload'] ), 0, self::MAX_PAYLOAD_LENGTH ) : '';
 
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
-			$result = $this->wpdb->insert(
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom security tables have no WordPress CRUD API.
+			$result = $wpdb->insert(
 				$this->table_name,
 				array(
 					'ip'           => $ip,
@@ -883,24 +935,88 @@ class BruteForceDB {
 	 * @return void
 	 */
 	public function maybe_migrate_old_table() {
-		$old_table = \esc_sql( $this->wpdb->prefix . 'secuplug_brute_force_table' );
+		$wpdb = $this->wpdb;
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$exists = $this->wpdb->get_var(
-			/* phpcs:ignore */
-			$this->wpdb->prepare( 'SHOW TABLES LIKE %s', $this->wpdb->esc_like( $old_table ) )
+		$old_table = \esc_sql( $wpdb->prefix . 'secuplug_brute_force_table' );
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom security tables have no WordPress CRUD API. Fresh security decisions, live reports or schema checks must not use stale cached results.
+		$exists = $wpdb->get_var(
+			$wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $old_table ) )
 		);
 
 		if ( $exists === $old_table ) {
 			/*
-			 * RENAME TABLE does not support parameterized table names in MySQL.
+			 * WordPress %i placeholders quote table identifiers before execution.
 			 * Both values are constructed from $wpdb->prefix (WordPress internal property)
 			 * concatenated with hardcoded string literals — no user input is involved.
 			 * Backtick-quoting the identifiers protects against reserved word conflicts.
 			 */
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
-			$this->wpdb->query( "RENAME TABLE `{$old_table}` TO `{$this->table_name}`" );
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom security tables have no WordPress CRUD API. Fresh security decisions, live reports or schema checks must not use stale cached results.
+			$wpdb->query( $wpdb->prepare( 'RENAME TABLE %i TO %i', $old_table, $this->table_name ) );
 		}
+	}
+
+
+	/**
+	 * Verify required columns and index definitions after schema changes.
+	 *
+	 * @return bool Whether the required schema exists.
+	 */
+	public function schema_is_ready() {
+		$wpdb = $this->wpdb;
+
+		$schemas = [
+			$this->table_name     => [
+				[ 'id', 'ip', 'attempts', 'expiration', 'last_attempt', 'log_type', 'user_agent', 'payload' ],
+				[
+					'PRIMARY'     => [ 'id' ],
+					'ip_log_type' => [ 'ip', 'log_type' ],
+				],
+			],
+			$this->ip_rules_table => [
+				[ 'id', 'ip', 'rule_type', 'created_at', 'expiration' ],
+				[
+					'PRIMARY' => [ 'id' ],
+					'ip'      => [ 'ip' ],
+				],
+			],
+		];
+		foreach ( $schemas as $table => $required ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom security tables have no WordPress CRUD API. Fresh security decisions, live reports or schema checks must not use stale cached results.
+			$columns = $wpdb->get_col( $wpdb->prepare( 'SHOW COLUMNS FROM %i', $table ) );
+
+			if ( $wpdb->last_error || array_diff( $required[0], (array) $columns ) ) {
+				return false;
+			}
+
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom security tables have no WordPress CRUD API. Fresh security decisions, live reports or schema checks must not use stale cached results.
+			$rows = $wpdb->get_results( $wpdb->prepare( 'SHOW INDEX FROM %i', $table ), ARRAY_A );
+
+			if ( $wpdb->last_error ) {
+				return false;
+			}
+
+			$indexes = [];
+
+			foreach ( (array) $rows as $row ) {
+				if ( in_array( $row['Key_name'], [ 'PRIMARY', 'ip' ], true ) && (int) $row['Non_unique'] !== 0 ) {
+					return false;
+				}
+
+				$indexes[ $row['Key_name'] ][ (int) $row['Seq_in_index'] ] = $row['Column_name'];
+			}
+
+			foreach ( $required[1] as $name => $fields ) {
+				$actual = $indexes[ $name ] ?? [];
+				ksort( $actual );
+
+				if ( array_values( $actual ) !== $fields ) {
+					return false;
+				}
+			}
+		}
+
+		return true;
 	}
 
 
@@ -912,7 +1028,9 @@ class BruteForceDB {
 	 * @return void
 	 */
 	public function create_table() {
-		$charset_collate = $this->wpdb->get_charset_collate();
+		$wpdb = $this->wpdb;
+
+		$charset_collate = $wpdb->get_charset_collate();
 		$table_name      = $this->table_name;
 		$rules_table     = $this->ip_rules_table;
 
@@ -951,34 +1069,39 @@ class BruteForceDB {
 	 * @return void
 	 */
 	public function maybe_add_database_indexes() {
+		$wpdb = $this->wpdb;
+
 		// Check if index exists on {$this->table_name}.
-		// phpcs:disable
-		$index_exists = $this->wpdb->get_results(
-			$this->wpdb->prepare(
-				"SHOW INDEX FROM {$this->table_name} WHERE Key_name = %s",
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom security tables have no WordPress CRUD API. Fresh security decisions, live reports or schema checks must not use stale cached results.
+		$index_exists = $wpdb->get_results(
+			$wpdb->prepare(
+				'SHOW INDEX FROM %i WHERE Key_name = %s',
+				$this->table_name,
 				'ip_log_type'
 			)
 		);
 
 		if ( empty( $index_exists ) ) {
-			
-			$this->wpdb->query(
-				$this->wpdb->prepare(
-					'ALTER TABLE ' . esc_sql( $this->table_name ) . ' ADD KEY ip_log_type (ip(20), log_type(15))'
+
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom security tables have no WordPress CRUD API. Fresh security decisions, live reports or schema checks must not use stale cached results.
+			$wpdb->query(
+				$wpdb->prepare(
+					// phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange -- Versioned plugin schema migration requires this DDL operation.
+					'ALTER TABLE %i ADD KEY ip_log_type (ip(20), log_type(15))',
+					$this->table_name
 				)
 			);
 		}
-		// phpcs:enable
 
 		// Check if expiration column exists in ip_rules_table.
-		// phpcs:disable
-		$col_exists = $this->wpdb->get_results(
-			$this->wpdb->prepare(
-				"SHOW COLUMNS FROM {$this->ip_rules_table} LIKE %s",
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom security tables have no WordPress CRUD API. Fresh security decisions, live reports or schema checks must not use stale cached results.
+		$col_exists = $wpdb->get_results(
+			$wpdb->prepare(
+				'SHOW COLUMNS FROM %i LIKE %s',
+				$this->ip_rules_table,
 				'expiration'
 			)
 		);
-		// phpcs:enable
 		if ( empty( $col_exists ) ) {
 			$this->create_table();
 		}
@@ -991,14 +1114,16 @@ class BruteForceDB {
 	 * @return void
 	 */
 	public function migrate_existing_rows_to_failed_login() {
-		// phpcs:disable
-		$this->wpdb->query(
-			$this->wpdb->prepare(
-				"UPDATE {$this->table_name} SET log_type = %s WHERE log_type = '' OR log_type IS NULL",
+		$wpdb = $this->wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom security tables have no WordPress CRUD API. Fresh security decisions, live reports or schema checks must not use stale cached results.
+		$wpdb->query(
+			$wpdb->prepare(
+				"UPDATE %i SET log_type = %s WHERE log_type = '' OR log_type IS NULL",
+				$this->table_name,
 				self::TYPE_FAILED_LOGIN
 			)
 		);
-		// phpcs:enable
 	}
 
 
@@ -1014,13 +1139,15 @@ class BruteForceDB {
 	 * @return int|false The number of rows inserted, or false on error.
 	 */
 	public function log_attempt_with_details( $ip, $log_type, $user_agent = '', $payload = '' ) {
+		$wpdb = $this->wpdb;
+
 		$log_type   = self::normalize_log_type( $log_type );
 		$user_agent = mb_substr( sanitize_text_field( $user_agent ), 0, self::MAX_USER_AGENT_LENGTH );
 		$payload    = mb_substr( $payload, 0, self::MAX_PAYLOAD_LENGTH );
 
 		// Always insert a new row to preserve payload/username/browser details.
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
-		$result = $this->wpdb->insert(
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom security tables have no WordPress CRUD API.
+		$result = $wpdb->insert(
 			$this->table_name,
 			array(
 				'ip'           => $ip,
@@ -1049,6 +1176,8 @@ class BruteForceDB {
 	 * @return bool True if blocked, false if whitelisted or error.
 	 */
 	public function block_ip( $ip, $duration_seconds = 0 ) {
+		$wpdb = $this->wpdb;
+
 		if ( $this->is_ip_whitelisted( $ip ) ) {
 			return false;
 		}
@@ -1059,12 +1188,13 @@ class BruteForceDB {
 		}
 
 		$now = time();
-		// phpcs:disable
-		$result = $this->wpdb->query(
-			$this->wpdb->prepare(
-				"INSERT INTO {$this->ip_rules_table} (ip, rule_type, created_at, expiration)
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom security tables have no WordPress CRUD API.
+		$result = $wpdb->query(
+			$wpdb->prepare(
+				'INSERT INTO %i (ip, rule_type, created_at, expiration)
 				 VALUES (%s, %s, %d, %d)
-				 ON DUPLICATE KEY UPDATE rule_type = %s, created_at = %d, expiration = %d",
+				 ON DUPLICATE KEY UPDATE rule_type = %s, created_at = %d, expiration = %d',
+				$this->ip_rules_table,
 				$ip,
 				'blocked',
 				$now,
@@ -1074,7 +1204,6 @@ class BruteForceDB {
 				$expiration
 			)
 		);
-		// phpcs:enable
 
 		$this->invalidate_cache_for_ip( $ip );
 		\wp_cache_delete( 'securefusion_bf_whitelisted_' . md5( $ip ), self::CACHE_GROUP );
@@ -1091,8 +1220,10 @@ class BruteForceDB {
 	 * @return bool Whether the operation succeeded.
 	 */
 	public function unblock_ip( $ip ) {
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
-		$result = $this->wpdb->delete(
+		$wpdb = $this->wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom security tables have no WordPress CRUD API.
+		$result = $wpdb->delete(
 			$this->ip_rules_table,
 			array(
 				'ip'        => $ip,
@@ -1115,8 +1246,10 @@ class BruteForceDB {
 	 * @return bool Whether the operation succeeded.
 	 */
 	public function delete_ip_rule( $ip ) {
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
-		$result = $this->wpdb->delete(
+		$wpdb = $this->wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom security tables have no WordPress CRUD API.
+		$result = $wpdb->delete(
 			$this->ip_rules_table,
 			array( 'ip' => $ip ),
 			array( '%s' )
@@ -1138,6 +1271,8 @@ class BruteForceDB {
 	 * @return array Array of IP/Range strings.
 	 */
 	public function get_blocked_rules() {
+		$wpdb = $this->wpdb;
+
 		$cache_key = 'securefusion_bf_blocked_rules';
 		$cached    = \wp_cache_get( $cache_key, self::CACHE_GROUP );
 
@@ -1145,15 +1280,15 @@ class BruteForceDB {
 			return $cached;
 		}
 
-		// phpcs:disable
-		$rows = $this->wpdb->get_results(
-			$this->wpdb->prepare(
-				"SELECT ip, expiration FROM {$this->ip_rules_table} WHERE rule_type = %s",
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom security tables have no WordPress CRUD API.
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				'SELECT ip, expiration FROM %i WHERE rule_type = %s',
+				$this->ip_rules_table,
 				'blocked'
 			),
 			ARRAY_A
 		);
-		// phpcs:enable
 
 		if ( ! is_array( $rows ) ) {
 			$rows = [];
@@ -1174,8 +1309,8 @@ class BruteForceDB {
 
 		if ( ! empty( $expired_ips ) ) {
 			foreach ( $expired_ips as $expired_ip ) {
-				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
-				$this->wpdb->delete(
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom security tables have no WordPress CRUD API.
+				$wpdb->delete(
 					$this->ip_rules_table,
 					array(
 						'ip'        => $expired_ip,
@@ -1278,17 +1413,20 @@ class BruteForceDB {
 	 * @return bool Whether the operation succeeded.
 	 */
 	public function whitelist_ip( $ip ) {
+		$wpdb = $this->wpdb;
+
 		if ( $this->is_ip_whitelisted( $ip ) ) {
 			return true;
 		}
 
 		$now = time();
-		// phpcs:disable
-		$result = $this->wpdb->query(
-			$this->wpdb->prepare(
-				"INSERT INTO {$this->ip_rules_table} (ip, rule_type, created_at, expiration)
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom security tables have no WordPress CRUD API.
+		$result = $wpdb->query(
+			$wpdb->prepare(
+				'INSERT INTO %i (ip, rule_type, created_at, expiration)
 				 VALUES (%s, %s, %d, 0)
-				 ON DUPLICATE KEY UPDATE rule_type = %s, created_at = %d, expiration = 0",
+				 ON DUPLICATE KEY UPDATE rule_type = %s, created_at = %d, expiration = 0',
+				$this->ip_rules_table,
 				$ip,
 				'whitelisted',
 				$now,
@@ -1296,7 +1434,6 @@ class BruteForceDB {
 				$now
 			)
 		);
-		// phpcs:enable
 
 		$this->invalidate_cache_for_ip( $ip );
 		\wp_cache_delete( 'securefusion_bf_blocked_' . md5( $ip ), self::CACHE_GROUP );
@@ -1313,6 +1450,8 @@ class BruteForceDB {
 	 * @return array Array of IP/Range strings.
 	 */
 	public function get_whitelisted_rules() {
+		$wpdb = $this->wpdb;
+
 		$cache_key = 'securefusion_bf_whitelisted_rules';
 		$cached    = \wp_cache_get( $cache_key, self::CACHE_GROUP );
 
@@ -1320,15 +1459,15 @@ class BruteForceDB {
 			return $cached;
 		}
 
-		// phpcs:disable
-		$rows = $this->wpdb->get_results(
-			$this->wpdb->prepare(
-				"SELECT ip FROM {$this->ip_rules_table} WHERE rule_type = %s",
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Custom security tables have no WordPress CRUD API.
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				'SELECT ip FROM %i WHERE rule_type = %s',
+				$this->ip_rules_table,
 				'whitelisted'
 			),
 			ARRAY_A
 		);
-		// phpcs:enable
 
 		if ( ! is_array( $rows ) ) {
 			$rows = [];
@@ -1397,27 +1536,29 @@ class BruteForceDB {
 	 * @return bool Whether the operation succeeded.
 	 */
 	public function delete_by_type( $type_filter = '' ) {
+		$wpdb = $this->wpdb;
+
 		if ( empty( $type_filter ) ) {
 			return $this->truncate_table();
 		}
 
 		if ( $type_filter === 'blocked' ) {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
-			$result = $this->wpdb->delete(
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom security tables have no WordPress CRUD API. Fresh security decisions, live reports or schema checks must not use stale cached results.
+			$result = $wpdb->delete(
 				$this->ip_rules_table,
 				array( 'rule_type' => 'blocked' ),
 				array( '%s' )
 			);
 		} else {
 			$type_filter = self::normalize_log_type( $type_filter );
-			// phpcs:disable
-			$result = $this->wpdb->query(
-				$this->wpdb->prepare(
-					"DELETE FROM {$this->table_name} WHERE log_type = %s",
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom security tables have no WordPress CRUD API. Fresh security decisions, live reports or schema checks must not use stale cached results.
+			$result = $wpdb->query(
+				$wpdb->prepare(
+					'DELETE FROM %i WHERE log_type = %s',
+					$this->table_name,
 					$type_filter
 				)
 			);
-			 // phpcs:enable
 		}
 
 		$this->invalidate_all_cache();
@@ -1436,21 +1577,26 @@ class BruteForceDB {
 	 * @return array Array of rule objects.
 	 */
 	public function get_all_rules( $per_page = 20, $offset = 0, $orderby = 'created_at', $order = 'DESC' ) {
+		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- ORDER BY expressions come only from the local allowlist; ASC/DESC is normalized. SQL expressions cannot be value placeholders.
+
+		$wpdb = $this->wpdb;
+
 		$allowed_columns = [ 'id', 'ip', 'rule_type', 'created_at', 'expiration' ];
 		$orderby         = in_array( $orderby, $allowed_columns, true ) ? $orderby : 'created_at';
 		$order           = strtoupper( $order ) === 'ASC' ? 'ASC' : 'DESC';
 		$per_page        = absint( $per_page );
 		$offset          = absint( $offset );
 
-		// phpcs:disable
-		return $this->wpdb->get_results(
-			$this->wpdb->prepare(
-				"SELECT id, ip, rule_type, created_at, expiration FROM {$this->ip_rules_table} ORDER BY {$orderby} {$order} LIMIT %d OFFSET %d",
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom security tables have no WordPress CRUD API. Fresh security decisions, live reports or schema checks must not use stale cached results.
+		return $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT id, ip, rule_type, created_at, expiration FROM %i ORDER BY {$orderby} {$order} LIMIT %d OFFSET %d",
+				$this->ip_rules_table,
 				$per_page,
 				$offset
 			)
 		);
-		 // phpcs:enable
+		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 	}
 
 
@@ -1460,8 +1606,10 @@ class BruteForceDB {
 	 * @return int Total rule count.
 	 */
 	public function get_total_rules_count() {
-		// phpcs:ignore
-		return (int) $this->wpdb->get_var( "SELECT COUNT(*) FROM {$this->ip_rules_table}" );
+		$wpdb = $this->wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom security tables have no WordPress CRUD API. Fresh security decisions, live reports or schema checks must not use stale cached results.
+		return (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM %i', $this->ip_rules_table ) );
 	}
 
 
@@ -1472,19 +1620,21 @@ class BruteForceDB {
 	 * @return array Array of objects with log_type, date_str, and count.
 	 */
 	public function get_daily_attempts_stats( $days = 30 ) {
+		$wpdb = $this->wpdb;
+
 		$time_limit = time() - ( $days * DAY_IN_SECONDS );
-		// phpcs:disable
-		$results = $this->wpdb->get_results(
-			$this->wpdb->prepare(
-				"SELECT log_type, YEAR(FROM_UNIXTIME(last_attempt)) as yr, MONTH(FROM_UNIXTIME(last_attempt)) as mo, DAY(FROM_UNIXTIME(last_attempt)) as dy, COUNT(*) as count 
-				 FROM `{$this->table_name}` 
-				 WHERE last_attempt >= %d 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom security tables have no WordPress CRUD API. Fresh security decisions, live reports or schema checks must not use stale cached results.
+		$results = $wpdb->get_results(
+			$wpdb->prepare(
+				'SELECT log_type, YEAR(FROM_UNIXTIME(last_attempt)) as yr, MONTH(FROM_UNIXTIME(last_attempt)) as mo, DAY(FROM_UNIXTIME(last_attempt)) as dy, COUNT(*) as count
+				 FROM %i
+				 WHERE last_attempt >= %d
 				 GROUP BY log_type, YEAR(FROM_UNIXTIME(last_attempt)), MONTH(FROM_UNIXTIME(last_attempt)), DAY(FROM_UNIXTIME(last_attempt))
-				 ORDER BY yr ASC, mo ASC, dy ASC",
+				 ORDER BY yr ASC, mo ASC, dy ASC',
+				$this->table_name,
 				$time_limit
 			)
 		);
-		// phpcs:enable
 
 		// Format to YYYY-MM-DD.
 		if ( is_array( $results ) ) {
@@ -1504,19 +1654,21 @@ class BruteForceDB {
 	 * @return array Array of objects with log_type, month_str, and count.
 	 */
 	public function get_monthly_attempts_stats( $months = 12 ) {
+		$wpdb = $this->wpdb;
+
 		$time_limit = time() - ( $months * 30 * DAY_IN_SECONDS );
-		// phpcs:disable
-		$results = $this->wpdb->get_results(
-			$this->wpdb->prepare(
-				"SELECT log_type, YEAR(FROM_UNIXTIME(last_attempt)) as yr, MONTH(FROM_UNIXTIME(last_attempt)) as mo, COUNT(*) as count 
-				 FROM `{$this->table_name}` 
-				 WHERE last_attempt >= %d 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom security tables have no WordPress CRUD API. Fresh security decisions, live reports or schema checks must not use stale cached results.
+		$results = $wpdb->get_results(
+			$wpdb->prepare(
+				'SELECT log_type, YEAR(FROM_UNIXTIME(last_attempt)) as yr, MONTH(FROM_UNIXTIME(last_attempt)) as mo, COUNT(*) as count
+				 FROM %i
+				 WHERE last_attempt >= %d
 				 GROUP BY log_type, YEAR(FROM_UNIXTIME(last_attempt)), MONTH(FROM_UNIXTIME(last_attempt))
-				 ORDER BY yr ASC, mo ASC",
+				 ORDER BY yr ASC, mo ASC',
+				$this->table_name,
 				$time_limit
 			)
 		);
-		 // phpcs:enable
 
 		// Format to YYYY-MM.
 		if ( is_array( $results ) ) {

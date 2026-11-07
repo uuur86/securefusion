@@ -92,7 +92,6 @@ class Main {
 			'cleanup_ip_attempts'             => '10',
 			'custom_login_url'                => '',
 			'change_login_error'              => '',
-			'change_admin_id'                 => '',
 			'filter_bad_requests'             => '1',
 			'disable_rest_api'                => '1',
 			'hide_usernames'                  => '1',
@@ -238,6 +237,7 @@ class Main {
 		// MIGRATION & UPDATE DETECTOR.
 		// Run update migrations synchronously during plugin load to prevent race conditions
 		// with Middleware::init() which runs early on 'plugins_loaded' and queries the database.
+		add_action( 'admin_notices', [ $this, 'database_notice' ] );
 		$this->maybe_update_plugin();
 	}
 
@@ -319,16 +319,66 @@ class Main {
 		}
 
 		// Database schema operations via centralized service.
-		$brute_force_db = new BruteForceDB();
-		$brute_force_db->maybe_migrate_old_table();
-		$brute_force_db->create_table();
-		$brute_force_db->maybe_add_database_indexes();
-		$brute_force_db->migrate_existing_rows_to_failed_login();
-
-		update_option( 'securefusion_db_version', SECUREFUSION_VERSION );
+		$this->install_database();
 
 		if ( ! wp_next_scheduled( 'securefusion_cleanup_ips_cron' ) ) {
 			wp_schedule_event( time(), 'daily', 'securefusion_cleanup_ips_cron' );
+		}
+	}
+
+
+	/**
+	 * Install and verify the schema before recording a successful version.
+	 *
+	 * @return bool Success.
+	 */
+	public function install_database() {
+		$db = new BruteForceDB();
+
+		$db->maybe_migrate_old_table();
+
+		global $wpdb;
+
+		if ( $wpdb->last_error ) {
+			update_option( 'securefusion_db_error', 1, false );
+			set_transient( 'securefusion_db_retry', 1, 300 );
+
+			return false;
+		}
+
+		$db->create_table();
+		$db->maybe_add_database_indexes();
+
+		if ( ! $db->schema_is_ready() ) {
+			update_option( 'securefusion_db_error', 1, false );
+			set_transient( 'securefusion_db_retry', 1, 300 );
+
+			return false;
+		}
+
+		$db->migrate_existing_rows_to_failed_login();
+
+		if ( $wpdb->last_error ) {
+			update_option( 'securefusion_db_error', 1, false );
+			set_transient( 'securefusion_db_retry', 1, 300 );
+
+			return false;
+		}
+
+		update_option( 'securefusion_db_version', SECUREFUSION_VERSION );
+		update_option( 'securefusion_db_verified', '1', false );
+		delete_option( 'securefusion_db_error' );
+		delete_transient( 'securefusion_db_retry' );
+
+		return true;
+	}
+
+	/**
+	 * Surface incomplete installation to administrators without exposing SQL.
+	 */
+	public function database_notice() {
+		if ( current_user_can( 'manage_options' ) && get_option( 'securefusion_db_error' ) ) {
+			echo '<div class="notice notice-error"><p>' . esc_html__( 'SecureFusion database setup is incomplete. Logging and IP protection may not work correctly. Check database permissions and server logs. Setup will retry on a request after five minutes.', 'secuplug' ) . '</p></div>';
 		}
 	}
 
@@ -342,7 +392,8 @@ class Main {
 	 */
 	public function maybe_update_plugin() {
 		$installed_version = get_option( 'securefusion_db_version' );
-		if ( $installed_version !== SECUREFUSION_VERSION ) {
+
+		if ( ( $installed_version !== SECUREFUSION_VERSION || '1' !== get_option( 'securefusion_db_verified' ) ) && ! get_transient( 'securefusion_db_retry' ) ) {
 			if ( Settings::is_network_mode() ) {
 				// New keys are added to the network layer; sites keep only their overrides.
 				$network = Settings::maybe_seed_network();
@@ -359,13 +410,7 @@ class Main {
 			}
 
 			// Run database schema updates.
-			$brute_force_db = new BruteForceDB();
-			$brute_force_db->maybe_migrate_old_table();
-			$brute_force_db->create_table();
-			$brute_force_db->maybe_add_database_indexes();
-			$brute_force_db->migrate_existing_rows_to_failed_login();
-
-			update_option( 'securefusion_db_version', SECUREFUSION_VERSION );
+			$this->install_database();
 		}
 	}
 

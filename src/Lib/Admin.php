@@ -113,6 +113,43 @@ class Admin {
 
 
 	/**
+	 * Explain the native WordPress account transition without mutating users.
+	 *
+	 * @return void
+	 */
+	protected function get_account_transition_html() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'You do not have permission to view this page.', 'secuplug' ) );
+		}
+		echo '<div class="fsf-account-guide">';
+		echo '<p>' . esc_html__( 'If you choose to replace this account, use WordPress user management and verify each step before removing the original account.', 'secuplug' ) . '</p>';
+		echo '<p>' . esc_html__( 'A different user ID is not protection against SQL injection or privilege escalation. Keep strong passwords, login protection and software updates in place.', 'secuplug' ) . '</p>';
+		if ( is_multisite() ) {
+			echo '<p>' . esc_html__( 'Multisite accounts are shared across sites. Ask a network administrator to review site memberships, super administrator access and content ownership on every affected site before replacing an account. Removing a user from one site is different from deleting the network account.', 'secuplug' ) . '</p>';
+		} else {
+			echo '<ol>';
+			foreach ( [
+				__( 'Back up the site and review data owned by the old account, including orders, memberships and records stored by other plugins. WordPress content reassignment does not guarantee migration of those records.', 'secuplug' ),
+				__( 'Create a new user with a distinct username, an accessible email address, a strong password and the Administrator role.', 'secuplug' ),
+				__( 'Sign in with the new account in a separate browser session and verify access before changing the old account.', 'secuplug' ),
+				__( 'From the new account, open Users. Only after checking plugin-owned data, delete the old account and select Attribute all content to the new account. If ownership is uncertain, postpone deletion and review the old account permissions instead.', 'secuplug' ),
+				__( 'Verify content authorship, media, plugin records and administrator access after the transition.', 'secuplug' ),
+			] as $step ) {
+				echo '<li>' . esc_html( $step ) . '</li>';
+			}
+			echo '</ol>';
+			if ( current_user_can( 'create_users' ) ) {
+				echo '<p><a class="button button-primary" href="' . esc_url( admin_url( 'user-new.php' ) ) . '">' . esc_html__( 'Create a new user', 'secuplug' ) . '</a></p>';
+			}
+		}
+		if ( current_user_can( 'list_users' ) ) {
+			echo '<p><a class="button" href="' . esc_url( admin_url( 'users.php' ) ) . '">' . esc_html__( 'Review site users', 'secuplug' ) . '</a></p>';
+		}
+		echo '</div>';
+	}
+
+
+	/**
 	 * Add admin menu pages.
 	 *
 	 * @return void
@@ -189,7 +226,6 @@ class Admin {
 
 		// login.
 		$login_url          = $this->get_settings( 'custom_login_url' );
-		$change_admin_id    = $this->get_settings( 'change_admin_id' ) > 1 ? 1 : 0;
 		$change_login_error = empty( $this->get_settings( 'change_login_error' ) ) ? 0 : 1;
 
 		// firewall.
@@ -267,7 +303,7 @@ class Admin {
 				<div class="dashboard-item fynd-sf-security-status-card <?php echo esc_attr( $security_pass ? 'fynd-sf-status-enabled' : 'fynd-sf-status-disabled' ); ?>">
 					<div class="fynd-sf-card-header-row">
 						<h2><?php esc_html_e( 'Security Status', 'secuplug' ); ?></h2>
-						
+
 						<div class="fynd-sf-system-badges">
 							<div class="fynd-sf-system-badge">
 								<span class="dashicons dashicons-wordpress"></span>
@@ -375,6 +411,21 @@ class Admin {
 					$this->admin_link
 				);
 
+				$first_user = get_userdata( 1 );
+
+				if ( $first_user && in_array( 'administrator', (array) $first_user->roles, true ) ) {
+					ob_start();
+					$this->get_account_transition_html();
+					$account_guide = ob_get_clean();
+					$this->add_status_box(
+						esc_html__( 'Administrator account review', 'secuplug' ),
+						false,
+						esc_html__( 'An administrator on this site uses ID 1. This alone is not a vulnerability. Review the account before deciding whether to replace it.', 'secuplug' ),
+						[],
+						$account_guide
+					);
+				}
+
 				$this->add_status_box(
 					esc_html__( 'XML-RPC FULL PROTECTION', 'secuplug' ),
 					$disable_all_xmlrpc,
@@ -420,11 +471,6 @@ class Admin {
 					esc_html__( 'Change Login Error', 'secuplug' ),
 					$change_login_error,
 					esc_html__( 'Disable default login errors and provide attackers with less than what they need.', 'secuplug' )
-				);
-				$this->add_status_box(
-					esc_html__( 'Change Admin ID', 'secuplug' ),
-					$change_admin_id,
-					esc_html__( "It's not difficult to predict your Admin ID if it's set to `1`. Secure your site against simple SQL vulnerabilities.", 'secuplug' )
 				);
 				$this->add_status_box(
 					esc_html__( 'Force HTTPS Admin', 'secuplug' ),
@@ -508,7 +554,7 @@ class Admin {
 	 * @return void
 	 */
 	public function get_settings_html() {
-		$has_ssl     = ! empty( get_transient( 'securefusion_ssl_cert_data' ) );
+		$has_ssl     = is_array( get_transient( 'securefusion_ssl_cert_data' ) );
 		$sub_site    = $this->layered && 'site' === $this->context;
 		$customized  = $this->customized_counts();
 		$total       = array_sum( $customized );
@@ -606,7 +652,7 @@ class Admin {
 						<?php endforeach; ?>
 					</h2>
 
-					<div class="content-box">
+					<div class="content-box" data-fsf-unsaved>
 						<?php $this->settings_page->form_start(); ?>
 						<div class="content-tab-wrapper">
 							<?php foreach ( $tabs as $tab_id => $tab ) : ?>
@@ -710,7 +756,7 @@ class Admin {
 	public function load() {
 		$current_user = \wp_get_current_user();
 
-		$ssl_cond = ! empty( get_transient( 'securefusion_ssl_cert_data' ) );
+		$ssl_cond = is_array( get_transient( 'securefusion_ssl_cert_data' ) );
 
 		$conf = [
 			[
@@ -1349,16 +1395,6 @@ class Admin {
 						'label' => esc_html__( 'Login error message', 'secuplug' ),
 						'after' => '<span class="description">' . esc_html__( 'Shown instead of the WordPress message, which tells attackers whether a username exists. Leave it empty to keep the WordPress message.', 'secuplug' ) . '</span>',
 					],
-					[
-						'type'   => 'text_input',
-						'name'   => 'change_admin_id',
-						'label'  => esc_html__( 'Administrator user ID', 'secuplug' ),
-						'before' => 'Your current ID is ',
-						'after'  => ' for "' . $current_user->user_login . '". ' .
-							'<span class="field-tip">' .
-							'	We recommend changing this field for each user one by one' .
-							'</span>',
-					],
 				],
 			],
 			[
@@ -1793,9 +1829,10 @@ class Admin {
 	 * @return void
 	 */
 	public function admin_theme_styles() {
-		\wp_enqueue_style( 'securefusion-admin-theme-main-css', \plugins_url( 'assets/css/admin.css', SECUREFUSION_BASENAME ), array(), SECUREFUSION_VERSION );
-		\wp_enqueue_style( 'securefusion-bastion', \plugins_url( 'assets/css/bastion.css', SECUREFUSION_BASENAME ), array( 'securefusion-admin-theme-main-css' ), SECUREFUSION_VERSION );
+		\wp_enqueue_style( 'securefusion-admin-theme-main-css', \plugins_url( 'assets/css/admin.css', SECUREFUSION_BASENAME ), array(), (string) filemtime( SECUREFUSION_PATH . 'assets/css/admin.css' ) );
+		\wp_enqueue_style( 'securefusion-bastion', \plugins_url( 'assets/css/bastion.css', SECUREFUSION_BASENAME ), array( 'securefusion-admin-theme-main-css' ), (string) filemtime( SECUREFUSION_PATH . 'assets/css/bastion.css' ) );
 		\wp_enqueue_script( 'securefusion-admin-js', \plugins_url( 'assets/js/admin.js', SECUREFUSION_BASENAME ), array(), SECUREFUSION_VERSION, true );
+		\wp_enqueue_script( 'securefusion-unsaved-settings', \plugins_url( 'assets/js/unsaved-settings.js', SECUREFUSION_BASENAME ), array( 'jquery', 'securefusion-admin-js' ), (string) filemtime( SECUREFUSION_PATH . 'assets/js/unsaved-settings.js' ), true );
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Non-state-changing query parameter check.
 		if ( isset( $_GET['page'] ) && 'secuplug' === $_GET['page'] ) {
@@ -1902,10 +1939,11 @@ class Admin {
 	 * @param mixed  $status  Status.
 	 * @param string $desc    Description.
 	 * @param array  $button  Button array.
+	 * @param string $details Optional expanded guidance HTML.
 	 *
 	 * @return void
 	 */
-	public function add_status_box( $title, $status = false, $desc = '', $button = [] ) {
+	public function add_status_box( $title, $status = false, $desc = '', $button = [], $details = '' ) {
 		$card_class = 'dashboard-item';
 		if ( $status !== false ) {
 			$card_class .= $status ? ' fynd-sf-status-enabled' : ' fynd-sf-status-disabled';
@@ -1933,6 +1971,15 @@ class Admin {
 						<?php $status ? esc_html_e( 'enabled', 'secuplug' ) : esc_html_e( 'disabled', 'secuplug' ); ?>
 					</span>
 				</div>
+				<?php
+			endif;
+
+			if ( ! empty( $details ) ) :
+				?>
+				<details class="fsf-card-details">
+					<summary><?php esc_html_e( 'Review guidance', 'secuplug' ); ?></summary>
+					<div class="fsf-card-details__body"><?php echo wp_kses_post( $details ); ?></div>
+				</details>
 				<?php
 			endif;
 

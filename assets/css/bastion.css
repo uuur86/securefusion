@@ -436,29 +436,32 @@
 	color: var(--fsf-ink-2);
 }
 
-/* Segmented control (radio groups, bastion.wasp.php) */
+/* Borders belong to labels only: no second outer box or inherited field spacing. */
 .fsf .fsf-seg {
 	display: inline-flex;
 	flex-wrap: wrap;
+	gap: 0;
 	margin: 0;
-	padding: 0 1px 1px 0;
+	padding: 0;
 	border: 0;
+	min-width: 0;
 }
-
-/* Each segment draws its own border, overlapping by 1px, so wrapped rows stay closed. */
 .fsf .fsf-seg > span {
 	display: flex;
-	margin: 0 -1px -1px 0;
-	border: 1px solid var(--fsf-line-strong);
-	background: var(--fsf-surface);
+	align-items: stretch;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background: transparent;
 }
-
-.fsf .fsf-seg > span:first-child {
+.fsf .fsf-seg > span + span {
+	margin-inline-start: -1px;
+}
+.fsf .fsf-seg > span:first-child > label {
 	border-start-start-radius: var(--fsf-radius);
 	border-end-start-radius: var(--fsf-radius);
 }
-
-.fsf .fsf-seg > span:last-child {
+.fsf .fsf-seg > span:last-child > label {
 	border-start-end-radius: var(--fsf-radius);
 	border-end-end-radius: var(--fsf-radius);
 }
@@ -471,7 +474,13 @@
 	opacity: 0;
 }
 
-.fsf .fsf-seg label {
+.fsf .fsf-seg > span > label {
+	margin: 0;
+	flex: 1;
+	border: 1px solid var(--fsf-line-strong);
+	border-radius: 0;
+	box-shadow: none;
+	box-sizing: border-box;
 	display: block;
 	min-width: 56px;
 	padding: 5px var(--fsf-3);
@@ -500,14 +509,6 @@
 
 .fsf .fsf-seg input[type="radio"]:disabled + label {
 	cursor: default;
-}
-
-/* While a value comes from the network, the chosen segment is tinted, not filled. */
-.fsf .wasp-inheritable[data-wasp-state="inherited"] .fsf-seg input[type="radio"]:checked + label,
-.fsf .wasp-inheritable[data-wasp-state="locked"] .fsf-seg input[type="radio"]:checked + label {
-	background: var(--fsf-brand-wash);
-	box-shadow: inset 0 0 0 1px var(--fsf-brand);
-	color: var(--fsf-brand-ink);
 }
 
 /* Locked fields: read-only look even before (or without) the script. */

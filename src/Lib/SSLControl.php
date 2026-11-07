@@ -92,57 +92,81 @@ class SSLControl {
 	protected function ssl_available( $url ) {
 		$cert_data = \get_transient( 'securefusion_ssl_cert_data' );
 
-		if ( ! $cert_data ) {
-			$url_parse = wp_parse_url( $url, PHP_URL_HOST );
-
-			if ( $url_parse === 'localhost' ) {
-				$cert_data = 'not-valid';
-			} elseif ( $url_parse ) {
-				$get_context = stream_context_create(
-					[
-						'ssl' => [ 'capture_peer_cert' => true ],
-					]
-				);
-				$socket_url  = 'ssl://' . $url_parse . ':443';
-
-				if ( $get_context ) {
-					// phpcs:ignore
-					set_error_handler( [ $this, 'ssl_error_handling' ] );
-					$stream = stream_socket_client(
-						$socket_url,
-						$errno,
-						$errstr,
-						30,
-						STREAM_CLIENT_CONNECT,
-						$get_context
-					);
-					restore_error_handler();
-
-					if ( $errno === 0 && $stream ) {
-						$cert_params = stream_context_get_params( $stream );
-						$cert_peer   = $cert_params['options']['ssl']['peer_certificate'];
-
-						if ( isset( $cert_peer ) ) {
-							$cert_data = openssl_x509_parse( $cert_peer );
-						}
-					}
-				}
-			}
-
-			\set_transient( 'securefusion_ssl_cert_data', $cert_data, DAY_IN_SECONDS );
+		if ( is_array( $cert_data ) && ! empty( $cert_data ) ) {
+			return $cert_data;
 		}
-
-		if ( $cert_data === 'not-valid' ) {
+		// Cache failures separately: false is also WordPress's cache-miss value.
+		if ( get_transient( 'securefusion_ssl_check_failed' ) ) {
 			return false;
 		}
 
-		if ( ! empty( $cert_data ) ) {
-			return $cert_data;
+		$host   = wp_parse_url( $url, PHP_URL_HOST );
+		$port   = wp_parse_url( $url, PHP_URL_PORT );
+		$port   = null === $port ? 443 : $port;
+		$result = false;
+
+		if ( $host && 'localhost' !== $host ) {
+			$result = $this->probe_certificate( $host, $port );
 		}
+
+		if ( is_array( $result ) && ! empty( $result ) ) {
+			set_transient( 'securefusion_ssl_cert_data', $result, DAY_IN_SECONDS );
+			delete_transient( 'securefusion_ssl_check_failed' );
+			return $result;
+		}
+
+		delete_transient( 'securefusion_ssl_cert_data' );
+		set_transient( 'securefusion_ssl_check_failed', 1, 300 );
 
 		return false;
 	}
 
+
+
+	/**
+	 * Probe a certificate with a short connection timeout and guaranteed cleanup.
+	 *
+	 * @param string $host Host.
+	 * @param int    $port Port.
+	 * @return array|false Parsed certificate or unavailable result.
+	 */
+	protected function probe_certificate( $host, $port ) {
+		$context = stream_context_create(
+			[
+				'ssl' => [
+					'capture_peer_cert' => true,
+					'verify_peer'       => true,
+					'verify_peer_name'  => true,
+					'peer_name'         => trim( $host, '[]' ),
+				],
+			]
+		);
+
+		$stream = false;
+
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_set_error_handler -- Capture expected TLS connection warnings; restored in finally.
+		set_error_handler( [ $this, 'ssl_error_handling' ] );
+
+		try {
+			$stream = stream_socket_client( 'ssl://' . $host . ':' . (int) $port, $errno, $errstr, 3, STREAM_CLIENT_CONNECT, $context );
+
+			if ( ! $stream ) {
+				return false;
+			}
+
+			$params = stream_context_get_params( $stream );
+			$peer   = $params['options']['ssl']['peer_certificate'] ?? null;
+
+			return $peer ? openssl_x509_parse( $peer ) : false;
+		} finally {
+			if ( is_resource( $stream ) ) {
+				// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_fclose -- This is a TLS socket, not a filesystem file.
+				fclose( $stream );
+			}
+
+			restore_error_handler();
+		}
+	}
 
 
 	/**

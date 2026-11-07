@@ -21,74 +21,13 @@ class Login {
 
 
 	/**
-	 * Initialize login class.
+	 * Legacy compatibility entry point. Existing IDs and stored legacy values are left untouched.
 	 *
-	 * @return void
-	 */
-	public function __construct() {
-		$admin_id = $this->get_settings( 'change_admin_id' );
-
-		// Never on multisite: wp_users is shared by every site, but posts and
-		// comments would only be updated on the current site.
-		if ( $admin_id > 1 && ! is_multisite() ) {
-			add_action( 'plugins_loaded', [ $this, 'change_admin_id' ] );
-		}
-	}
-
-
-
-	/**
-	 * Change admin ID.
-	 *
+	 * @deprecated Use the administrator account transition guide.
 	 * @return void
 	 */
 	public function change_admin_id() {
-		global $wpdb;
-
-		$admin_id = (int) get_current_user_id();
-		$new_id   = (int) $this->get_settings( 'change_admin_id' );
-
-		if ( is_multisite() || ! \current_user_can( 'manage_options' ) || $admin_id < 1 ) {
-			return;
-		}
-
-		if ( $admin_id === $new_id || $new_id < 1 ) {
-			return;
-		}
-
-		$user = get_userdata( $admin_id );
-
-		// Check if the new ID is already assigned to a different user to prevent database conflicts.
-		$existing_user_with_new_id = get_userdata( $new_id );
-
-		if ( $existing_user_with_new_id ) {
-
-			if ( $existing_user_with_new_id->user_login !== $user->user_login ) {
-
-				if ( $admin_id !== $new_id ) {
-					$this->set_settings( 'change_admin_id', $admin_id );
-				}
-
-				return;
-			}
-
-			return;
-		}
-
-		if ( ! empty( $user->roles ) && in_array( 'administrator', $user->roles, true ) ) {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->update( $wpdb->users, [ 'ID' => $new_id ], [ 'ID' => $admin_id ], [ '%d' ], [ '%d' ] );
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->update( $wpdb->usermeta, [ 'user_id' => $new_id ], [ 'user_id' => $admin_id ], [ '%d' ], [ '%d' ] );
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->update( $wpdb->posts, [ 'post_author' => $new_id ], [ 'post_author' => $admin_id ], [ '%d' ], [ '%d' ] );
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->update( $wpdb->comments, [ 'user_id' => $new_id ], [ 'user_id' => $admin_id ], [ '%d' ], [ '%d' ] );
-
-			wp_set_current_user( $new_id, $user->user_login );
-			wp_set_auth_cookie( $new_id );
-			do_action( 'securefusion_wp_login', $user->user_login );
-		}
+		// Intentionally inert: user IDs must never be rewritten.
 	}
 
 

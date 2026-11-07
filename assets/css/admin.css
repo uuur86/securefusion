@@ -906,3 +906,33 @@
         flex-wrap: wrap;
     }
 }
+/* Expandable dashboard guidance, shared by cards with longer content. */
+.fynd-sf-dashboard .dashboard-item:has(.fsf-card-details[open]) {
+	grid-column: 1 / -1;
+}
+.fynd-sf-dashboard .fsf-card-details {
+	margin-top: 16px;
+	border-top: 1px solid #d5dfe3;
+	padding-top: 12px;
+}
+.fynd-sf-dashboard .fsf-card-details > summary {
+	cursor: pointer;
+	color: #087e80;
+	font-weight: 600;
+}
+.fynd-sf-dashboard .fsf-card-details > summary:focus-visible {
+	outline: 2px solid #087e80;
+	outline-offset: 4px;
+}
+.fynd-sf-dashboard .fsf-card-details__body {
+	max-width: 80ch;
+	overflow-wrap: anywhere;
+	padding-top: 8px;
+}
+.fynd-sf-dashboard .fsf-card-details__body ol {
+	margin-inline-start: 20px;
+}
+.fynd-sf-dashboard .fsf-card-details__body li {
+	margin-block: 10px;
+	line-height: 1.65;
+}
