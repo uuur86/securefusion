@@ -3,7 +3,7 @@
  * Plugin Name: SecureFusion
  * Plugin URI: https://fyndsoft.com/portfolio/securefusion
  * Description: Firewall, login protection, Content Security Policy, security headers, XML-RPC and REST API hardening, HTTPS enforcement and a security log, built to stay light on every request.
- * Version: 2.0.3
+ * Version: 3.0.0
  * Author: codeplusdev
  * Author URI: https://profiles.wordpress.org/codeplusdev/
  * License: GPLv3 or later
@@ -25,7 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 if ( ! defined( 'SECUREFUSION_VERSION' ) ) {
 
-	define( 'SECUREFUSION_VERSION', '2.0.3' );
+	define( 'SECUREFUSION_VERSION', '3.0.0' );
 
 }
 
@@ -65,17 +65,25 @@ $securefusion = new Main();
  *
  * The bundled files are named after the locale alone (tr_TR.mo), which load_plugin_textdomain()
  * never finds: it only looks for secuplug-tr_TR.mo. They are loaded by path, first, because they
- * match this version's strings. A language pack from WordPress.org fills in what they lack.
+ * match this version's strings. A locale without its own file uses the file of its language
+ * (de.mo for de_AT, de_CH or de_DE_formal). A language pack from WordPress.org fills in what they lack.
  *
  * @return void
  */
 function securefusion_load_translations() {
 
-	$locale = determine_locale();
+	$locale  = determine_locale();
+	$bundled = SECUREFUSION_PATH . 'languages/' . $locale . '.mo';
+
+	if ( ! is_readable( $bundled ) ) {
+
+		$bundled = SECUREFUSION_PATH . 'languages/' . strtok( $locale, '_' ) . '.mo';
+
+	}
 
 	unload_textdomain( 'secuplug', true );
 
-	foreach ( array( SECUREFUSION_PATH . 'languages/' . $locale . '.mo', WP_LANG_DIR . '/plugins/secuplug-' . $locale . '.mo' ) as $file ) {
+	foreach ( array( $bundled, WP_LANG_DIR . '/plugins/secuplug-' . $locale . '.mo' ) as $file ) {
 
 		if ( is_readable( $file ) ) {
 

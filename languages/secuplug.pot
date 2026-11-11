@@ -1,1273 +1,2764 @@
 # Copyright (C) 2026 codeplusdev
-# This file is distributed under the same license as the SecureFusion package.
+# This file is distributed under the GPLv3 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: SecureFusion\n"
-"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/secuplug\n"
-"POT-Creation-Date: 2026-05-25 18:03:00+00:00\n"
+"Project-Id-Version: SecureFusion 3.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/plugin\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-11-11T03:01:39+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: secuplug\n"
 
-#: src/Lib/Admin.php:81
-#: src/Lib/Admin.php:117
-#: src/Lib/Admin.php:428
-msgid "Settings"
-msgstr ""
-
-#: src/Lib/Admin.php:97
-#: src/Lib/Admin.php:98
+#. Plugin Name of the plugin
+#: secuplug.php
+#: src/Lib/Admin.php:236
+#: src/Lib/Admin.php:237
+#: src/Lib/Admin.php:440
 msgid "SecureFusion"
 msgstr ""
 
-#: src/Lib/Admin.php:107
-#: src/Lib/Admin.php:213
-#: src/Lib/Admin.php:217
-msgid "SecureFusion Dashboard"
+#. Plugin URI of the plugin
+#: secuplug.php
+msgid "https://fyndsoft.com/portfolio/securefusion"
 msgstr ""
 
-#: src/Lib/Admin.php:108
-msgid "Dashboard"
+#. Description of the plugin
+#: secuplug.php
+msgid "Firewall, login protection, Content Security Policy, security headers, XML-RPC and REST API hardening, HTTPS enforcement and a security log, built to stay light on every request."
 msgstr ""
 
-#: src/Lib/Admin.php:116
-msgid "SecureFusion Settings"
+#. Author of the plugin
+#: secuplug.php
+msgid "codeplusdev"
 msgstr ""
 
-#: src/Lib/Admin.php:125
-msgid "SecureFusion Security Log"
+#. Author URI of the plugin
+#: secuplug.php
+msgid "https://profiles.wordpress.org/codeplusdev/"
 msgstr ""
 
-#: src/Lib/Admin.php:126
-#: src/Lib/SecurityLog.php:413
-#: src/Lib/SecurityLog.php:417
-msgid "Security Log"
+#: assets/wasp/bastion.wasp.php:30
+msgid "Follows the network setting"
 msgstr ""
 
-#: src/Lib/Admin.php:134
-msgid "SecureFusion IP Rules"
+#: assets/wasp/bastion.wasp.php:31
+#: src/Lib/AdminSettingsView.php:139
+msgid "Customized for this site"
 msgstr ""
 
-#: src/Lib/Admin.php:135
-#: src/Lib/IPRules.php:238
-msgid "IP Rules"
+#: src/Lib/Admin.php:117
+#: src/Lib/Admin.php:256
+#: src/Lib/AdminDashboard.php:329
+msgid "Settings"
 msgstr ""
 
-#: src/Lib/Admin.php:143
-msgid "SecureFusion IP Ranges"
+#: src/Lib/Admin.php:154
+msgid "No requests went over the limit in the last 7 days."
 msgstr ""
 
-#: src/Lib/Admin.php:144
-#: src/Lib/IPRanges.php:115
-msgid "IP Ranges"
+#. translators: 1: number of requests, 2: number of IP addresses.
+#: src/Lib/Admin.php:160
+#, php-format
+msgid "%1$s request went over the limit in the last 7 days, from %2$s IP address(es)."
+msgid_plural "%1$s requests went over the limit in the last 7 days, from %2$s IP address(es)."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/Lib/Admin.php:177
+msgid "You do not have permission to view this page."
 msgstr ""
 
-#: src/Lib/Admin.php:218
-msgid "You can monitor your WordPress security settings."
+#: src/Lib/Admin.php:183
+msgid "If you choose to replace this account, use WordPress user management and verify each step before removing the original account."
 msgstr ""
 
-#: src/Lib/Admin.php:225
-msgid "Daily Security Events (Last 30 Days)"
+#: src/Lib/Admin.php:185
+msgid "A different user ID is not protection against SQL injection or privilege escalation. Keep strong passwords, login protection and software updates in place."
 msgstr ""
 
-#: src/Lib/Admin.php:226
-msgid "Real-time"
+#: src/Lib/Admin.php:189
+msgid "Multisite accounts are shared across sites. Ask a network administrator to review site memberships, super administrator access and content ownership on every affected site before replacing an account. Removing a user from one site is different from deleting the network account."
 msgstr ""
 
-#: src/Lib/Admin.php:234
-msgid "Monthly Security Events (Last 12 Months)"
+#: src/Lib/Admin.php:196
+msgid "Back up the site and review data owned by the old account, including orders, memberships and records stored by other plugins. WordPress content reassignment does not guarantee migration of those records."
 msgstr ""
 
-#: src/Lib/Admin.php:235
-msgid "Overview"
+#: src/Lib/Admin.php:197
+msgid "Create a new user with a distinct username, an accessible email address, a strong password and the Administrator role."
+msgstr ""
+
+#: src/Lib/Admin.php:198
+msgid "Sign in with the new account in a separate browser session and verify access before changing the old account."
+msgstr ""
+
+#: src/Lib/Admin.php:199
+msgid "From the new account, open Users. Only after checking plugin-owned data, delete the old account and select Attribute all content to the new account. If ownership is uncertain, postpone deletion and review the old account permissions instead."
+msgstr ""
+
+#: src/Lib/Admin.php:200
+msgid "Verify content authorship, media, plugin records and administrator access after the transition."
+msgstr ""
+
+#: src/Lib/Admin.php:211
+msgid "Create a new user"
+msgstr ""
+
+#: src/Lib/Admin.php:219
+msgid "Review site users"
 msgstr ""
 
 #: src/Lib/Admin.php:246
-msgid "Security Status"
+#: src/Lib/AdminDashboard.php:96
+#: src/Lib/AdminDashboard.php:100
+msgid "SecureFusion Dashboard"
 msgstr ""
 
-#: src/Lib/Admin.php:253
-msgid "Vulnerable version"
+#: src/Lib/Admin.php:247
+msgid "Dashboard"
 msgstr ""
 
-#: src/Lib/Admin.php:260
-msgid "Outdated version"
+#: src/Lib/Admin.php:255
+msgid "SecureFusion Settings"
 msgstr ""
 
-#: src/Lib/Admin.php:271
-#: src/Lib/SecurityLog.php:429
-msgid "Total Attacks"
+#: src/Lib/Admin.php:264
+msgid "SecureFusion Security Log"
 msgstr ""
 
-#: src/Lib/Admin.php:278
-#: src/Lib/SecurityLog.php:436
-msgid "Failed Logins"
+#: src/Lib/Admin.php:265
+#: src/Lib/SecurityLogView.php:90
+#: src/Lib/SecurityLogView.php:94
+msgid "Security Log"
 msgstr ""
 
-#: src/Lib/Admin.php:285
-#: src/Lib/SecurityLog.php:443
-msgid "Bad Requests"
+#: src/Lib/Admin.php:273
+msgid "SecureFusion IP Rules"
 msgstr ""
 
-#: src/Lib/Admin.php:292
-#: src/Lib/SecurityLog.php:450
-msgid "Bad Cookies"
+#: src/Lib/Admin.php:274
+#: src/Lib/IPRules.php:303
+msgid "IP Rules"
 msgstr ""
 
-#: src/Lib/Admin.php:299
-#: src/Lib/SecurityLog.php:457
-msgid "Bad Bots"
+#: src/Lib/Admin.php:282
+msgid "SecureFusion IP Ranges"
 msgstr ""
 
-#: src/Lib/Admin.php:306
-#: src/Lib/SecurityLog.php:464
-msgid "Bad Queries"
-msgstr ""
-
-#: src/Lib/Admin.php:313
-#: src/Lib/IPRanges.php:138
-#: src/Lib/SecurityLog.php:471
-msgid "Unique IPs"
-msgstr ""
-
-#: src/Lib/Admin.php:322
-msgid "System Security Warnings:"
-msgstr ""
-
-#: src/Lib/Admin.php:325
-msgid "Your WordPress version has security vulnerabilities. Please update WordPress."
-msgstr ""
-
-#: src/Lib/Admin.php:328
-msgid "Your PHP version has security vulnerabilities. Please upgrade PHP."
-msgstr ""
-
-#: src/Lib/Admin.php:336
-msgid "Everything is running smoothly. No security issues have been detected."
-msgstr ""
-
-#: src/Lib/Admin.php:343
-msgid "View Security Log"
+#: src/Lib/Admin.php:283
+#: src/Lib/IPRanges.php:127
+msgid "IP Ranges"
 msgstr ""
 
 #: src/Lib/Admin.php:356
-msgid "XML-RPC FULL PROTECTION"
-msgstr ""
-
-#: src/Lib/Admin.php:358
-msgid "Blocks all remote requests. Most commonly used to prevent all types of remote attacks."
-msgstr ""
-
-#: src/Lib/Admin.php:362
-msgid "XML-RPC LOGIN PROTECTION"
-msgstr ""
-
-#: src/Lib/Admin.php:364
-msgid "Blocks remote login requests. Most commonly used to prevent brute force login attempts."
-msgstr ""
-
-#: src/Lib/Admin.php:368
-msgid "XML-RPC PINGBACK PROTECTION"
-msgstr ""
-
-#: src/Lib/Admin.php:370
-msgid "Blocks remote pingback requests. Most commonly used to prevent DDoS attacks."
-msgstr ""
-
-#: src/Lib/Admin.php:374
-msgid "SELF PINGBACK PROTECTION"
-msgstr ""
-
-#: src/Lib/Admin.php:376
-msgid "Blocks remote self-pingback requests. Most commonly used to prevent DDoS attacks."
-msgstr ""
-
-#: src/Lib/Admin.php:380
-msgid "New Custom Login URL"
-msgstr ""
-
-#: src/Lib/Admin.php:382
-msgid "Hides login url from the attackers."
-msgstr ""
-
-#: src/Lib/Admin.php:386
-msgid "Enable HTTPS / SSL"
-msgstr ""
-
-#: src/Lib/Admin.php:388
-msgid "SSL automatically encrypts your privileged information data."
-msgstr ""
-
-#: src/Lib/Admin.php:392
-msgid "Force HTTPS Login"
-msgstr ""
-
-#: src/Lib/Admin.php:394
-msgid "Redirect login page protocol HTTP to HTTPS"
-msgstr ""
-
-#: src/Lib/Admin.php:397
-msgid "Change Login Error"
-msgstr ""
-
-#: src/Lib/Admin.php:399
-msgid "Disable default login errors and provide attackers with less than what they need."
-msgstr ""
-
-#: src/Lib/Admin.php:402
-msgid "Change Admin ID"
-msgstr ""
-
-#: src/Lib/Admin.php:404
-msgid "It's not difficult to predict your Admin ID if it's set to `1`. Secure your site against simple SQL vulnerabilities."
-msgstr ""
-
-#: src/Lib/Admin.php:407
-msgid "Force HTTPS Admin"
-msgstr ""
-
-#: src/Lib/Admin.php:409
-msgid "Redirects the admin page protocol from HTTP to HTTPS"
-msgstr ""
-
-#: src/Lib/Admin.php:412
-msgid "Force HTTPS Front Page"
-msgstr ""
-
-#: src/Lib/Admin.php:414
-msgid "Redirects the front page protocol from HTTP to HTTPS."
-msgstr ""
-
-#: src/Lib/Admin.php:417
-#: src/Lib/Admin.php:740
-msgid "Filter Bad Requests"
-msgstr ""
-
-#: src/Lib/Admin.php:419
-msgid "Helps secure your site against attacks like XSS, CSRF, and Code Injections."
-msgstr ""
-
-#: src/Lib/Admin.php:422
-msgid "Disable Rest API"
-msgstr ""
-
-#: src/Lib/Admin.php:424
-msgid "Conceals sensitive information from attackers, such as Admin user IDs, user lists, and their IDs."
-msgstr ""
-
-#: src/Lib/Admin.php:430
-msgid "Manage your security features"
-msgstr ""
-
-#: src/Lib/Admin.php:432
-msgid "Go to settings"
-msgstr ""
-
-#: src/Lib/Admin.php:489
-msgid "Only use this if you have an SSL certificate; otherwise, it cannot be enabled."
-msgstr ""
-
-#: src/Lib/Admin.php:493
-msgid "ERROR! You don’t have any valid SSL certificate. "
-msgstr ""
-
-#: src/Lib/Admin.php:498
-msgid "Free SSL certificate providers"
-msgstr ""
-
-#: src/Lib/Admin.php:501
-msgid "Let’s Encrypt"
-msgstr ""
-
-#: src/Lib/Admin.php:505
-msgid "Cloudflare"
-msgstr ""
-
-#: src/Lib/Admin.php:513
-msgid "Comodo / Sectigo"
-msgstr ""
-
-#: src/Lib/Admin.php:517
-msgid "Digicert"
-msgstr ""
-
-#: src/Lib/Admin.php:533
-#: src/Lib/Admin.php:537
-msgid "SecureFusion Security Settings"
-msgstr ""
-
-#: src/Lib/Admin.php:538
-msgid "You can manage your WordPress security settings."
-msgstr ""
-
-#: src/Lib/Admin.php:547
-msgid "XMLRPC"
-msgstr ""
-
-#: src/Lib/Admin.php:551
-msgid "Login"
-msgstr ""
-
-#: src/Lib/Admin.php:555
-msgid "SSL"
-msgstr ""
-
-#: src/Lib/Admin.php:559
-msgid "Active Guard"
-msgstr ""
-
-#: src/Lib/Admin.php:563
-msgid "Security Policies"
-msgstr ""
-
-#: src/Lib/Admin.php:567
-msgid "Advanced"
-msgstr ""
-
-#: src/Lib/Admin.php:595
-msgid "If you don't have experience in cybersecurity or regular expressions, do not modify these areas."
-msgstr ""
-
-#: src/Lib/Admin.php:600
-msgid "Save Settings"
-msgstr ""
-
-#: src/Lib/Admin.php:629
 msgid "SecureFusion is active!"
 msgstr ""
 
-#: src/Lib/Admin.php:630
+#: src/Lib/Admin.php:357
 msgid "Configure your security settings to protect your site."
 msgstr ""
 
-#: src/Lib/Admin.php:633
+#: src/Lib/Admin.php:360
 msgid "Go to Settings"
 msgstr ""
 
-#: src/Lib/Admin.php:655
-msgid "XML-RPC SETTINGS"
+#: src/Lib/Admin.php:401
+msgid "Customize for this site"
 msgstr ""
 
-#: src/Lib/Admin.php:656
-msgid "You can prevent XML-RPC attacks."
+#: src/Lib/Admin.php:402
+msgid "Network setting"
 msgstr ""
 
-#: src/Lib/Admin.php:663
-msgid "Disable All XML-RPC Services"
+#: src/Lib/Admin.php:403
+msgid "Set by the network administrator"
 msgstr ""
 
-#: src/Lib/Admin.php:667
-#: src/Lib/Admin.php:684
-#: src/Lib/Admin.php:701
-#: src/Lib/Admin.php:718
-#: src/Lib/Admin.php:744
-#: src/Lib/Admin.php:760
-#: src/Lib/Admin.php:776
-#: src/Lib/Admin.php:792
-#: src/Lib/Admin.php:808
-msgid "No"
+#: src/Lib/Admin.php:404
+msgid "(empty)"
 msgstr ""
 
-#: src/Lib/Admin.php:671
-#: src/Lib/Admin.php:688
-#: src/Lib/Admin.php:705
-#: src/Lib/Admin.php:722
-#: src/Lib/Admin.php:748
-#: src/Lib/Admin.php:764
-#: src/Lib/Admin.php:780
-#: src/Lib/Admin.php:796
-#: src/Lib/Admin.php:812
-msgid "Yes"
+#: src/Lib/Admin.php:405
+msgid "Use network setting"
 msgstr ""
 
-#: src/Lib/Admin.php:674
-msgid "Enabling this option will completely disable XML-RPC functionality, which can prevent certain types of attacks but may affect integrations with other systems and applications."
+#: src/Lib/Admin.php:439
+msgid "SecureFusion Network Settings"
 msgstr ""
 
-#: src/Lib/Admin.php:680
-msgid "Disable XML-RPC Login Service"
+#: src/Lib/Admin.php:462
+msgid "Network Settings"
 msgstr ""
 
-#: src/Lib/Admin.php:691
-msgid "If checked, this will disable login capability through XML-RPC. This helps prevent brute force attacks but may affect some legitimate XML-RPC uses."
+#: src/Lib/Admin.php:483
+msgid "SecureFusion: another plugin loads an older version of the wasp settings library, so network defaults are not available. Each site uses its own settings until that plugin is updated."
 msgstr ""
 
-#: src/Lib/Admin.php:697
-msgid "Disable XML-RPC Pingback Service"
+#: src/Lib/Admin.php:541
+msgid "Hosts only: inline code and keywords are set by the protection level."
 msgstr ""
 
-#: src/Lib/Admin.php:708
-msgid "Pingbacks can be abused for DDoS attacks. Disabling this will prevent pingbacks, improving security."
+#: src/Lib/Admin.php:542
+msgid "Invalid URL format"
 msgstr ""
 
-#: src/Lib/Admin.php:714
-msgid "Disable Self Pingback Service"
+#: src/Lib/Admin.php:543
+msgid "Invalid regex pattern"
 msgstr ""
 
-#: src/Lib/Admin.php:725
-msgid "WordPress generates pingbacks to its own posts by default. This option disables such self-pingbacks."
+#: src/Lib/Admin.php:552
+msgid "Saved."
 msgstr ""
 
-#: src/Lib/Admin.php:732
-msgid "ACTIVE GUARD SETTINGS"
+#: src/Lib/Admin.php:553
+#: src/Lib/Notifier.php:182
+msgid "Working…"
 msgstr ""
 
-#: src/Lib/Admin.php:733
-msgid "Active guard and firewall settings. (Beta)"
+#: src/Lib/Admin.php:554
+msgid "The request failed. Your changes were not confirmed."
 msgstr ""
 
-#: src/Lib/Admin.php:756
-msgid "Disable Rest API for Visitors"
+#: src/Lib/Admin.php:555
+msgid "Not used while protection is Off"
 msgstr ""
 
-#: src/Lib/Admin.php:772
-msgid "Hide apache and PHP version"
+#: src/Lib/Admin.php:556
+msgid "Not used while all inline code is allowed"
 msgstr ""
 
-#: src/Lib/Admin.php:788
-msgid "Block bad bots"
+#: src/Lib/Admin.php:669
+msgid "Restore the default value of this setting?"
 msgstr ""
 
-#: src/Lib/Admin.php:804
-msgid "Add HTTP Headers for Browser Security"
+#: src/Lib/Admin.php:670
+msgid "Restore default"
 msgstr ""
 
-#: src/Lib/Admin.php:819
-msgid "Max Payload Size (Bytes)"
+#: src/Lib/AdminDashboard.php:101
+msgid "You can monitor your WordPress security settings."
 msgstr ""
 
-#: src/Lib/Admin.php:821
-msgid " bytes"
+#: src/Lib/AdminDashboard.php:108
+msgid "Daily Security Events (Last 30 Days)"
 msgstr ""
 
-#: src/Lib/Admin.php:821
-msgid "Maximum allowed request payload size (excluding file uploads). IPs exceeding this limit will be permanently blocked. Set 0 to disable. Default: 4096."
+#: src/Lib/AdminDashboard.php:109
+msgid "Real-time"
 msgstr ""
 
-#: src/Lib/Admin.php:829
-msgid "SECURITY POLICIES"
+#: src/Lib/AdminDashboard.php:117
+msgid "Monthly Security Events (Last 12 Months)"
 msgstr ""
 
-#: src/Lib/Admin.php:830
-msgid "Content Security Policy (CSP) configurations."
+#: src/Lib/AdminDashboard.php:118
+msgid "Overview"
 msgstr ""
 
-#: src/Lib/Admin.php:837
-msgid "Enable CSP Style Sources"
+#: src/Lib/AdminDashboard.php:129
+msgid "Security Status"
 msgstr ""
 
-#: src/Lib/Admin.php:841
-#: src/Lib/Admin.php:866
-#: src/Lib/Admin.php:891
-#: src/Lib/Admin.php:916
-#: src/Lib/Admin.php:941
-#: src/Lib/Admin.php:966
-#: src/Lib/Admin.php:992
-#: src/Lib/Admin.php:1009
-#: src/Lib/Admin.php:1026
-msgid "Disable"
+#: src/Lib/AdminDashboard.php:136
+msgid "Vulnerable version"
 msgstr ""
 
-#: src/Lib/Admin.php:845
-#: src/Lib/Admin.php:870
-#: src/Lib/Admin.php:895
-#: src/Lib/Admin.php:920
-#: src/Lib/Admin.php:945
-#: src/Lib/Admin.php:970
-#: src/Lib/Admin.php:996
-#: src/Lib/Admin.php:1013
-#: src/Lib/Admin.php:1030
-msgid "Enable"
+#: src/Lib/AdminDashboard.php:143
+msgid "Outdated version"
 msgstr ""
 
-#: src/Lib/Admin.php:852
-msgid "CSP Allowed Style Sources"
+#: src/Lib/AdminDashboard.php:154
+#: src/Lib/SecurityLogView.php:106
+msgid "Total Attacks"
 msgstr ""
 
-#: src/Lib/Admin.php:862
-msgid "Enable CSP Script Sources"
+#: src/Lib/AdminDashboard.php:161
+#: src/Lib/SecurityLogView.php:113
+msgid "Failed Logins"
 msgstr ""
 
-#: src/Lib/Admin.php:877
-msgid "CSP Allowed Script Sources"
+#: src/Lib/AdminDashboard.php:168
+#: src/Lib/SecurityLogView.php:120
+msgid "Bad Requests"
 msgstr ""
 
-#: src/Lib/Admin.php:887
-msgid "Enable CSP Font Sources"
+#: src/Lib/AdminDashboard.php:175
+#: src/Lib/SecurityLogView.php:127
+msgid "Bad Cookies"
 msgstr ""
 
-#: src/Lib/Admin.php:902
-msgid "CSP Allowed Font Sources"
+#: src/Lib/AdminDashboard.php:182
+#: src/Lib/SecurityLogView.php:134
+msgid "Bad Bots"
 msgstr ""
 
-#: src/Lib/Admin.php:912
-msgid "Enable CSP Frame Sources"
+#: src/Lib/AdminDashboard.php:189
+#: src/Lib/SecurityLogView.php:141
+msgid "Bad Queries"
 msgstr ""
 
-#: src/Lib/Admin.php:927
-msgid "CSP Frame Sources (iframe embed)"
+#: src/Lib/AdminDashboard.php:196
+#: src/Lib/IPRanges.php:150
+#: src/Lib/SecurityLogView.php:148
+msgid "Unique IPs"
 msgstr ""
 
-#: src/Lib/Admin.php:937
-msgid "Enable CSP Worker Sources"
+#: src/Lib/AdminDashboard.php:205
+msgid "System Security Warnings:"
 msgstr ""
 
-#: src/Lib/Admin.php:952
-msgid "CSP Worker Sources"
+#: src/Lib/AdminDashboard.php:208
+msgid "Your WordPress version has security vulnerabilities. Please update WordPress."
 msgstr ""
 
-#: src/Lib/Admin.php:962
-msgid "Enable CSP Image Sources"
+#: src/Lib/AdminDashboard.php:211
+msgid "Your PHP version has security vulnerabilities. Please upgrade PHP."
 msgstr ""
 
-#: src/Lib/Admin.php:977
-msgid "CSP Image Sources"
+#: src/Lib/AdminDashboard.php:219
+msgid "Everything is running smoothly. No security issues have been detected."
 msgstr ""
 
-#: src/Lib/Admin.php:987
-msgid "Upgrade Insecure Requests"
+#: src/Lib/AdminDashboard.php:226
+msgid "View Security Log"
 msgstr ""
 
-#: src/Lib/Admin.php:988
-msgid "Instructs the browser to upgrade all HTTP requests to HTTPS."
+#: src/Lib/AdminDashboard.php:247
+msgid "Administrator account review"
 msgstr ""
 
-#: src/Lib/Admin.php:1004
-msgid "Block All Mixed Content"
+#: src/Lib/AdminDashboard.php:249
+msgid "An administrator on this site uses ID 1. This alone is not a vulnerability. Review the account before deciding whether to replace it."
 msgstr ""
 
-#: src/Lib/Admin.php:1005
-msgid "Prevents loading any HTTP content on an HTTPS page."
+#: src/Lib/AdminDashboard.php:257
+msgid "XML-RPC FULL PROTECTION"
 msgstr ""
 
-#: src/Lib/Admin.php:1021
-msgid "Sandbox"
+#: src/Lib/AdminDashboard.php:259
+msgid "Blocks all remote requests. Most commonly used to prevent all types of remote attacks."
 msgstr ""
 
-#: src/Lib/Admin.php:1022
-msgid "Enables a sandbox for the requested resource similar to the iframe sandbox attribute. This can block some features of your website (like payment gateway integration). Use with caution!"
+#: src/Lib/AdminDashboard.php:263
+msgid "XML-RPC LOGIN PROTECTION"
 msgstr ""
 
-#: src/Lib/Admin.php:1039
-msgid "LOGIN SETTINGS - BE CAREFUL!"
+#: src/Lib/AdminDashboard.php:265
+msgid "Blocks remote login requests. Most commonly used to prevent brute force login attempts."
 msgstr ""
 
-#: src/Lib/Admin.php:1040
-msgid "You can hide or secure your login page against attackers. Please save your new login url before you change it."
+#: src/Lib/AdminDashboard.php:269
+msgid "XML-RPC PINGBACK PROTECTION"
 msgstr ""
 
-#: src/Lib/Admin.php:1046
-msgid "Min. Wait Time"
+#: src/Lib/AdminDashboard.php:271
+msgid "Blocks remote pingback requests. Most commonly used to prevent DDoS attacks."
 msgstr ""
 
-#: src/Lib/Admin.php:1048
-msgid " hour(s)"
+#: src/Lib/AdminDashboard.php:275
+msgid "SELF PINGBACK PROTECTION"
 msgstr ""
 
-#: src/Lib/Admin.php:1048
-msgid "Minimum Wait Time After Failed Attempt"
+#: src/Lib/AdminDashboard.php:277
+msgid "Blocks remote self-pingback requests. Most commonly used to prevent DDoS attacks."
 msgstr ""
 
-#: src/Lib/Admin.php:1053
-msgid "Max. Attempt Limit"
+#: src/Lib/AdminDashboard.php:281
+msgid "New Custom Login URL"
 msgstr ""
 
-#: src/Lib/Admin.php:1055
-msgid " time(s)"
+#: src/Lib/AdminDashboard.php:283
+msgid "Hides login url from the attackers."
 msgstr ""
 
-#: src/Lib/Admin.php:1055
-msgid "Maximum Failed Login Attempt Limit"
+#: src/Lib/AdminDashboard.php:287
+msgid "Enable HTTPS / SSL"
 msgstr ""
 
-#: src/Lib/Admin.php:1060
-msgid "Auto-Delete IPs: Older Than"
+#: src/Lib/AdminDashboard.php:289
+msgid "SSL automatically encrypts your privileged information data."
 msgstr ""
 
-#: src/Lib/Admin.php:1062
-msgid " day(s)"
+#: src/Lib/AdminDashboard.php:293
+msgid "Force HTTPS Login"
 msgstr ""
 
-#: src/Lib/Admin.php:1062
-msgid "Delete IPs inactive for this many days (0 to disable)."
+#: src/Lib/AdminDashboard.php:295
+msgid "Redirect login page protocol HTTP to HTTPS"
 msgstr ""
 
-#: src/Lib/Admin.php:1067
-msgid "Auto-Delete IPs: Fewer Than"
+#: src/Lib/AdminDashboard.php:299
+msgid "Change Login Error"
 msgstr ""
 
-#: src/Lib/Admin.php:1069
-msgid " attempt(s)"
+#: src/Lib/AdminDashboard.php:301
+msgid "Disable default login errors and provide attackers with less than what they need."
 msgstr ""
 
-#: src/Lib/Admin.php:1069
-msgid "Only delete IPs that have fewer than this many total attempts."
+#: src/Lib/AdminDashboard.php:305
+msgid "Force HTTPS Admin"
 msgstr ""
 
-#: src/Lib/Admin.php:1074
-msgid "Custom Login Path"
+#: src/Lib/AdminDashboard.php:307
+msgid "Redirects the admin page protocol from HTTP to HTTPS"
 msgstr ""
 
-#: src/Lib/Admin.php:1081
-msgid "Custom Login Error Message"
+#: src/Lib/AdminDashboard.php:311
+msgid "Force HTTPS Front Page"
 msgstr ""
 
-#: src/Lib/Admin.php:1086
-msgid "Your Admin ID"
+#: src/Lib/AdminDashboard.php:313
+msgid "Redirects the front page protocol from HTTP to HTTPS."
 msgstr ""
 
-#: src/Lib/Admin.php:1098
-msgid "SSL SETTINGS"
+#: src/Lib/AdminDashboard.php:317
+#: src/Lib/AdminSections/ActiveGuardSettings.php:27
+msgid "Filter malicious requests"
 msgstr ""
 
-#: src/Lib/Admin.php:1099
-msgid "HTTPS/SSL security settings."
+#: src/Lib/AdminDashboard.php:319
+msgid "Helps secure your site against attacks like XSS, CSRF, and Code Injections."
 msgstr ""
 
-#: src/Lib/Admin.php:1107
-msgid "HTTPS Support"
+#: src/Lib/AdminDashboard.php:323
+msgid "Disable Rest API"
 msgstr ""
 
-#: src/Lib/Admin.php:1110
-#: src/Lib/Admin.php:1127
-#: src/Lib/Admin.php:1144
-#: src/Lib/Admin.php:1161
-#: src/Lib/Admin.php:1178
-msgid "Disabled"
+#: src/Lib/AdminDashboard.php:325
+msgid "Conceals sensitive information from attackers, such as Admin user IDs, user lists, and their IDs."
 msgstr ""
 
-#: src/Lib/Admin.php:1114
-#: src/Lib/Admin.php:1131
-#: src/Lib/Admin.php:1148
-#: src/Lib/Admin.php:1165
-#: src/Lib/Admin.php:1182
-msgid "Enabled"
+#: src/Lib/AdminDashboard.php:331
+msgid "Manage your security features"
 msgstr ""
 
-#: src/Lib/Admin.php:1124
-msgid "Force HTTPS on login page"
+#: src/Lib/AdminDashboard.php:333
+msgid "Go to settings"
 msgstr ""
 
-#: src/Lib/Admin.php:1141
-msgid "Force HTTPS on admin page"
-msgstr ""
-
-#: src/Lib/Admin.php:1158
-msgid "Force HTTPS on front page"
-msgstr ""
-
-#: src/Lib/Admin.php:1175
-msgid "Force HTTPS site-wide"
-msgstr ""
-
-#: src/Lib/Admin.php:1192
-msgid "ADVANCED SETTINGS"
-msgstr ""
-
-#: src/Lib/Admin.php:1193
-msgid "Advanced security settings. `Filter Bad Requests` must be active for it to work."
-msgstr ""
-
-#: src/Lib/Admin.php:1199
-msgid "Cookie Regex Patterns"
-msgstr ""
-
-#: src/Lib/Admin.php:1211
-msgid "Get/Post Request Regex Patterns"
-msgstr ""
-
-#: src/Lib/Admin.php:1340
-#: src/Lib/SecurityLog.php:46
+#: src/Lib/AdminDashboardWidgets.php:114
+#: src/Lib/SecurityLog.php:55
 msgid "Failed Login"
 msgstr ""
 
-#: src/Lib/Admin.php:1341
-#: src/Lib/SecurityLog.php:48
+#: src/Lib/AdminDashboardWidgets.php:115
+#: src/Lib/SecurityLog.php:57
 msgid "Bad Request"
 msgstr ""
 
-#: src/Lib/Admin.php:1342
-#: src/Lib/SecurityLog.php:49
+#: src/Lib/AdminDashboardWidgets.php:116
+#: src/Lib/SecurityLog.php:58
 msgid "Bad Cookie"
 msgstr ""
 
-#: src/Lib/Admin.php:1343
-#: src/Lib/SecurityLog.php:50
+#: src/Lib/AdminDashboardWidgets.php:117
+#: src/Lib/SecurityLog.php:59
 msgid "Bad Bot"
 msgstr ""
 
-#: src/Lib/Admin.php:1344
-#: src/Lib/SecurityLog.php:51
+#: src/Lib/AdminDashboardWidgets.php:118
+#: src/Lib/SecurityLog.php:60
 msgid "Bad Query"
 msgstr ""
 
-#: src/Lib/Admin.php:1345
+#: src/Lib/AdminDashboardWidgets.php:119
 msgid "Blocked Request"
 msgstr ""
 
-#: src/Lib/Admin.php:1398
+#: src/Lib/AdminDashboardWidgets.php:180
 msgid "enabled"
 msgstr ""
 
-#: src/Lib/Admin.php:1398
+#: src/Lib/AdminDashboardWidgets.php:180
 msgid "disabled"
 msgstr ""
 
-#: src/Lib/Admin.php:1443
-msgid "Are you sure you want to reset this field to its default value?"
+#: src/Lib/AdminDashboardWidgets.php:189
+msgid "Review guidance"
 msgstr ""
 
-#: src/Lib/Admin.php:1444
-msgid "Reset"
+#: src/Lib/AdminSections/ActiveGuardSettings.php:19
+#: src/Lib/AdminSettingsView.php:68
+msgid "Firewall"
 msgstr ""
 
-#: src/Lib/CommentsBlock.php:61
+#: src/Lib/AdminSections/ActiveGuardSettings.php:20
+msgid "Checks requests before WordPress handles them and hides details that attackers look for. The request filter is in beta."
+msgstr ""
+
+#: src/Lib/AdminSections/ActiveGuardSettings.php:28
+msgid "Blocks requests that contain common attack patterns such as code injection and cross-site scripting. The patterns are on the Advanced tab."
+msgstr ""
+
+#: src/Lib/AdminSections/ActiveGuardSettings.php:32
+#: src/Lib/AdminSections/ActiveGuardSettings.php:49
+#: src/Lib/AdminSections/ActiveGuardSettings.php:66
+#: src/Lib/AdminSections/ActiveGuardSettings.php:83
+#: src/Lib/AdminSections/ActiveGuardSettings.php:100
+#: src/Lib/AdminSections/ActiveGuardSettings.php:117
+#: src/Lib/AdminSections/ActiveGuardSettings.php:134
+#: src/Lib/AdminSections/ActiveGuardSettings.php:158
+#: src/Lib/AdminSections/RecaptchaSettings.php:80
+#: src/Lib/AdminSections/RecaptchaSettings.php:96
+#: src/Lib/AdminSections/RecaptchaSettings.php:112
+#: src/Lib/AdminSections/RecaptchaSettings.php:128
+#: src/Lib/AdminSections/RecaptchaSettings.php:144
+#: src/Lib/AdminSections/RecaptchaSettings.php:160
+#: src/Lib/AdminSections/XmlrpcSettings.php:31
+#: src/Lib/AdminSections/XmlrpcSettings.php:48
+#: src/Lib/AdminSections/XmlrpcSettings.php:65
+#: src/Lib/AdminSections/XmlrpcSettings.php:82
+#: src/Lib/AdminSettingsView.php:272
+msgid "No"
+msgstr ""
+
+#: src/Lib/AdminSections/ActiveGuardSettings.php:36
+#: src/Lib/AdminSections/ActiveGuardSettings.php:53
+#: src/Lib/AdminSections/ActiveGuardSettings.php:70
+#: src/Lib/AdminSections/ActiveGuardSettings.php:87
+#: src/Lib/AdminSections/ActiveGuardSettings.php:104
+#: src/Lib/AdminSections/ActiveGuardSettings.php:121
+#: src/Lib/AdminSections/ActiveGuardSettings.php:138
+#: src/Lib/AdminSections/ActiveGuardSettings.php:162
+#: src/Lib/AdminSections/RecaptchaSettings.php:84
+#: src/Lib/AdminSections/RecaptchaSettings.php:100
+#: src/Lib/AdminSections/RecaptchaSettings.php:116
+#: src/Lib/AdminSections/RecaptchaSettings.php:132
+#: src/Lib/AdminSections/RecaptchaSettings.php:148
+#: src/Lib/AdminSections/RecaptchaSettings.php:164
+#: src/Lib/AdminSections/XmlrpcSettings.php:35
+#: src/Lib/AdminSections/XmlrpcSettings.php:52
+#: src/Lib/AdminSections/XmlrpcSettings.php:69
+#: src/Lib/AdminSections/XmlrpcSettings.php:86
+#: src/Lib/AdminSettingsView.php:276
+msgid "Yes"
+msgstr ""
+
+#: src/Lib/AdminSections/ActiveGuardSettings.php:44
+msgid "Close the REST API to visitors"
+msgstr ""
+
+#: src/Lib/AdminSections/ActiveGuardSettings.php:45
+msgid "Visitors who are not logged in cannot read posts, pages, users or settings through /wp-json/wp/v2/. The API index and the endpoints of other plugins stay open."
+msgstr ""
+
+#: src/Lib/AdminSections/ActiveGuardSettings.php:61
+msgid "Hide usernames from visitors"
+msgstr ""
+
+#: src/Lib/AdminSections/ActiveGuardSettings.php:62
+msgid "Stops the common ways to find login names: ?author=1 links, the REST users list, administrators in the users sitemap and oEmbed author data. Author pages keep working."
+msgstr ""
+
+#: src/Lib/AdminSections/ActiveGuardSettings.php:78
+msgid "Hide server and PHP versions"
+msgstr ""
+
+#: src/Lib/AdminSections/ActiveGuardSettings.php:79
+msgid "Removes the Server and X-Powered-By response headers that reveal software versions."
+msgstr ""
+
+#: src/Lib/AdminSections/ActiveGuardSettings.php:95
+msgid "Block bad bots"
+msgstr ""
+
+#: src/Lib/AdminSections/ActiveGuardSettings.php:96
+msgid "Blocks requests whose user agent matches the bad bot list (by default libwww-perl)."
+msgstr ""
+
+#: src/Lib/AdminSections/ActiveGuardSettings.php:112
+msgid "Send browser security headers"
+msgstr ""
+
+#: src/Lib/AdminSections/ActiveGuardSettings.php:113
+msgid "Sends X-Frame-Options, X-Content-Type-Options and Referrer-Policy. Content Security Policy and HSTS have their own settings."
+msgstr ""
+
+#: src/Lib/AdminSections/ActiveGuardSettings.php:129
+msgid "Isolate pages from other windows (COOP)"
+msgstr ""
+
+#: src/Lib/AdminSections/ActiveGuardSettings.php:130
+msgid "Sends Cross-Origin-Opener-Policy: same-origin. This blocks some cross-site leaks but breaks sign-in pop-ups such as \"Sign in with Google\". Leave it off if you use them."
+msgstr ""
+
+#: src/Lib/AdminSections/ActiveGuardSettings.php:145
+msgid "Maximum request size"
+msgstr ""
+
+#: src/Lib/AdminSections/ActiveGuardSettings.php:147
+msgid " bytes"
+msgstr ""
+
+#: src/Lib/AdminSections/ActiveGuardSettings.php:147
+msgid "Larger requests from visitors (file uploads excluded) are written to the Security Log. 0 turns the check off. Default: 4096."
+msgstr ""
+
+#: src/Lib/AdminSections/ActiveGuardSettings.php:153
+msgid "Block oversized requests"
+msgstr ""
+
+#: src/Lib/AdminSections/ActiveGuardSettings.php:154
+msgid "Check the Security Log first."
+msgstr ""
+
+#: src/Lib/AdminSections/ActiveGuardSettings.php:154
+msgid "Long comments and checkout forms can go over the limit. A blocked address cannot open any page of this site until the block ends."
+msgstr ""
+
+#: src/Lib/AdminSections/ActiveGuardSettings.php:169
+msgid "Oversized requests allowed"
+msgstr ""
+
+#: src/Lib/AdminSections/ActiveGuardSettings.php:171
+msgid " requests"
+msgstr ""
+
+#: src/Lib/AdminSections/ActiveGuardSettings.php:171
+msgid "An address is blocked when it reaches this many oversized requests within 10 minutes. A single request never blocks anyone unless this is 1. Default: 5."
+msgstr ""
+
+#: src/Lib/AdminSections/ActiveGuardSettings.php:176
+msgid "Oversized request block time"
+msgstr ""
+
+#: src/Lib/AdminSections/ActiveGuardSettings.php:178
+#: src/Lib/AdminSections/LoginSettings.php:35
+msgid " minute(s)"
+msgstr ""
+
+#: src/Lib/AdminSections/ActiveGuardSettings.php:178
+msgid "The block ends by itself after this time, 10080 minutes (7 days) at most. You can unblock an address sooner on the Security Log page. Default: 30."
+msgstr ""
+
+#: src/Lib/AdminSections/AdvancedSettings.php:19
+#: src/Lib/AdminSettingsView.php:72
+msgid "Advanced"
+msgstr ""
+
+#: src/Lib/AdminSections/AdvancedSettings.php:20
+msgid "Patterns used by \"Filter malicious requests\" on the Firewall tab."
+msgstr ""
+
+#: src/Lib/AdminSections/AdvancedSettings.php:26
+msgid "Cookie patterns"
+msgstr ""
+
+#: src/Lib/AdminSections/AdvancedSettings.php:35
+msgid "Alphanumeric"
+msgstr ""
+
+#: src/Lib/AdminSections/AdvancedSettings.php:36
+msgid "Safe Chars"
+msgstr ""
+
+#: src/Lib/AdminSections/AdvancedSettings.php:37
+msgid "No Special Chars"
+msgstr ""
+
+#: src/Lib/AdminSections/AdvancedSettings.php:38
+msgid "PHPSESSID"
+msgstr ""
+
+#: src/Lib/AdminSections/AdvancedSettings.php:44
+msgid "Request patterns (GET and POST)"
+msgstr ""
+
+#: src/Lib/AdminSections/AdvancedSettings.php:53
+msgid "SQL Vars"
+msgstr ""
+
+#: src/Lib/AdminSections/AdvancedSettings.php:54
+msgid "SQL Keywords"
+msgstr ""
+
+#: src/Lib/AdminSections/AdvancedSettings.php:55
+msgid "Base64 Func"
+msgstr ""
+
+#: src/Lib/AdminSections/AdvancedSettings.php:56
+msgid "XSS Script Tag"
+msgstr ""
+
+#: src/Lib/AdminSections/AdvancedSettings.php:57
+msgid "XSS Event Handler"
+msgstr ""
+
+#: src/Lib/AdminSections/AdvancedSettings.php:58
+msgid "LFI Traversal"
+msgstr ""
+
+#: src/Lib/AdminSections/LoginSettings.php:19
+#: src/Lib/AdminSettingsView.php:66
+msgid "Login"
+msgstr ""
+
+#: src/Lib/AdminSections/LoginSettings.php:20
+msgid "Limits password guessing and can move the login page to an address only you know. Write down a new login address before you save it."
+msgstr ""
+
+#: src/Lib/AdminSections/LoginSettings.php:26
+msgid "Lockout duration"
+msgstr ""
+
+#: src/Lib/AdminSections/LoginSettings.php:28
+msgid " hour(s)"
+msgstr ""
+
+#: src/Lib/AdminSections/LoginSettings.php:28
+msgid "How long an IP stays blocked after too many failed logins."
+msgstr ""
+
+#: src/Lib/AdminSections/LoginSettings.php:33
+msgid "Counting window"
+msgstr ""
+
+#: src/Lib/AdminSections/LoginSettings.php:35
+msgid "Failed logins are counted within this period."
+msgstr ""
+
+#: src/Lib/AdminSections/LoginSettings.php:40
+msgid "Failed logins allowed"
+msgstr ""
+
+#: src/Lib/AdminSections/LoginSettings.php:42
+msgid " attempts"
+msgstr ""
+
+#: src/Lib/AdminSections/LoginSettings.php:42
+msgid "An IP is blocked after this many failed logins within the counting window."
+msgstr ""
+
+#: src/Lib/AdminSections/LoginSettings.php:47
+msgid "Forget IPs after"
+msgstr ""
+
+#: src/Lib/AdminSections/LoginSettings.php:49
+msgid " day(s)"
+msgstr ""
+
+#: src/Lib/AdminSections/LoginSettings.php:49
+msgid "Removes IP records that were inactive for this many days. 0 keeps them."
+msgstr ""
+
+#: src/Lib/AdminSections/LoginSettings.php:54
+msgid "Forget only IPs with fewer than"
+msgstr ""
+
+#: src/Lib/AdminSections/LoginSettings.php:56
+msgid " failed logins"
+msgstr ""
+
+#: src/Lib/AdminSections/LoginSettings.php:56
+msgid "IPs with this many failed logins or more are kept."
+msgstr ""
+
+#: src/Lib/AdminSections/LoginSettings.php:61
+msgid "Login page address"
+msgstr ""
+
+#: src/Lib/AdminSections/LoginSettings.php:62
+msgid "(site address)"
+msgstr ""
+
+#: src/Lib/AdminSections/LoginSettings.php:63
+msgid "Example: hidden-login. Leave it empty to keep the standard wp-login.php address."
+msgstr ""
+
+#: src/Lib/AdminSections/LoginSettings.php:68
+msgid "Login error message"
+msgstr ""
+
+#: src/Lib/AdminSections/LoginSettings.php:69
+msgid "Shown instead of the WordPress message, which tells attackers whether a username exists. Leave it empty to keep the WordPress message."
+msgstr ""
+
+#: src/Lib/AdminSections/NotificationSettings.php:19
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:85
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:117
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:125
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:154
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:162
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:170
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:178
+#: src/Lib/AdminSections/SslSettings.php:119
+#: src/Lib/AdminSections/SslSettings.php:163
+#: src/Lib/AdminSections/SslSettings.php:181
+#: src/Lib/CSPIntegrationSettings.php:65
+msgid "Off"
+msgstr ""
+
+#: src/Lib/AdminSections/NotificationSettings.php:23
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:117
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:125
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:154
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:162
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:170
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:178
+#: src/Lib/AdminSections/SslSettings.php:123
+#: src/Lib/AdminSections/SslSettings.php:167
+#: src/Lib/AdminSections/SslSettings.php:185
+#: src/Lib/CSPIntegrationSettings.php:61
+msgid "On"
+msgstr ""
+
+#: src/Lib/AdminSections/NotificationSettings.php:43
+#: src/Lib/AdminSettingsView.php:71
+msgid "Notifications"
+msgstr ""
+
+#: src/Lib/AdminSections/NotificationSettings.php:44
+msgid "Visitors and other users never see them."
+msgstr ""
+
+#: src/Lib/AdminSections/NotificationSettings.php:49
+msgid "Show notifications"
+msgstr ""
+
+#: src/Lib/AdminSections/NotificationSettings.php:50
+msgid "Turns every kind below on or off at once."
+msgstr ""
+
+#: src/Lib/AdminSections/NotificationSettings.php:54
+msgid "Blocked content"
+msgstr ""
+
+#: src/Lib/AdminSections/NotificationSettings.php:55
+msgid "When the Content Security Policy blocks something on the page you are viewing, or would block it while testing, with a button to allow it. Also works when the policy does not apply to administrators."
+msgstr ""
+
+#: src/Lib/AdminSections/NotificationSettings.php:59
+msgid "Protection status"
+msgstr ""
+
+#: src/Lib/AdminSections/NotificationSettings.php:60
+msgid "Things that need a decision, such as a policy that is still only being tested or a cache driver that stopped working."
+msgstr ""
+
+#: src/Lib/AdminSections/NotificationSettings.php:64
+msgid "Activity summary"
+msgstr ""
+
+#: src/Lib/AdminSections/NotificationSettings.php:65
+msgid "At most once a day: how many addresses were stopped or logged since the last summary."
+msgstr ""
+
+#: src/Lib/AdminSections/RecaptchaSettings.php:19
+#: src/Lib/AdminSettingsView.php:70
+msgid "reCAPTCHA"
+msgstr ""
+
+#: src/Lib/AdminSections/RecaptchaSettings.php:20
+msgid "Adds a Google reCAPTCHA check to the forms you choose. The script loads lazily to keep pages fast."
+msgstr ""
+
+#: src/Lib/AdminSections/RecaptchaSettings.php:27
+msgid "Use reCAPTCHA"
+msgstr ""
+
+#: src/Lib/AdminSections/RecaptchaSettings.php:28
+msgid "Create the site key and the secret key in the Google reCAPTCHA admin console for this domain."
+msgstr ""
+
+#: src/Lib/AdminSections/RecaptchaSettings.php:32
+msgid "Disable"
+msgstr ""
+
+#: src/Lib/AdminSections/RecaptchaSettings.php:36
+msgid "Enable"
+msgstr ""
+
+#: src/Lib/AdminSections/RecaptchaSettings.php:43
+msgid "Site key"
+msgstr ""
+
+#: src/Lib/AdminSections/RecaptchaSettings.php:44
+msgid "reCAPTCHA site key"
+msgstr ""
+
+#: src/Lib/AdminSections/RecaptchaSettings.php:49
+msgid "Secret key"
+msgstr ""
+
+#: src/Lib/AdminSections/RecaptchaSettings.php:50
+msgid "reCAPTCHA secret key"
+msgstr ""
+
+#: src/Lib/AdminSections/RecaptchaSettings.php:56
+msgid "reCAPTCHA type"
+msgstr ""
+
+#: src/Lib/AdminSections/RecaptchaSettings.php:60
+msgid "reCAPTCHA v2 (Checkbox)"
+msgstr ""
+
+#: src/Lib/AdminSections/RecaptchaSettings.php:64
+msgid "reCAPTCHA v2 (Invisible)"
+msgstr ""
+
+#: src/Lib/AdminSections/RecaptchaSettings.php:68
+msgid "reCAPTCHA v3"
+msgstr ""
+
+#: src/Lib/AdminSections/RecaptchaSettings.php:76
+msgid "Login form"
+msgstr ""
+
+#: src/Lib/AdminSections/RecaptchaSettings.php:92
+msgid "Registration form"
+msgstr ""
+
+#: src/Lib/AdminSections/RecaptchaSettings.php:108
+msgid "Lost password form"
+msgstr ""
+
+#: src/Lib/AdminSections/RecaptchaSettings.php:124
+msgid "Comment form"
+msgstr ""
+
+#: src/Lib/AdminSections/RecaptchaSettings.php:140
+msgid "Contact Form 7 forms"
+msgstr ""
+
+#: src/Lib/AdminSections/RecaptchaSettings.php:156
+msgid "Mailchimp for WP forms"
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:63
+msgid "Limits as soon as it holds a host."
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:72
+#: src/Lib/AdminSettingsView.php:69
+msgid "Content Security Policy"
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:73
+msgid "Tells browsers what your pages may load and run. The admin area is never restricted, and the login page only gets the framing and base URL rules."
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:81
+msgid "Protection"
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:89
+msgid "On (recommended)"
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:92
+msgid "A script only runs when it comes from your own site, from a host your theme or plugins load, from a service allowed below, or when it was approved for the page. Code that WordPress, your theme and active plugins print is approved while the page is built. Injected code has none of these, so browsers refuse it. Framing by other sites and changed base URLs are blocked too."
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:93
+msgid "Anything blocked on a page you visit shows up as a notification at the bottom right, with a button to allow it."
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:99
+msgid "When a rule is broken"
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:103
+msgid "Test: block nothing, only report"
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:107
+msgid "Enforce: block it"
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:110
+msgid "While you test, visitors are not protected against injected scripts. Notifications show what would be blocked. Framing and base URL rules are enforced either way."
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:116
+msgid "Apply to logged-in members"
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:118
+msgid "When off, members only get the framing and base URL rules. Account and cart pages can print code of their own, so visit them once as a member."
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:124
+msgid "Apply to administrators"
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:126
+msgid "When off, nothing is blocked for you, and notifications still show what visitors lose. Page builder editors and the Customizer are left alone either way."
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:132
+msgid "How inline code is verified"
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:136
+msgid "Automatic (recommended)"
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:140
+msgid "Nonce"
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:144
+msgid "Hash"
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:147
+msgid "A nonce is one token that is new on every visit. A page cache would hand the same token to everyone, so behind a page cache Automatic lists a hash for each piece of approved code instead and pages stay cached. With the cache driver installed it uses the nonce there too. The Page cache box below shows what applies to this site."
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:153
+msgid "Allow all inline code"
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:155
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:171
+msgid "Lowers protection."
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:155
+msgid "Code written into the page itself then runs without being checked, including code an attacker manages to inject. Only the hosts scripts load from stay limited. Use it only when a page cannot work otherwise."
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:161
+msgid "Block inline event handlers"
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:163
+msgid "Can break pages."
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:163
+msgid "Stops attributes such as onclick, onload and onerror, which cannot be approved one by one. It closes a common injection route, but many themes and speed plugins rely on them. A notification offers to switch this off again when a page needs it."
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:169
+msgid "Allow code built at runtime (eval) on every page"
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:171
+msgid "Pages that load WordPress templates, such as product variations and playlists, need this and get it on their own. Turn it on only when a notification says another script needs it."
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:177
+msgid "Upgrade HTTP requests to HTTPS"
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:179
+msgid "Sent only on HTTPS pages. Turn it off only if a resource exists solely over plain HTTP."
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:184
+msgid "Report URL"
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:186
+msgid "Optional address where browsers send violation reports as JSON."
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:194
+msgid "Allowed script (JS) hosts"
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:199
+msgid "Hosts of scripts that your theme and plugins register are allowed automatically, and Services above cover the common providers. Other hosts belong here. The quickest way to add one is the Allow button on the notification that reports it."
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:204
+msgid "Additional style hosts"
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:207
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:225
+msgid "FontAwesome"
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:209
+msgid "Added to the style rule, which exists while inline code is verified. Stylesheets your theme and plugins register are allowed automatically."
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:213
+msgid "Additional worker hosts"
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:216
+msgid "Background workers may always come from your own site and from blob: addresses. Hosts listed here are added."
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:220
+msgid "Allowed font hosts"
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:223
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:247
+msgid "data:"
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:224
+msgid "Google Fonts"
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:227
+msgid "Empty: fonts are not limited."
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:228
+msgid "Fonts then load only from your own site and the hosts listed. Icons and text fall back to system fonts if a host is missing."
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:232
+msgid "Allowed embed hosts"
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:235
+msgid "YouTube"
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:236
+msgid "Google Maps"
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:237
+msgid "Spotify"
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:239
+msgid "Empty: embeds are not limited."
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:240
+msgid "Videos, maps and payment forms from hosts not listed then stay blank."
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:244
+msgid "Allowed image hosts"
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:248
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:268
+msgid "https:"
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:249
+msgid "Gravatar"
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:250
+msgid "Jetpack CDN"
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:252
+msgid "Empty: images are not limited."
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:253
+msgid "Images from any host not listed then disappear, including ones pasted into posts."
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:257
+msgid "Allowed connection hosts"
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:260
+msgid "Empty: connections are not limited."
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:261
+msgid "Analytics, live search and payment requests to hosts not listed then fail silently."
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:265
+msgid "Allowed audio and video hosts"
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:270
+msgid "Empty: audio and video are not limited."
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:271
+msgid "Audio and video files on hosts not listed then do not play."
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:275
+msgid "Allowed form targets"
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:278
+msgid "Empty: forms may post anywhere."
+msgstr ""
+
+#: src/Lib/AdminSections/SecurityPoliciesSettings.php:279
+msgid "Forms that post to another site, such as payment gateways and newsletter services, then stop submitting."
+msgstr ""
+
+#: src/Lib/AdminSections/SslSettings.php:19
+#: src/Lib/AdminSettingsView.php:67
+msgid "HTTPS"
+msgstr ""
+
+#: src/Lib/AdminSections/SslSettings.php:20
+msgid "Moves logins, the admin area and visitors to HTTPS."
+msgstr ""
+
+#: src/Lib/AdminSections/SslSettings.php:28
+msgid "HTTPS support"
+msgstr ""
+
+#: src/Lib/AdminSections/SslSettings.php:29
+msgid "Turn this on after your SSL certificate works. The options below need it."
+msgstr ""
+
+#: src/Lib/AdminSections/SslSettings.php:32
+#: src/Lib/AdminSections/SslSettings.php:49
+#: src/Lib/AdminSections/SslSettings.php:66
+#: src/Lib/AdminSections/SslSettings.php:83
+#: src/Lib/AdminSections/SslSettings.php:100
+msgid "Disabled"
+msgstr ""
+
+#: src/Lib/AdminSections/SslSettings.php:36
+#: src/Lib/AdminSections/SslSettings.php:53
+#: src/Lib/AdminSections/SslSettings.php:70
+#: src/Lib/AdminSections/SslSettings.php:87
+#: src/Lib/AdminSections/SslSettings.php:104
+msgid "Enabled"
+msgstr ""
+
+#: src/Lib/AdminSections/SslSettings.php:46
+msgid "Use HTTPS on the login page"
+msgstr ""
+
+#: src/Lib/AdminSections/SslSettings.php:63
+msgid "Use HTTPS in the admin area"
+msgstr ""
+
+#: src/Lib/AdminSections/SslSettings.php:80
+msgid "Use HTTPS on the front page"
+msgstr ""
+
+#: src/Lib/AdminSections/SslSettings.php:97
+msgid "Use HTTPS on the whole site"
+msgstr ""
+
+#: src/Lib/AdminSections/SslSettings.php:114
+msgid "Strict HTTPS in browsers (HSTS)"
+msgstr ""
+
+#: src/Lib/AdminSections/SslSettings.php:115
+msgid "Can make the site unreachable."
+msgstr ""
+
+#: src/Lib/AdminSections/SslSettings.php:115
+msgid "Browsers that see this refuse plain HTTP and refuse to bypass certificate errors for the duration below. If your certificate expires or HTTPS stops working, those visitors cannot open the site, and turning this off does not reach them. Use it only when renewal is automatic and every page works over HTTPS."
+msgstr ""
+
+#: src/Lib/AdminSections/SslSettings.php:132
+msgid "How long browsers remember HSTS"
+msgstr ""
+
+#: src/Lib/AdminSections/SslSettings.php:133
+msgid "Start with 1 day. Raise it step by step once the site has run without HTTPS problems."
+msgstr ""
+
+#: src/Lib/AdminSections/SslSettings.php:137
+msgid "1 day (test)"
+msgstr ""
+
+#: src/Lib/AdminSections/SslSettings.php:141
+msgid "30 days"
+msgstr ""
+
+#: src/Lib/AdminSections/SslSettings.php:145
+msgid "1 year"
+msgstr ""
+
+#: src/Lib/AdminSections/SslSettings.php:149
+msgid "2 years"
+msgstr ""
+
+#: src/Lib/AdminSections/SslSettings.php:158
+msgid "HSTS: include subdomains"
+msgstr ""
+
+#: src/Lib/AdminSections/SslSettings.php:159
+msgid "Affects every subdomain."
+msgstr ""
+
+#: src/Lib/AdminSections/SslSettings.php:159
+msgid "Any subdomain without working HTTPS, such as mail, staging or a shop on another server, becomes unreachable. On a subdomain network this covers every site."
+msgstr ""
+
+#: src/Lib/AdminSections/SslSettings.php:176
+msgid "HSTS: allow preloading"
+msgstr ""
+
+#: src/Lib/AdminSections/SslSettings.php:177
+msgid "Removal takes months."
+msgstr ""
+
+#: src/Lib/AdminSections/SslSettings.php:177
+msgid "Only sent with subdomains on and a duration of at least 1 year. Once your domain is on the browser preload lists it must stay HTTPS-only."
+msgstr ""
+
+#: src/Lib/AdminSections/XmlrpcSettings.php:19
+#: src/Lib/AdminSettingsView.php:65
+msgid "XML-RPC"
+msgstr ""
+
+#: src/Lib/AdminSections/XmlrpcSettings.php:20
+msgid "XML-RPC is an older remote publishing interface. Attackers use it to try many passwords in a single request. Most sites do not need it."
+msgstr ""
+
+#: src/Lib/AdminSections/XmlrpcSettings.php:27
+msgid "Turn off XML-RPC completely"
+msgstr ""
+
+#: src/Lib/AdminSections/XmlrpcSettings.php:38
+msgid "Blocks every XML-RPC request. Apps that publish through XML-RPC (older mobile apps, some Jetpack features) stop working."
+msgstr ""
+
+#: src/Lib/AdminSections/XmlrpcSettings.php:44
+msgid "Block logins through XML-RPC"
+msgstr ""
+
+#: src/Lib/AdminSections/XmlrpcSettings.php:55
+msgid "Stops password guessing through XML-RPC. Leave this on unless an app signs in to your site through XML-RPC."
+msgstr ""
+
+#: src/Lib/AdminSections/XmlrpcSettings.php:61
+msgid "Block pingbacks"
+msgstr ""
+
+#: src/Lib/AdminSections/XmlrpcSettings.php:72
+msgid "Attackers can use pingbacks to make your site send traffic floods to other sites."
+msgstr ""
+
+#: src/Lib/AdminSections/XmlrpcSettings.php:78
+msgid "Block pingbacks to your own posts"
+msgstr ""
+
+#: src/Lib/AdminSections/XmlrpcSettings.php:89
+msgid "WordPress pings your own posts when you link between them. This only adds noise to your comments."
+msgstr ""
+
+#: src/Lib/AdminSettingsView.php:50
+msgid "Turn these on only after your site opens without warnings at https://."
+msgstr ""
+
+#: src/Lib/AdminSettingsView.php:54
+msgid "No valid SSL certificate was found for this site, so HTTPS options cannot be turned on."
+msgstr ""
+
+#: src/Lib/AdminSettingsView.php:55
+msgid "Many hosts install a free certificate for you. Free providers:"
+msgstr ""
+
+#: src/Lib/AdminSettingsView.php:58
+msgid "Paid providers:"
+msgstr ""
+
+#: src/Lib/AdminSettingsView.php:77
+#: src/Lib/AdminSettingsView.php:262
+msgid "Network policy"
+msgstr ""
+
+#: src/Lib/AdminSettingsView.php:91
+msgid "SecureFusion settings"
+msgstr ""
+
+#: src/Lib/AdminSettingsView.php:97
+msgid "Network security settings"
+msgstr ""
+
+#: src/Lib/AdminSettingsView.php:98
+msgid "Defaults for every site in the network."
+msgstr ""
+
+#: src/Lib/AdminSettingsView.php:104
+msgid "Security settings"
+msgstr ""
+
+#: src/Lib/AdminSettingsView.php:105
+msgid "Choose which protections run on this site."
+msgstr ""
+
+#: src/Lib/AdminSettingsView.php:114
+msgid "This site follows the network settings."
+msgstr ""
+
+#. translators: %s: number of settings customized for this site.
+#: src/Lib/AdminSettingsView.php:120
+#, php-format
+msgid "%s setting is customized for this site."
+msgid_plural "%s settings are customized for this site."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/Lib/AdminSettingsView.php:123
+msgid "Change a value to customize it for this site only. \"Use network setting\" brings the network value back."
+msgstr ""
+
+#: src/Lib/AdminSettingsView.php:141
+msgid "customized for this site"
+msgstr ""
+
+#: src/Lib/AdminSettingsView.php:164
+msgid "Advanced settings"
+msgstr ""
+
+#: src/Lib/AdminSettingsView.php:165
+msgid "Opening this panel does not change your settings. Adjust only what this site needs."
+msgstr ""
+
+#: src/Lib/AdminSettingsView.php:166
+msgid "Find a setting"
+msgstr ""
+
+#: src/Lib/AdminSettingsView.php:168
+msgid "These settings can block parts of your pages."
+msgstr ""
+
+#: src/Lib/AdminSettingsView.php:168
+msgid "Each one is marked. Use Test before you enforce a change."
+msgstr ""
+
+#: src/Lib/AdminSettingsView.php:188
+msgid "Wrong patterns can block normal visitors or let attacks through. Change them only if you know regular expressions."
+msgstr ""
+
+#: src/Lib/AdminSettingsView.php:196
+msgid "Save settings"
+msgstr ""
+
+#: src/Lib/AdminSettingsView.php:201
+msgid "Saves every tab. Settings that follow the network are not stored for this site."
+msgstr ""
+
+#: src/Lib/AdminSettingsView.php:205
+msgid "Saves every tab."
+msgstr ""
+
+#: src/Lib/AdminSettingsView.php:263
+msgid "Settings on this page are the defaults for every site in the network."
+msgstr ""
+
+#: src/Lib/AdminSettingsView.php:268
+msgid "Site administrators can customize their site"
+msgstr ""
+
+#: src/Lib/AdminSettingsView.php:279
+msgid "When off, only network administrators can change settings for a single site. Brute-force limits are always set here, for all sites."
+msgstr ""
+
+#: src/Lib/CommentsBlock.php:82
 msgid "Admin/Whitelisted IP address."
 msgstr ""
 
-#: src/Lib/CommentsBlock.php:61
-#: src/Lib/CommentsBlock.php:148
+#: src/Lib/CommentsBlock.php:82
+#: src/Lib/CommentsBlock.php:191
 msgid "Whitelisted IP"
 msgstr ""
 
-#: src/Lib/CommentsBlock.php:66
-#: src/Lib/CommentsBlock.php:147
+#: src/Lib/CommentsBlock.php:89
+#: src/Lib/CommentsBlock.php:190
 msgid "Unblock IP"
 msgstr ""
 
-#: src/Lib/CommentsBlock.php:72
-#: src/Lib/CommentsBlock.php:146
+#: src/Lib/CommentsBlock.php:97
+#: src/Lib/CommentsBlock.php:189
 msgid "Block IP"
 msgstr ""
 
-#: src/Lib/CommentsBlock.php:102
+#: src/Lib/CommentsBlock.php:142
 msgid "Block ranges"
 msgstr ""
 
-#: src/Lib/CommentsBlock.php:106
+#: src/Lib/CommentsBlock.php:146
 msgid "Block Spam"
 msgstr ""
 
-#: src/Lib/CommentsBlock.php:143
-#: src/Lib/SecurityLog.php:124
+#: src/Lib/CommentsBlock.php:186
+#: src/Lib/SecurityLog.php:144
 msgid "Are you sure you want to block this IP?"
 msgstr ""
 
-#: src/Lib/CommentsBlock.php:144
+#: src/Lib/CommentsBlock.php:187
 msgid "Are you sure you want to unblock this IP?"
 msgstr ""
 
-#: src/Lib/CommentsBlock.php:145
+#: src/Lib/CommentsBlock.php:188
 msgid "Are you sure you want to block all IP addresses/ranges for all comments currently in Spam?"
 msgstr ""
 
-#: src/Lib/CommentsBlock.php:149
+#: src/Lib/CommentsBlock.php:192
 msgid "Operation completed successfully."
 msgstr ""
 
-#: src/Lib/CommentsBlock.php:150
-#: src/Lib/CommentsBlock.php:196
-#: src/Lib/SecurityLog.php:344
+#: src/Lib/CommentsBlock.php:193
+#: src/Lib/CommentsBlock.php:264
+#: src/Lib/SecurityLog.php:436
 msgid "Operation failed."
 msgstr ""
 
-#: src/Lib/CommentsBlock.php:151
-#: src/Lib/IPRanges.php:70
-#: src/Lib/SecurityLog.php:118
+#: src/Lib/CommentsBlock.php:194
+#: src/Lib/IPRanges.php:77
+#: src/Lib/SecurityLog.php:135
 msgid "Processing..."
 msgstr ""
 
-#: src/Lib/CommentsBlock.php:161
-#: src/Lib/CommentsBlock.php:204
-#: src/Lib/IPRules.php:118
-#: src/Lib/IPRules.php:167
-#: src/Lib/SecurityLog.php:137
+#: src/Lib/CommentsBlock.php:207
+#: src/Lib/CommentsBlock.php:275
+#: src/Lib/IPRules.php:142
+#: src/Lib/IPRules.php:216
+#: src/Lib/SecurityLog.php:160
 msgid "Security check failed."
 msgstr ""
 
-#: src/Lib/CommentsBlock.php:166
-#: src/Lib/CommentsBlock.php:209
-#: src/Lib/IPRules.php:123
-#: src/Lib/IPRules.php:172
-#: src/Lib/SecurityLog.php:142
+#: src/Lib/CommentsBlock.php:215
+#: src/Lib/CommentsBlock.php:283
+#: src/Lib/CSPCacheAdmin.php:51
+#: src/Lib/CSPInlineAdmin.php:141
+#: src/Lib/IPRules.php:150
+#: src/Lib/IPRules.php:224
+#: src/Lib/Notifier.php:237
+#: src/Lib/SecurityLog.php:168
 msgid "Permission denied."
 msgstr ""
 
-#: src/Lib/CommentsBlock.php:174
+#: src/Lib/CommentsBlock.php:226
 msgid "Invalid IP address."
 msgstr ""
 
-#: src/Lib/CommentsBlock.php:182
-#: src/Lib/SecurityLog.php:317
+#: src/Lib/CommentsBlock.php:238
+#: src/Lib/SecurityLog.php:400
 msgid "This IP is whitelisted and cannot be blocked."
 msgstr ""
 
-#: src/Lib/CommentsBlock.php:187
+#: src/Lib/CommentsBlock.php:248
 msgid "IP blocked."
 msgstr ""
 
-#: src/Lib/CommentsBlock.php:192
+#: src/Lib/CommentsBlock.php:258
 msgid "IP unblocked."
 msgstr ""
 
-#: src/Lib/CommentsBlock.php:220
+#: src/Lib/CommentsBlock.php:306
 msgid "No spam comment IPs found."
 msgstr ""
 
-#: src/Lib/CommentsBlock.php:295
+#. translators: %d: Number of blocked IPs/ranges.
+#: src/Lib/CommentsBlock.php:422
+#, php-format
 msgid "Successfully blocked %d IP addresses/ranges."
 msgstr ""
 
-#: src/Lib/IPRanges.php:63
-msgid "WARNING: This action is irreversible! All failed login attempt data will be permanently deleted. Are you absolutely sure?"
+#: src/Lib/CSPCacheAdmin.php:74
+#: src/Lib/CSPInlineAdmin.php:167
+#: src/Lib/CSPInlineAdmin.php:269
+msgid "Unknown operation or stale record. Refresh the list."
 msgstr ""
 
-#: src/Lib/IPRanges.php:64
-#: src/Lib/SecurityLog.php:112
-msgid "Importing data will add records to the existing table. Continue?"
+#: src/Lib/CSPCacheAdmin.php:99
+msgid "Inline code is not verified right now, so page caches are not affected."
 msgstr ""
 
-#: src/Lib/IPRanges.php:65
-msgid "All data has been deleted successfully."
+#: src/Lib/CSPCacheAdmin.php:106
+msgid "Hash method: pages stay in every cache. Each piece of inline code adds about 55 bytes to the policy."
 msgstr ""
 
-#: src/Lib/IPRanges.php:66
-#: src/Lib/SecurityLog.php:114
-msgid "No data to export."
+#: src/Lib/CSPCacheAdmin.php:107
+msgid "A page cache was found, so hashes are used and pages stay cached. Each piece of inline code adds about 55 bytes to the policy. Install the cache driver to use one short nonce instead."
 msgstr ""
 
-#: src/Lib/IPRanges.php:67
-#: src/Lib/SecurityLog.php:115
-msgid "Import completed successfully."
+#: src/Lib/CSPCacheAdmin.php:113
+msgid "Cached pages receive a fresh nonce on every visit through the cache driver."
 msgstr ""
 
-#: src/Lib/IPRanges.php:68
-#: src/Lib/SecurityLog.php:116
-msgid "Import failed. Please check the file format."
+#: src/Lib/CSPCacheAdmin.php:119
+msgid "While you test, pages stay cached. Once you enforce, pages are marked as not cacheable so that no cache can hand one nonce to every visitor."
 msgstr ""
 
-#: src/Lib/IPRanges.php:69
-#: src/Lib/SecurityLog.php:117
-msgid "Please select a valid JSON file."
+#: src/Lib/CSPCacheAdmin.php:123
+msgid "Pages are marked as not cacheable, so no cache can hand one nonce to every visitor. If a cache or CDN keeps your pages, install the cache driver or choose Hash."
 msgstr ""
 
-#: src/Lib/IPRanges.php:71
-#: src/Lib/SecurityLog.php:119
-msgid "Copied to clipboard!"
+#: src/Lib/CSPCacheAdmin.php:138
+msgid "Cache driver: not installed."
 msgstr ""
 
-#: src/Lib/IPRanges.php:72
-#: src/Lib/SecurityLog.php:120
-msgid "Copy failed. Please select and copy manually."
+#. translators: %s: how long ago, for example "5 minutes".
+#: src/Lib/CSPCacheAdmin.php:147
+#, php-format
+msgid "Cache driver: working. Checked %s ago."
 msgstr ""
 
-#: src/Lib/IPRanges.php:73
-msgid "IP range has been blocked."
+#: src/Lib/CSPCacheAdmin.php:153
+msgid "Cache driver: installed but not used. A cache answers visitors before PHP runs, so the driver cannot refresh the nonce. To keep pages cached, choose the Hash method above, or exclude HTML pages from that cache and check again."
 msgstr ""
 
-#: src/Lib/IPRanges.php:74
-msgid "IP range has been unblocked."
+#: src/Lib/CSPCacheAdmin.php:159
+msgid "Cache driver: installed but not used. The site could not request its own home page, so the driver could not be tested."
 msgstr ""
 
-#: src/Lib/IPRanges.php:75
-msgid "IP range block/unblock operation failed."
+#: src/Lib/CSPCacheAdmin.php:163
+msgid "Cache driver: installed, not confirmed yet. Servers can keep the previous wp-config.php for a few minutes. Check again shortly."
 msgstr ""
 
-#: src/Lib/IPRanges.php:76
-msgid "Are you sure you want to block this IP range?"
+#: src/Lib/CSPCacheAdmin.php:192
+msgid "Page cache"
 msgstr ""
 
-#: src/Lib/IPRanges.php:120
-#: src/Lib/IPRanges.php:312
-msgid "IP Range TXT List"
+#. translators: %s: comma-separated cache names.
+#: src/Lib/CSPCacheAdmin.php:198
+#, php-format
+msgid "Detected: %s."
 msgstr ""
 
-#: src/Lib/IPRanges.php:124
-msgid "IP Ranges Management"
+#: src/Lib/CSPCacheAdmin.php:202
+msgid "No page cache detected."
 msgstr ""
 
-#: src/Lib/IPRanges.php:125
-msgid "View and manage IP subnets that have generated failed login attempts."
+#: src/Lib/CSPCacheAdmin.php:210
+msgid "wp-config.php could not be changed from here. To install the driver by hand, add these lines directly below the first line (<?php) of wp-config.php, then check again:"
 msgstr ""
 
-#: src/Lib/IPRanges.php:137
-msgid "IP Range"
+#. translators: 1: first marker line, 2: last marker line.
+#: src/Lib/CSPCacheAdmin.php:216
+#, php-format
+msgid "wp-config.php could not be changed from here. Delete the lines from \"%1$s\" to \"%2$s\" by hand."
 msgstr ""
 
-#: src/Lib/IPRanges.php:139
-msgid "Total Attempts"
+#: src/Lib/CSPCacheAdmin.php:223
+msgid "Install cache driver"
 msgstr ""
 
-#: src/Lib/IPRanges.php:165
-#: src/Lib/IPRules.php:308
-#: src/Lib/SecurityLog.php:564
-msgid "Actions"
+#: src/Lib/CSPCacheAdmin.php:225
+msgid "Check again"
 msgstr ""
 
-#: src/Lib/IPRanges.php:199
-msgid "Logs"
+#: src/Lib/CSPCacheAdmin.php:226
+msgid "Remove cache driver"
 msgstr ""
 
-#: src/Lib/IPRanges.php:203
-msgid "List"
+#: src/Lib/CSPCacheAdmin.php:230
+msgid "Not needed right now: the driver only refreshes the nonce of verified inline code. It becomes available when protection is on and \"Allow all inline code\" is off."
 msgstr ""
 
-#: src/Lib/IPRanges.php:208
-#: src/Lib/SecurityLog.php:640
-msgid "Unblock"
+#: src/Lib/CSPCacheAdmin.php:232
+msgid "Adds five marked lines to wp-config.php so a fresh nonce is set before your page cache answers. Nothing else is changed, and removing the driver deletes the lines again. It is tested right away and only used if the test passes."
 msgstr ""
 
-#: src/Lib/IPRanges.php:213
-#: src/Lib/SecurityLog.php:645
-msgid "Block"
+#: src/Lib/CSPCacheSetup.php:483
+msgid "a page cache plugin"
 msgstr ""
 
-#: src/Lib/IPRanges.php:233
-#: src/Lib/IPRules.php:363
-#: src/Lib/SecurityLog.php:664
-msgid "Page %1$s of %2$s (%3$s items)"
+#: src/Lib/CSPInlineAdmin.php:218
+msgid "Enter up to 10 exact paths, one per line, or * for every page."
 msgstr ""
 
-#: src/Lib/IPRanges.php:271
-msgid "No IP ranges found. Your site is clean!"
+#: src/Lib/CSPInlineAdmin.php:248
+msgid "Enter a SHA-256 base64 digest and an exact path, or *."
 msgstr ""
 
-#: src/Lib/IPRanges.php:280
-msgid "IPs in Range"
+#: src/Lib/CSPInlineAdmin.php:277
+msgid "The list is busy. Retry your change."
 msgstr ""
 
-#: src/Lib/IPRanges.php:289
-msgid "Copy IP List"
+#. translators: %s: file and line that sent output early.
+#: src/Lib/CSPInlineAdmin.php:356
+#, php-format
+msgid "On at least one page the full policy could not be sent, because the response had already started (%s). That page only received the always-on rules. A theme or plugin that flushes output early causes this."
 msgstr ""
 
-#: src/Lib/IPRanges.php:292
-#: src/Lib/IPRanges.php:324
-#: src/Lib/SecurityLog.php:729
-msgid "Close"
+#: src/Lib/CSPInlineAdmin.php:362
+msgid "On at least one page an optimizer moved inline scripts into data: addresses (Autoptimize does this when it defers inline JavaScript). A hash cannot verify those, so that page was sent with all inline code allowed. Install the cache driver or choose the Nonce method, or turn that optimizer option off."
 msgstr ""
 
-#: src/Lib/IPRanges.php:321
-msgid "Copy List"
+#: src/Lib/CSPInlineAdmin.php:368
+msgid "On at least one page the policy grew too large for common web servers. That page was sent without some of the optional limits (images, fonts, media and similar), keeping the script rules. Shorten the allow lists to get them back."
 msgstr ""
 
-#: src/Lib/IPRules.php:75
-msgid "Are you sure you want to delete this rule?"
+#: src/Lib/CSPInlineAdmin.php:374
+msgid "On at least one page the policy grew too large for common web servers even without inline verification. That page only received the always-on rules. Shorten the allow lists."
 msgstr ""
 
-#: src/Lib/IPRules.php:76
-#: src/Lib/IPRules.php:153
-msgid "Rule has been added successfully."
+#: src/Lib/CSPInlineAdmin.php:378
+msgid "On at least one page the policy grew too large for common web servers. That page was sent without inline verification, keeping only the host limits. Install the cache driver or choose the Nonce method, or shorten the allow lists."
 msgstr ""
 
-#: src/Lib/IPRules.php:77
-#: src/Lib/IPRules.php:187
-msgid "Rule has been deleted successfully."
+#: src/Lib/CSPInlineAdmin.php:433
+msgid "Sent to visitors now"
 msgstr ""
 
-#: src/Lib/IPRules.php:78
-#: src/Lib/IPRules.php:155
-msgid "Failed to add rule."
+#: src/Lib/CSPInlineAdmin.php:435
+msgid "No Content Security Policy is sent."
 msgstr ""
 
-#: src/Lib/IPRules.php:79
-#: src/Lib/IPRules.php:189
-msgid "Failed to delete rule."
+#: src/Lib/CSPInlineAdmin.php:441
+msgid "Framing and base URL rules are enforced. The rest of the rules below is only being tested:"
 msgstr ""
 
-#: src/Lib/IPRules.php:80
-#: src/Lib/IPRules.php:131
-msgid "Invalid IP address or CIDR range format."
+#: src/Lib/CSPInlineAdmin.php:445
+msgid "These rules are enforced:"
 msgstr ""
 
-#: src/Lib/IPRules.php:136
-msgid "Invalid rule type."
+#: src/Lib/CSPInlineAdmin.php:453
+msgid "The last scan received fewer rules than this from your home page. Either something on the server replaces the header, or the page was sent before its policy was complete. The page answered with:"
 msgstr ""
 
-#: src/Lib/IPRules.php:144
-msgid "This IP/range is whitelisted and cannot be blocked."
+#: src/Lib/CSPInlineAdmin.php:454
+msgid "No Content Security Policy."
 msgstr ""
 
-#: src/Lib/IPRules.php:179
-msgid "Invalid IP or range."
+#. translators: %d: number of items waiting for review.
+#: src/Lib/CSPInlineAdmin.php:460
+#, php-format
+msgid "%d item in page content is not approved, so browsers are blocking it."
+msgid_plural "%d items in page content are not approved, so browsers are blocking them."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/Lib/CSPInlineAdmin.php:465
+msgid "Still open: code in attributes such as onclick and onerror runs, because many themes need it. Once your pages work, turn on \"Block inline event handlers\" and visit them again; a notification tells you if one needs it."
 msgstr ""
 
-#: src/Lib/IPRules.php:242
-msgid "IP Rules Management"
+#: src/Lib/CSPInlineAdmin.php:468
+msgid "This note clears when you save the settings."
 msgstr ""
 
-#: src/Lib/IPRules.php:243
-msgid "Manually block or whitelist specific IP addresses and range blocks."
+#: src/Lib/CSPInlineAdmin.php:507
+msgid "Each site reviews its own exceptions in its own SecureFusion settings."
 msgstr ""
 
-#: src/Lib/IPRules.php:251
-msgid "Add New Rule"
+#: src/Lib/CSPInlineAdmin.php:517
+msgid "Exceptions"
 msgstr ""
 
-#: src/Lib/IPRules.php:254
-msgid "IP Address or Subnet (CIDR)"
+#: src/Lib/CSPInlineAdmin.php:518
+msgid "Nothing is needed here on most sites. Code and hosts from WordPress, your theme and active plugins are allowed automatically as each page is produced. An optional scan finds what only you can judge: code pasted into page content and hosts that scripts load on their own."
 msgstr ""
 
-#: src/Lib/IPRules.php:258
-#: src/Lib/IPRules.php:281
-msgid "Rule Type"
+#: src/Lib/CSPInlineAdmin.php:521
+msgid "Pages that could not be scanned"
 msgstr ""
 
-#: src/Lib/IPRules.php:260
-#: src/Lib/IPRules.php:321
-#: src/Lib/SecurityLog.php:52
-#: src/Lib/SecurityLog.php:627
-msgid "Blocked"
+#: src/Lib/CSPInlineAdmin.php:523
+msgid "Scan site"
 msgstr ""
 
-#: src/Lib/IPRules.php:261
-#: src/Lib/IPRules.php:319
-#: src/Lib/SecurityLog.php:625
-msgid "Whitelisted"
+#: src/Lib/CSPInlineAdmin.php:524
+msgid "Approve everything listed? Anything malicious already on your pages would be approved too."
 msgstr ""
 
-#: src/Lib/IPRules.php:267
-msgid "Add Rule"
+#: src/Lib/CSPInlineAdmin.php:524
+msgid "Approve all"
 msgstr ""
 
-#: src/Lib/IPRules.php:280
-msgid "IP / Subnet (CIDR)"
+#: src/Lib/CSPInlineAdmin.php:525
+msgid "Revoke all"
 msgstr ""
 
-#: src/Lib/IPRules.php:282
-msgid "Created At"
+#: src/Lib/CSPInlineAdmin.php:529
+msgid "Find"
 msgstr ""
 
-#: src/Lib/IPRules.php:335
-#: src/Lib/SecurityLog.php:616
-msgid "ago"
+#: src/Lib/CSPInlineAdmin.php:530
+msgid "Only waiting for approval"
 msgstr ""
 
-#: src/Lib/IPRules.php:345
+#: src/Lib/CSPInlineAdmin.php:534
+msgid "Add a hash by hand"
+msgstr ""
+
+#: src/Lib/CSPInlineAdmin.php:535
+msgid "Name"
+msgstr ""
+
+#: src/Lib/CSPInlineAdmin.php:536
+msgid "Type"
+msgstr ""
+
+#: src/Lib/CSPInlineAdmin.php:536
+#: src/Lib/Notifier.php:185
+msgid "Script"
+msgstr ""
+
+#: src/Lib/CSPInlineAdmin.php:536
+msgid "Style"
+msgstr ""
+
+#: src/Lib/CSPInlineAdmin.php:537
+msgid "SHA-256 digest (base64 only)"
+msgstr ""
+
+#: src/Lib/CSPInlineAdmin.php:538
+msgid "Exact page path, or * for every page"
+msgstr ""
+
+#: src/Lib/CSPInlineAdmin.php:539
+msgid "Add"
+msgstr ""
+
+#: src/Lib/CSPInlineAdmin.php:555
+msgid "Not scanned yet"
+msgstr ""
+
+#: src/Lib/CSPInlineAdmin.php:556
+msgid "Scanning"
+msgstr ""
+
+#: src/Lib/CSPInlineAdmin.php:557
+msgid "Scan complete"
+msgstr ""
+
+#: src/Lib/CSPInlineAdmin.php:558
+msgid "Scan incomplete: some pages failed"
+msgstr ""
+
+#: src/Lib/CSPInlineAdmin.php:559
+msgid "Scan failed"
+msgstr ""
+
+#. translators: 1: scan state, 2: pages processed, 3: discovered URLs, 4: items found, 5: failed pages.
+#: src/Lib/CSPInlineAdmin.php:564
+#, php-format
+msgid "%1$s: %2$d of %3$d pages, %4$d items found, %5$d pages failed."
+msgstr ""
+
+#. translators: %d: number of pages.
+#: src/Lib/CSPInlineAdmin.php:576
+#, php-format
+msgid "%d page was answered by a page cache, so only its external hosts could be checked. Clear the cache and scan again to check its inline code."
+msgid_plural "%d pages were answered by a page cache, so only their external hosts could be checked. Clear the cache and scan again to check their inline code."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/Lib/CSPInlineAdmin.php:637
+msgid "Inline script"
+msgstr ""
+
+#: src/Lib/CSPInlineAdmin.php:638
+msgid "Inline style"
+msgstr ""
+
+#: src/Lib/CSPInlineAdmin.php:639
+msgid "Script host"
+msgstr ""
+
+#: src/Lib/CSPInlineAdmin.php:640
+msgid "Style host"
+msgstr ""
+
+#: src/Lib/CSPInlineAdmin.php:641
+msgid "Embed host"
+msgstr ""
+
+#. translators: %d: number of sources trusted automatically.
+#: src/Lib/CSPInlineAdmin.php:663
+#, php-format
+msgid "Trusted automatically (%d)"
+msgstr ""
+
+#: src/Lib/CSPInlineAdmin.php:666
+msgid "Exclude a source only if you know it must not run inline code or load external hosts."
+msgstr ""
+
+#: src/Lib/CSPInlineAdmin.php:671
+msgid "Excluded"
+msgstr ""
+
+#: src/Lib/CSPInlineAdmin.php:671
+msgid "Trusted"
+msgstr ""
+
+#: src/Lib/CSPInlineAdmin.php:674
+msgid "Trust again"
+msgstr ""
+
+#: src/Lib/CSPInlineAdmin.php:674
+msgid "Exclude"
+msgstr ""
+
+#: src/Lib/CSPInlineAdmin.php:696
+msgid "Nothing needs your review."
+msgstr ""
+
+#: src/Lib/CSPInlineAdmin.php:703
+#: src/Lib/CSPInlineSources.php:317
+msgid "WordPress"
+msgstr ""
+
+#: src/Lib/CSPInlineAdmin.php:704
+msgid "Theme"
+msgstr ""
+
+#: src/Lib/CSPInlineAdmin.php:705
+msgid "Plugin"
+msgstr ""
+
+#: src/Lib/CSPInlineAdmin.php:706
+msgid "External"
+msgstr ""
+
+#: src/Lib/CSPInlineAdmin.php:707
+msgid "Unknown"
+msgstr ""
+
+#. translators: 1: items waiting, 2: total items.
+#: src/Lib/CSPInlineAdmin.php:733
+#, php-format
+msgid "%1$d of %2$d waiting"
+msgstr ""
+
+#. translators: %d: total items.
+#: src/Lib/CSPInlineAdmin.php:738
+#, php-format
+msgid "All %d approved"
+msgstr ""
+
+#. translators: %s: theme or plugin name.
+#: src/Lib/CSPInlineAdmin.php:749
+#, php-format
+msgid "Approve all from %s"
+msgstr ""
+
+#: src/Lib/CSPInlineAdmin.php:752
+#: src/Lib/CSPInlineAdmin.php:799
+msgid "Revoke"
+msgstr ""
+
+#: src/Lib/CSPInlineAdmin.php:785
+msgid "Approved"
+msgstr ""
+
+#: src/Lib/CSPInlineAdmin.php:785
+msgid "Waiting"
+msgstr ""
+
+#: src/Lib/CSPInlineAdmin.php:793
+msgid "Printed directly into the page, so only this exact text is allowed. If it changes, approve it again."
+msgstr ""
+
+#: src/Lib/CSPInlineAdmin.php:795
+msgid "Pages, one path per line, or * for every page"
+msgstr ""
+
+#: src/Lib/CSPInlineAdmin.php:799
+msgid "Approve"
+msgstr ""
+
+#: src/Lib/CSPInlineAdmin.php:801
+msgid "Save pages"
+msgstr ""
+
+#: src/Lib/CSPInlineAdmin.php:803
+#: src/Lib/IPRules.php:445
 msgid "Remove"
 msgstr ""
 
-#: src/Lib/IPRules.php:401
+#: src/Lib/CSPInlineScan.php:393
+msgid "Not a complete HTML page below 2 MB."
+msgstr ""
+
+#: src/Lib/CSPInlineScan.php:420
+msgid "Inventory was busy. Rescan to retry this page."
+msgstr ""
+
+#: src/Lib/CSPInlineScan.php:427
+msgid "The inline inventory is full. Remove obsolete records and rescan; discovery has stopped."
+msgstr ""
+
+#: src/Lib/CSPInlineSources.php:323
+msgid "External hosts"
+msgstr ""
+
+#: src/Lib/CSPInlineSources.php:329
+msgid "Unknown or page content"
+msgstr ""
+
+#: src/Lib/CSPIntegrationSettings.php:33
+msgid "Auto: allowed, found on this site"
+msgstr ""
+
+#: src/Lib/CSPIntegrationSettings.php:34
+msgid "Auto: allowed as a well-known service"
+msgstr ""
+
+#: src/Lib/CSPIntegrationSettings.php:35
+msgid "Auto: not found on this site. Switch it on if you use it, or press Allow when a notification asks"
+msgstr ""
+
+#: src/Lib/CSPIntegrationSettings.php:40
+msgid "Included sources"
+msgstr ""
+
+#: src/Lib/CSPIntegrationSettings.php:48
+msgid "Provider documentation"
+msgstr ""
+
+#: src/Lib/CSPIntegrationSettings.php:57
+msgid "Auto"
+msgstr ""
+
+#: src/Lib/IPRanges.php:70
+msgid "WARNING: This action is irreversible! All failed login attempt data will be permanently deleted. Are you absolutely sure?"
+msgstr ""
+
+#: src/Lib/IPRanges.php:71
+#: src/Lib/SecurityLog.php:129
+msgid "Importing data will add records to the existing table. Continue?"
+msgstr ""
+
+#: src/Lib/IPRanges.php:72
+msgid "All data has been deleted successfully."
+msgstr ""
+
+#: src/Lib/IPRanges.php:73
+#: src/Lib/SecurityLog.php:131
+msgid "No data to export."
+msgstr ""
+
+#: src/Lib/IPRanges.php:74
+#: src/Lib/SecurityLog.php:132
+msgid "Import completed successfully."
+msgstr ""
+
+#: src/Lib/IPRanges.php:75
+#: src/Lib/SecurityLog.php:133
+msgid "Import failed. Please check the file format."
+msgstr ""
+
+#: src/Lib/IPRanges.php:76
+#: src/Lib/SecurityLog.php:134
+msgid "Please select a valid JSON file."
+msgstr ""
+
+#: src/Lib/IPRanges.php:78
+#: src/Lib/SecurityLog.php:136
+msgid "Loading..."
+msgstr ""
+
+#: src/Lib/IPRanges.php:79
+#: src/Lib/SecurityLog.php:137
+msgid "Error"
+msgstr ""
+
+#: src/Lib/IPRanges.php:80
+#: src/Lib/SecurityLog.php:138
+msgid "Failed to load IP list."
+msgstr ""
+
+#: src/Lib/IPRanges.php:81
+#: src/Lib/SecurityLog.php:139
+msgid "Copied to clipboard!"
+msgstr ""
+
+#: src/Lib/IPRanges.php:82
+#: src/Lib/SecurityLog.php:140
+msgid "Copy failed. Please select and copy manually."
+msgstr ""
+
+#: src/Lib/IPRanges.php:83
+msgid "IP range has been blocked."
+msgstr ""
+
+#: src/Lib/IPRanges.php:84
+msgid "IP range has been unblocked."
+msgstr ""
+
+#: src/Lib/IPRanges.php:85
+msgid "IP range block/unblock operation failed."
+msgstr ""
+
+#: src/Lib/IPRanges.php:86
+msgid "Are you sure you want to block this IP range?"
+msgstr ""
+
+#: src/Lib/IPRanges.php:132
+#: src/Lib/IPRanges.php:330
+msgid "IP Range TXT List"
+msgstr ""
+
+#: src/Lib/IPRanges.php:136
+msgid "IP Ranges Management"
+msgstr ""
+
+#: src/Lib/IPRanges.php:137
+msgid "View and manage IP subnets that have generated failed login attempts."
+msgstr ""
+
+#: src/Lib/IPRanges.php:149
+msgid "IP Range"
+msgstr ""
+
+#: src/Lib/IPRanges.php:151
+msgid "Total Attempts"
+msgstr ""
+
+#: src/Lib/IPRanges.php:178
+#: src/Lib/IPRules.php:376
+#: src/Lib/SecurityLogView.php:242
+msgid "Actions"
+msgstr ""
+
+#: src/Lib/IPRanges.php:212
+msgid "Logs"
+msgstr ""
+
+#: src/Lib/IPRanges.php:216
+msgid "List"
+msgstr ""
+
+#: src/Lib/IPRanges.php:221
+#: src/Lib/SecurityLogView.php:326
+msgid "Unblock"
+msgstr ""
+
+#: src/Lib/IPRanges.php:226
+#: src/Lib/SecurityLogView.php:331
+msgid "Block"
+msgstr ""
+
+#. translators: 1: Current page, 2: Total pages, 3: Total items.
+#: src/Lib/IPRanges.php:246
+#: src/Lib/IPRules.php:463
+#: src/Lib/SecurityLogView.php:350
+#, php-format
+msgid "Page %1$s of %2$s (%3$s items)"
+msgstr ""
+
+#: src/Lib/IPRanges.php:284
+msgid "No IP ranges found. Your site is clean!"
+msgstr ""
+
+#: src/Lib/IPRanges.php:293
+msgid "IPs in Range"
+msgstr ""
+
+#: src/Lib/IPRanges.php:302
+msgid "Copy IP List"
+msgstr ""
+
+#: src/Lib/IPRanges.php:305
+#: src/Lib/IPRanges.php:342
+#: src/Lib/SecurityLogView.php:415
+msgid "Close"
+msgstr ""
+
+#: src/Lib/IPRanges.php:339
+msgid "Copy List"
+msgstr ""
+
+#: src/Lib/IPRules.php:84
+msgid "Are you sure you want to delete this rule?"
+msgstr ""
+
+#: src/Lib/IPRules.php:85
+#: src/Lib/IPRules.php:196
+msgid "Rule has been added successfully."
+msgstr ""
+
+#: src/Lib/IPRules.php:86
+#: src/Lib/IPRules.php:245
+msgid "Rule has been deleted successfully."
+msgstr ""
+
+#: src/Lib/IPRules.php:87
+#: src/Lib/IPRules.php:200
+msgid "Failed to add rule."
+msgstr ""
+
+#: src/Lib/IPRules.php:88
+#: src/Lib/IPRules.php:249
+msgid "Failed to delete rule."
+msgstr ""
+
+#: src/Lib/IPRules.php:89
+#: src/Lib/IPRules.php:161
+msgid "Invalid IP address or CIDR range format."
+msgstr ""
+
+#: src/Lib/IPRules.php:169
+msgid "Invalid rule type."
+msgstr ""
+
+#: src/Lib/IPRules.php:181
+msgid "This IP/range is whitelisted and cannot be blocked."
+msgstr ""
+
+#: src/Lib/IPRules.php:234
+msgid "Invalid IP or range."
+msgstr ""
+
+#: src/Lib/IPRules.php:307
+msgid "IP Rules Management"
+msgstr ""
+
+#: src/Lib/IPRules.php:308
+msgid "Manually block or whitelist specific IP addresses and range blocks."
+msgstr ""
+
+#: src/Lib/IPRules.php:316
+msgid "Add New Rule"
+msgstr ""
+
+#: src/Lib/IPRules.php:319
+msgid "IP Address or Subnet (CIDR)"
+msgstr ""
+
+#: src/Lib/IPRules.php:323
+#: src/Lib/IPRules.php:346
+msgid "Rule Type"
+msgstr ""
+
+#: src/Lib/IPRules.php:325
+#: src/Lib/IPRules.php:389
+#: src/Lib/SecurityLog.php:61
+#: src/Lib/SecurityLogView.php:313
+msgid "Blocked"
+msgstr ""
+
+#: src/Lib/IPRules.php:326
+#: src/Lib/IPRules.php:387
+#: src/Lib/SecurityLogView.php:311
+msgid "Whitelisted"
+msgstr ""
+
+#: src/Lib/IPRules.php:332
+msgid "Add Rule"
+msgstr ""
+
+#: src/Lib/IPRules.php:345
+msgid "IP / Subnet (CIDR)"
+msgstr ""
+
+#: src/Lib/IPRules.php:347
+msgid "Duration"
+msgstr ""
+
+#: src/Lib/IPRules.php:348
+msgid "Created At"
+msgstr ""
+
+#: src/Lib/IPRules.php:396
+#: src/Lib/IPRules.php:404
+msgid "Permanent"
+msgstr ""
+
+#. translators: %s: Formatted expiration date and time
+#: src/Lib/IPRules.php:409
+#, php-format
+msgid "Until %s"
+msgstr ""
+
+#: src/Lib/IPRules.php:431
+#: src/Lib/SecurityLogView.php:298
+msgid "ago"
+msgstr ""
+
+#: src/Lib/IPRules.php:501
 msgid "No IP rules defined yet."
 msgstr ""
 
-#: src/Lib/Middleware.php:125
-msgid "SecureFusion: Request payload exceeds the allowed limit. Your IP has been blocked."
+#: src/Lib/LoginTracking.php:110
+msgid "You have reached the login attempts limit. Your IP has been locked out."
 msgstr ""
 
-#: src/Lib/Middleware.php:126
-msgid "Payload Too Large"
-msgstr ""
-
-#: src/Lib/Middleware.php:180
-msgid "SecureFusion Firewall has denied access to this resource."
-msgstr ""
-
-#: src/Lib/Middleware.php:181
-msgid "Access Denied"
-msgstr ""
-
-#: src/Lib/Middleware.php:429
-msgid "SecureFusion Firewall has denied this cookie request."
-msgstr ""
-
-#: src/Lib/Middleware.php:430
-msgid "Cookie Failure"
-msgstr ""
-
-#: src/Lib/Middleware.php:496
-msgid "SecureFusion Firewall has denied this comment submission."
-msgstr ""
-
-#: src/Lib/Middleware.php:497
-msgid "Comment Submission Failure"
-msgstr ""
-
-#: src/Lib/Middleware.php:506
-msgid "SecureFusion Firewall has denied this request."
-msgstr ""
-
-#: src/Lib/Middleware.php:507
-msgid "Request Failure"
-msgstr ""
-
-#: src/Lib/Middleware.php:530
-msgid "SecureFusion Firewall has denied this WP Query."
-msgstr ""
-
-#: src/Lib/Middleware.php:531
-msgid "WP Query Failure"
-msgstr ""
-
-#: src/Lib/Middleware.php:575
-msgid "The REST API on this site has been disabled."
-msgstr ""
-
-#: src/Lib/Middleware.php:671
-msgid "<strong>ERROR</strong>: You have reached the login attempts limit."
-msgstr ""
-
-#: src/Lib/Middleware.php:672
+#: src/Lib/LoginTracking.php:111
 msgid "Too many failed login attempts"
 msgstr ""
 
-#: src/Lib/SecurityLog.php:45
+#: src/Lib/Main.php:423
+msgid "SecureFusion database setup is incomplete. Logging and IP protection may not work correctly. Check database permissions and server logs. Setup will retry on a request after five minutes."
+msgstr ""
+
+#: src/Lib/Notifier.php:166
+msgid "SecureFusion notifications"
+msgstr ""
+
+#: src/Lib/Notifier.php:167
+msgid "Blocked by your security policy"
+msgstr ""
+
+#: src/Lib/Notifier.php:168
+msgid "Would be blocked (test mode)"
+msgstr ""
+
+#: src/Lib/Notifier.php:169
+msgid "Allow it only if you know this host and your site needs it."
+msgstr ""
+
+#: src/Lib/Notifier.php:170
+msgid "Code written directly into this page is not approved. Review it under Exceptions."
+msgstr ""
+
+#: src/Lib/Notifier.php:171
+msgid "Inline code"
+msgstr ""
+
+#: src/Lib/Notifier.php:172
+msgid "A script on this page builds code while it runs. Allow it only if something on the page stopped working."
+msgstr ""
+
+#: src/Lib/Notifier.php:173
+msgid "Code built at runtime (eval)"
+msgstr ""
+
+#: src/Lib/Notifier.php:174
+msgid "This page uses attributes such as onclick or onload. Allow them only if something on the page stopped working."
+msgstr ""
+
+#: src/Lib/Notifier.php:175
+msgid "Inline event handler"
+msgstr ""
+
+#: src/Lib/Notifier.php:176
+msgid "Allow"
+msgstr ""
+
+#: src/Lib/Notifier.php:177
+msgid "Do not ask again"
+msgstr ""
+
+#: src/Lib/Notifier.php:178
+msgid "Review"
+msgstr ""
+
+#: src/Lib/Notifier.php:179
+msgid "Reload page"
+msgstr ""
+
+#: src/Lib/Notifier.php:180
+msgid "Dismiss"
+msgstr ""
+
+#: src/Lib/Notifier.php:181
+msgid "Turn off notifications like this"
+msgstr ""
+
+#: src/Lib/Notifier.php:183
+msgid "The request failed. Nothing was changed."
+msgstr ""
+
+#: src/Lib/Notifier.php:186
+msgid "Stylesheet"
+msgstr ""
+
+#: src/Lib/Notifier.php:187
+msgid "Image"
+msgstr ""
+
+#: src/Lib/Notifier.php:188
+msgid "Font"
+msgstr ""
+
+#: src/Lib/Notifier.php:189
+msgid "Embed"
+msgstr ""
+
+#: src/Lib/Notifier.php:190
+msgid "Connection"
+msgstr ""
+
+#: src/Lib/Notifier.php:191
+msgid "Audio or video"
+msgstr ""
+
+#: src/Lib/Notifier.php:192
+msgid "Background worker"
+msgstr ""
+
+#: src/Lib/Notifier.php:193
+msgid "Form target"
+msgstr ""
+
+#: src/Lib/Notifier.php:271
+msgid "Turned off. You can turn it back on under SecureFusion > Settings > Notifications."
+msgstr ""
+
+#: src/Lib/Notifier.php:283
+msgid "The policy is now enforced. Notifications will tell you when something is blocked."
+msgstr ""
+
+#: src/Lib/Notifier.php:290
+msgid "Code built at runtime is now allowed on every page."
+msgstr ""
+
+#: src/Lib/Notifier.php:291
+msgid "Inline event handlers are now allowed."
+msgstr ""
+
+#: src/Lib/Notifier.php:328
+msgid "This request could not be used. Reload the page and try again."
+msgstr ""
+
+#. translators: %s: service name, for example "Google Analytics".
+#: src/Lib/Notifier.php:366
+#, php-format
+msgid "%s is now allowed under Services."
+msgstr ""
+
+#. translators: %s: host, for example "https://cdn.example.com".
+#: src/Lib/Notifier.php:382
+#, php-format
+msgid "%s is now allowed."
+msgstr ""
+
+#: src/Lib/Notifier.php:503
+msgid "Open settings"
+msgstr ""
+
+#: src/Lib/Notifier.php:513
+msgid "Your security policy is only being tested"
+msgstr ""
+
+#: src/Lib/Notifier.php:514
+msgid "Nothing is blocked yet, so visitors are not protected by it. Browse your pages: a notification appears for anything that would be blocked. When everything works, enforce the policy."
+msgstr ""
+
+#: src/Lib/Notifier.php:517
+msgid "Enforce now"
+msgstr ""
+
+#: src/Lib/Notifier.php:533
+msgid "A page was sent with fewer security rules"
+msgstr ""
+
+#: src/Lib/Notifier.php:548
+msgid "The cache driver is not in use"
+msgstr ""
+
+#: src/Lib/Notifier.php:549
+msgid "It did not pass its test, so it is not used. The Page cache box in the settings says why."
+msgstr ""
+
+#: src/Lib/Notifier.php:561
+msgid "Database setup is incomplete"
+msgstr ""
+
+#: src/Lib/Notifier.php:562
+msgid "Logging and address blocking may not work. Check the database permissions; setup is retried automatically."
+msgstr ""
+
+#: src/Lib/Notifier.php:604
+msgid "Security summary"
+msgstr ""
+
+#. translators: 1: number of addresses, 2: time span, for example "3 days".
+#: src/Lib/Notifier.php:607
+#, php-format
+msgid "%1$s address was stopped or logged in the last %2$s."
+msgid_plural "%1$s addresses were stopped or logged in the last %2$s."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/Lib/Notifier.php:613
+msgid "Open security log"
+msgstr ""
+
+#: src/Lib/ReCaptcha.php:219
+#: src/Lib/ReCaptcha.php:237
+#: src/Lib/ReCaptcha.php:255
+#: src/Lib/ReCaptcha.php:285
+msgid "Error:"
+msgstr ""
+
+#: src/Lib/ReCaptcha.php:219
+#: src/Lib/ReCaptcha.php:237
+#: src/Lib/ReCaptcha.php:255
+#: src/Lib/ReCaptcha.php:285
+#: src/Lib/ReCaptcha.php:348
+#: src/Lib/ReCaptcha.php:366
+msgid "Please complete the reCAPTCHA."
+msgstr ""
+
+#: src/Lib/ReCaptcha.php:256
+#: src/Lib/ReCaptcha.php:286
+msgid "reCAPTCHA Failed"
+msgstr ""
+
+#. translators: %s: number of minutes.
+#: src/Lib/RequestFirewall.php:145
+#, php-format
+msgid "This address sent too many oversized requests. Try again in %s minute."
+msgid_plural "This address sent too many oversized requests. Try again in %s minutes."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/Lib/RequestFirewall.php:149
+msgid "Too many oversized requests"
+msgstr ""
+
+#: src/Lib/RequestFirewall.php:325
+msgid "SecureFusion Firewall has denied access to this resource."
+msgstr ""
+
+#: src/Lib/RequestFirewall.php:326
+msgid "Access Denied"
+msgstr ""
+
+#: src/Lib/RequestFirewall.php:490
+msgid "SecureFusion Firewall has denied this cookie request."
+msgstr ""
+
+#: src/Lib/RequestFirewall.php:491
+msgid "Cookie Failure"
+msgstr ""
+
+#: src/Lib/RequestFirewall.php:547
+msgid "SecureFusion Firewall has denied this comment submission."
+msgstr ""
+
+#: src/Lib/RequestFirewall.php:548
+msgid "Comment Submission Failure"
+msgstr ""
+
+#: src/Lib/RequestFirewall.php:558
+msgid "SecureFusion Firewall has denied this request."
+msgstr ""
+
+#: src/Lib/RequestFirewall.php:559
+msgid "Request Failure"
+msgstr ""
+
+#: src/Lib/RequestFirewall.php:588
+msgid "SecureFusion Firewall has denied this WP Query."
+msgstr ""
+
+#: src/Lib/RequestFirewall.php:589
+msgid "WP Query Failure"
+msgstr ""
+
+#: src/Lib/RestAccess.php:104
+msgid "The REST API on this site has been disabled."
+msgstr ""
+
+#: src/Lib/SecurityLog.php:54
 msgid "All Types"
 msgstr ""
 
-#: src/Lib/SecurityLog.php:47
+#: src/Lib/SecurityLog.php:56
 msgid "Successful Login"
 msgstr ""
 
-#: src/Lib/SecurityLog.php:111
+#: src/Lib/SecurityLog.php:62
+msgid "Oversized Request"
+msgstr ""
+
+#: src/Lib/SecurityLog.php:128
 msgid "WARNING: This action is irreversible! Selected log data will be permanently deleted. Are you absolutely sure?"
 msgstr ""
 
-#: src/Lib/SecurityLog.php:113
+#: src/Lib/SecurityLog.php:130
 msgid "Data has been deleted successfully."
 msgstr ""
 
-#: src/Lib/SecurityLog.php:121
-#: src/Lib/SecurityLog.php:326
+#: src/Lib/SecurityLog.php:141
+#: src/Lib/SecurityLog.php:412
 msgid "IP has been blocked."
 msgstr ""
 
-#: src/Lib/SecurityLog.php:122
-#: src/Lib/SecurityLog.php:337
+#: src/Lib/SecurityLog.php:142
+#: src/Lib/SecurityLog.php:427
 msgid "IP has been unblocked."
 msgstr ""
 
-#: src/Lib/SecurityLog.php:123
+#: src/Lib/SecurityLog.php:143
 msgid "IP block/unblock operation failed."
 msgstr ""
 
-#: src/Lib/SecurityLog.php:167
+#: src/Lib/SecurityLog.php:200
 msgid "Data has been deleted."
 msgstr ""
 
-#: src/Lib/SecurityLog.php:169
+#: src/Lib/SecurityLog.php:204
 msgid "Failed to delete data."
 msgstr ""
 
-#: src/Lib/SecurityLog.php:231
+#: src/Lib/SecurityLog.php:277
+msgid "Import data is too large."
+msgstr ""
+
+#: src/Lib/SecurityLog.php:287
 msgid "Invalid JSON data."
 msgstr ""
 
-#: src/Lib/SecurityLog.php:241
+#. translators: %d: Number of imported rows.
+#: src/Lib/SecurityLog.php:299
+#, php-format
 msgid "%d records imported successfully."
 msgstr ""
 
-#: src/Lib/SecurityLog.php:261
+#: src/Lib/SecurityLog.php:324
 msgid "Invalid range prefix."
 msgstr ""
 
-#: src/Lib/SecurityLog.php:278
+#. translators: %d: Number of IPs in the range.
+#: src/Lib/SecurityLog.php:346
+#, php-format
 msgid "%1$d IPs in range %2$s"
 msgstr ""
 
-#: src/Lib/SecurityLog.php:309
+#: src/Lib/SecurityLog.php:388
 msgid "Invalid IP address or range."
 msgstr ""
 
-#: src/Lib/SecurityLog.php:418
+#: src/Lib/SecurityLogView.php:95
 msgid "Monitor and manage security events, blocked IPs, and attack records."
 msgstr ""
 
-#: src/Lib/SecurityLog.php:478
+#: src/Lib/SecurityLogView.php:155
 msgid "Total Records"
 msgstr ""
 
-#: src/Lib/SecurityLog.php:495
+#: src/Lib/SecurityLogView.php:172
 msgid "Export JSON"
 msgstr ""
 
-#: src/Lib/SecurityLog.php:499
+#: src/Lib/SecurityLogView.php:176
 msgid "Import JSON"
 msgstr ""
 
-#: src/Lib/SecurityLog.php:506
+#: src/Lib/SecurityLogView.php:183
 msgid "Delete Data"
 msgstr ""
 
-#: src/Lib/SecurityLog.php:518
+#. translators: %s: IP range prefix.
+#: src/Lib/SecurityLogView.php:195
+#, php-format
 msgid "Filtered by range: %s"
 msgstr ""
 
-#: src/Lib/SecurityLog.php:523
+#: src/Lib/SecurityLogView.php:200
 msgid "Show all"
 msgstr ""
 
-#: src/Lib/SecurityLog.php:534
+#: src/Lib/SecurityLogView.php:211
 msgid "IP Address"
 msgstr ""
 
-#: src/Lib/SecurityLog.php:535
+#: src/Lib/SecurityLogView.php:212
 msgid "Attack Type"
 msgstr ""
 
-#: src/Lib/SecurityLog.php:536
+#: src/Lib/SecurityLogView.php:213
 msgid "Attempts"
 msgstr ""
 
-#: src/Lib/SecurityLog.php:537
+#: src/Lib/SecurityLogView.php:214
 msgid "Last Attempt"
 msgstr ""
 
-#: src/Lib/SecurityLog.php:563
+#: src/Lib/SecurityLogView.php:241
 msgid "Status"
 msgstr ""
 
-#: src/Lib/SecurityLog.php:589
+#: src/Lib/SecurityLogView.php:267
 msgid "View Payload Details"
 msgstr ""
 
-#: src/Lib/SecurityLog.php:629
+#: src/Lib/SecurityLogView.php:315
 msgid "Active"
 msgstr ""
 
-#: src/Lib/SecurityLog.php:634
+#: src/Lib/SecurityLogView.php:320
 msgid "Admin IP — Cannot be blocked"
 msgstr ""
 
-#: src/Lib/SecurityLog.php:704
+#: src/Lib/SecurityLogView.php:390
 msgid "No records found for the current filter."
 msgstr ""
 
-#: src/Lib/SecurityLog.php:706
+#: src/Lib/SecurityLogView.php:392
 msgid "No security events recorded yet. Your site is clean!"
 msgstr ""
 
-#: src/Lib/SecurityLog.php:717
+#: src/Lib/SecurityLogView.php:403
 msgid "Payload Details"
 msgstr ""
 
-#: src/Lib/SecurityLog.php:726
+#: src/Lib/SecurityLogView.php:412
 msgid "Copy Payload"
 msgstr ""
 
-#: src/Lib/Traits/WPCommon.php:321
-msgid "Version %s - Check out."
-msgstr ""
-
-#: src/Lib/Traits/WPCommon.php:324
-msgid "What's New"
-msgstr ""
-
-#: src/Lib/Traits/WPCommon.php:339
-msgid "Products"
-msgstr ""
-
-#: src/Lib/Traits/WPCommon.php:342
+#: src/Lib/SettingsExperience.php:79
+#: src/Lib/Traits/WPCommon.php:616
 msgid "Services"
 msgstr ""
 
-#: xmlrpc_server.php:81
+#: src/Lib/SettingsExperience.php:80
+msgid "Hosts these services need are added for you. Auto allows a service that is found on this site, and a few that only ever serve their own code. Services that serve code from any account, such as tag managers and public libraries, wait until they are found or you allow them."
+msgstr ""
+
+#: src/Lib/SettingsExperience.php:87
+msgid "Host lists"
+msgstr ""
+
+#: src/Lib/SettingsExperience.php:88
+msgid "The script, style and worker lists only add hosts to rules the policy already has. Every other list is empty by default and limits its resource type as soon as it holds a host, so test before you enforce it."
+msgstr ""
+
+#: src/Lib/SettingsExperience.php:120
+msgid "Remote publishing and pingbacks. Review advanced settings only if an app or service needs a different access rule."
+msgstr ""
+
+#: src/Lib/SettingsExperience.php:121
+msgid "Repeated failed logins are limited using your saved thresholds. Adjust timing or the login address only when needed."
+msgstr ""
+
+#: src/Lib/SettingsExperience.php:122
+msgid "Manage request filtering and browser protection here. Access restrictions, limits and compatibility options are under Advanced settings."
+msgstr ""
+
+#: src/Lib/SettingsExperience.php:123
+msgid "Use an encrypted connection after your certificate is ready. Extra redirects and strict browser HTTPS (HSTS) are under Advanced settings."
+msgstr ""
+
+#: src/Lib/SettingsExperience.php:124
+msgid "One switch. Scripts from your site, your plugins and trusted services run, injected ones do not, and a notification asks you about anything else. Choices that lower protection or can break pages are marked and live under Advanced settings."
+msgstr ""
+
+#: src/Lib/SettingsExperience.php:125
+msgid "Small messages at the bottom right of your pages and the admin area, shown only to administrators. They say what was blocked and offer the fix."
+msgstr ""
+
+#: src/Lib/SettingsExperience.php:126
+msgid "An optional extra check for forms. Set up your keys before enabling it; choose individual forms under Advanced settings."
+msgstr ""
+
+#: src/Lib/SettingsExperience.php:127
+msgid "Custom request and cookie rules are optional. Leave them unchanged unless this site needs a specific exception."
+msgstr ""
+
+#: src/Lib/SettingsExperience.php:128
+msgid "Choose whether individual site administrators may customize the network defaults."
+msgstr ""
+
+#. translators: %s: Version number
+#: src/Lib/Traits/WPCommon.php:578
+#, php-format
+msgid "Version %s - Check out."
+msgstr ""
+
+#: src/Lib/Traits/WPCommon.php:581
+msgid "What's New"
+msgstr ""
+
+#: src/Lib/Traits/WPCommon.php:613
+msgid "Products"
+msgstr ""
+
+#: src/Lib/UserEnumeration.php:253
+msgid "Sorry, you are not allowed to list users."
+msgstr ""
+
+#: xmlrpc_server.php:91
 msgid "XMLRPC login disabled"
 msgstr ""
 
-#: xmlrpc_server.php:100
+#: xmlrpc_server.php:114
 msgid "XMLRPC pingback disabled"
 msgstr ""
-

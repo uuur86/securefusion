@@ -338,7 +338,7 @@
 		var $rangeTitle    = $('#fynd-sf-range-modal-title');
 
 		function openRangeModal(rangePrefix) {
-			$rangeTitle.text('Loading...');
+			$rangeTitle.text(securefusionLog.loading);
 			$rangeTextarea.val('');
 			$rangeModal.fadeIn(200);
 
@@ -356,13 +356,13 @@
 					var lineCount = Math.min(response.data.ips.length, 20);
 					$rangeTextarea.attr('rows', Math.max(lineCount, 3));
 				} else {
-					$rangeTitle.text('Error');
+					$rangeTitle.text(securefusionLog.error);
 					$rangeTextarea.val(response.data.message);
 				}
 			})
 			.fail(function () {
-				$rangeTitle.text('Error');
-				$rangeTextarea.val('Failed to load IP list.');
+				$rangeTitle.text(securefusionLog.error);
+				$rangeTextarea.val(securefusionLog.loadFailed);
 			});
 		}
 

@@ -534,6 +534,16 @@ class Admin {
 		\wp_enqueue_style( 'securefusion-admin-theme-main-css', \plugins_url( 'assets/css/admin.css', SECUREFUSION_BASENAME ), array(), (string) filemtime( SECUREFUSION_PATH . 'assets/css/admin.css' ) );
 		\wp_enqueue_style( 'securefusion-bastion', \plugins_url( 'assets/css/bastion.css', SECUREFUSION_BASENAME ), array( 'securefusion-admin-theme-main-css' ), (string) filemtime( SECUREFUSION_PATH . 'assets/css/bastion.css' ) );
 		\wp_enqueue_script( 'securefusion-admin-js', \plugins_url( 'assets/js/admin.js', SECUREFUSION_BASENAME ), array( 'jquery' ), (string) filemtime( SECUREFUSION_PATH . 'assets/js/admin.js' ), true );
+		\wp_localize_script(
+			'securefusion-admin-js',
+			'securefusionAdmin',
+			[
+				'hostsOnly'    => __( 'Hosts only: inline code and keywords are set by the protection level.', 'secuplug' ),
+				'invalidUrl'   => __( 'Invalid URL format', 'secuplug' ),
+				'invalidRegex' => __( 'Invalid regex pattern', 'secuplug' ),
+			]
+		);
+
 		\wp_enqueue_script( 'securefusion-inline-manager', \plugins_url( 'assets/js/inline-manager.js', SECUREFUSION_BASENAME ), [ 'jquery' ], (string) filemtime( SECUREFUSION_PATH . 'assets/js/inline-manager.js' ), true );
 		\wp_localize_script(
 			'securefusion-inline-manager',

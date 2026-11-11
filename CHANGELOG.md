@@ -16,7 +16,7 @@
 * Fixed: The REST API block could be bypassed on sub-directory multisite and with `?rest_route=`.
 * Fixed: `data:` could become a script source through an allow list or the site scan.
 * Fixed: Inline hashes broke behind HTML optimizers, and the policy was cut short when output buffers closed early.
-* Fixed: Bundled translations were not loaded.
+* Fixed: Bundled translations were not loaded. German, French, Spanish and Turkish are complete, and other German locales use the German translation.
 * Fixed: Database tables are verified before installation is marked complete; SSL checks time out sooner.
 * Improved: No DNS lookup on REST API requests from visitors.
 

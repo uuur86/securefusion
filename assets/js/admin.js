@@ -278,12 +278,12 @@
 				if (fieldType === 'url') {
 					// Allow lists hold hosts and schemes; the protection level owns every keyword.
 					if (val === 'self' || val === '*' || val.charAt(0) === "'") {
-						showError('Hosts only: inline code and keywords are set by the protection level.');
+						showError(securefusionAdmin.hostsOnly);
 						return;
 					} else if (val === 'blob:' || val === 'filesystem:' || val === 'https:' || val === 'http:' || val.indexOf('data:') === 0) {
 						// Accept as-is
 					} else if (!validateUrl(val)) {
-						showError('Invalid URL format');
+						showError(securefusionAdmin.invalidUrl);
 						return;
 					} else if (val.indexOf('http') !== 0) {
 						// Auto-add https if it looks like a domain
@@ -291,7 +291,7 @@
 					}
 				} else if (fieldType === 'regex') {
 					if (!validateRegex(val)) {
-						showError('Invalid regex pattern');
+						showError(securefusionAdmin.invalidRegex);
 						return;
 					}
 				}

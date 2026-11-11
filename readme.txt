@@ -2,8 +2,8 @@
 Contributors: codeplusdev, ugurbicer
 Tags: security, firewall, login security, brute force, content security policy
 Requires at least: 6.6
-Tested up to: 7.0
-Stable tag: 2.0.3
+Tested up to: 7.1
+Stable tag: 3.0.0
 Requires PHP: 7.4
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -145,7 +145,7 @@ None, unless you turn on reCAPTCHA. See External services.
 * Fixed: The REST API block could be bypassed on sub-directory multisite and with `?rest_route=`.
 * Fixed: `data:` could become a script source through an allow list or the site scan.
 * Fixed: Inline hashes broke behind HTML optimizers, and the policy was cut short when output buffers closed early.
-* Fixed: Bundled translations were not loaded.
+* Fixed: Bundled translations were not loaded. German, French, Spanish and Turkish are complete, and other German locales use the German translation.
 * Fixed: Database tables are verified before installation is marked complete; SSL checks time out sooner.
 * Improved: No DNS lookup on REST API requests from visitors.
 
