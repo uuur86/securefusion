@@ -10,7 +10,9 @@
 namespace SecureFusion\Lib;
 
 if ( ! defined( 'ABSPATH' ) ) {
+
 	exit; // Exit if accessed directly.
+
 }
 
 use SecureFusion\Lib\Traits\WPCommon;
@@ -42,6 +44,7 @@ class IPRanges {
 	 * @return void
 	 */
 	public function enqueue_assets() {
+
 		// Reusing some of the security-log styles.
 		wp_enqueue_style(
 			'securefusion-security-log-css',
@@ -80,6 +83,7 @@ class IPRanges {
 				'confirmBlock'   => esc_html__( 'Are you sure you want to block this IP range?', 'secuplug' ),
 			]
 		);
+
 	}
 
 
@@ -89,6 +93,7 @@ class IPRanges {
 	 * @return void
 	 */
 	public function render() {
+
 		$db = new BruteForceDB();
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -154,6 +159,7 @@ class IPRanges {
 										],
 										$page_url
 									);
+
 									$sort_class = $is_sorted ? 'sorted ' . strtolower( $order ) : 'sortable desc';
 									?>
 									<th scope="col" class="manage-column column-<?php echo esc_attr( $col_key ); ?> <?php echo esc_attr( $sort_class ); ?>">
@@ -303,11 +309,16 @@ class IPRanges {
 			<?php
 			$all_ranges = $db->get_ip_ranges();
 			$txt_list   = '';
+
 			if ( is_array( $all_ranges ) ) {
+
 				foreach ( $all_ranges as $range ) {
+
 					$cidr      = $this->calculate_cidr( $range->range_prefix, $range->min_last_octet, $range->max_last_octet );
 					$txt_list .= $cidr . "\n";
+
 				}
+
 			}
 			?>
 			<div id="fynd-sf-txt-list-modal" class="fynd-sf-modal" style="display:none;">
@@ -333,4 +344,5 @@ class IPRanges {
 		</div>
 		<?php
 	}
+
 }

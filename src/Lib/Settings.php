@@ -19,13 +19,27 @@
 namespace SecureFusion\Lib;
 
 if ( ! defined( 'ABSPATH' ) ) {
+
 	exit; // Exit if accessed directly.
+
 }
 
 /**
  * Layered settings resolver.
  */
 class Settings {
+
+	/**
+	 * Read older CSP configurations as a protection level, without writing a migration.
+	 *
+	 * @param array $values Stored values from one settings layer.
+	 * @return array
+	 */
+	public static function preserve_csp_profile( $values ) {
+
+		return CSPPolicy::upgrade_values( $values );
+
+	}
 
 	/**
 	 * Per-site option: all settings (single site) or overrides (network mode).
@@ -114,24 +128,32 @@ class Settings {
 	 * @return void
 	 */
 	public static function boot( array $defaults ) {
+
 		self::$defaults = $defaults;
 
 		if ( self::$booted || ! function_exists( 'add_action' ) ) {
+
 			return;
+
 		}
 
 		self::$booted = true;
 
 		foreach ( [ 'add_option_', 'update_option_', 'delete_option_' ] as $prefix ) {
+
 			add_action( $prefix . self::SITE_OPTION, [ __CLASS__, 'flush' ] );
+
 		}
 
 		foreach ( [ 'add_site_option_', 'update_site_option_', 'delete_site_option_' ] as $prefix ) {
+
 			add_action( $prefix . self::NETWORK_OPTION, [ __CLASS__, 'flush' ] );
+
 		}
 
 		add_action( 'activated_plugin', [ __CLASS__, 'reset_mode' ] );
 		add_action( 'deactivated_plugin', [ __CLASS__, 'reset_mode' ] );
+
 	}
 
 
@@ -142,7 +164,9 @@ class Settings {
 	 * @return array
 	 */
 	public static function defaults() {
+
 		return self::$defaults;
+
 	}
 
 
@@ -153,15 +177,20 @@ class Settings {
 	 * @return bool
 	 */
 	public static function is_network_mode() {
+
 		if ( null !== self::$network_mode ) {
+
 			return self::$network_mode;
+
 		}
 
 		$mode = false;
 
 		if ( function_exists( 'is_multisite' ) && is_multisite() && defined( 'SECUREFUSION_BASENAME' ) ) {
+
 			$sitewide = get_site_option( 'active_sitewide_plugins', [] );
 			$mode     = is_array( $sitewide ) && isset( $sitewide[ SECUREFUSION_BASENAME ] );
+
 		}
 
 		/**
@@ -172,6 +201,7 @@ class Settings {
 		self::$network_mode = (bool) apply_filters( 'securefusion_network_mode', $mode );
 
 		return self::$network_mode;
+
 	}
 
 
@@ -184,8 +214,10 @@ class Settings {
 	 * @return void
 	 */
 	public static function set_network_mode( $mode ) {
+
 		self::$network_mode = ( null === $mode ) ? null : (bool) $mode;
 		self::$cache        = [];
+
 	}
 
 
@@ -196,7 +228,31 @@ class Settings {
 	 * @return void
 	 */
 	public static function reset_mode() {
+
 		self::set_network_mode( null );
+
+	}
+
+
+
+	/**
+	 * Changes some of the current site's stored values outside the settings form.
+	 *
+	 * The caller validates the values and ends the request afterwards: the form's sanitizer expects
+	 * a whole submitted form, so it is taken off this option for the rest of the request.
+	 *
+	 * @param array $changes Values by setting name.
+	 * @return void
+	 */
+	public static function update_site( array $changes ) {
+
+		$values = get_option( self::SITE_OPTION, [] );
+
+		remove_all_filters( 'sanitize_option_' . self::SITE_OPTION );
+		update_option( self::SITE_OPTION, array_merge( is_array( $values ) ? $values : [], $changes ) );
+
+		self::flush();
+
 	}
 
 
@@ -207,7 +263,9 @@ class Settings {
 	 * @return void
 	 */
 	public static function flush() {
+
 		self::$cache = [];
+
 	}
 
 
@@ -218,9 +276,11 @@ class Settings {
 	 * @return array
 	 */
 	public static function network_values() {
+
 		$values = get_site_option( self::NETWORK_OPTION, [] );
 
-		return is_array( $values ) ? $values : [];
+		return self::preserve_csp_profile( is_array( $values ) ? $values : [] );
+
 	}
 
 
@@ -231,7 +291,9 @@ class Settings {
 	 * @return array
 	 */
 	public static function inherited_values() {
+
 		return array_merge( self::$defaults, self::network_values() );
+
 	}
 
 
@@ -242,9 +304,11 @@ class Settings {
 	 * @return array
 	 */
 	public static function site_values() {
+
 		$values = get_option( self::SITE_OPTION, [] );
 
-		return is_array( $values ) ? $values : [];
+		return self::preserve_csp_profile( is_array( $values ) ? $values : [] );
+
 	}
 
 
@@ -255,22 +319,30 @@ class Settings {
 	 * @return array
 	 */
 	public static function all() {
+
 		$blog_id = function_exists( 'get_current_blog_id' ) ? get_current_blog_id() : 0;
 
 		if ( isset( self::$cache[ $blog_id ] ) ) {
+
 			return self::$cache[ $blog_id ];
+
 		}
 
 		if ( self::is_network_mode() ) {
+
 			$overrides = array_diff_key( self::site_values(), array_flip( self::NETWORK_ONLY ) );
 			$resolved  = array_merge( self::inherited_values(), $overrides );
+
 		} else {
+
 			$resolved = array_merge( self::$defaults, self::site_values() );
+
 		}
 
 		self::$cache[ $blog_id ] = $resolved;
 
 		return $resolved;
+
 	}
 
 
@@ -282,9 +354,11 @@ class Settings {
 	 * @return mixed|null
 	 */
 	public static function get( $name ) {
+
 		$all = self::all();
 
 		return array_key_exists( $name, $all ) ? $all[ $name ] : null;
+
 	}
 
 
@@ -295,9 +369,11 @@ class Settings {
 	 * @return bool
 	 */
 	public static function site_admins_can_customize() {
+
 		$network = self::network_values();
 
 		return isset( $network[ self::POLICY_SITE_ADMINS ] ) && '1' === (string) $network[ self::POLICY_SITE_ADMINS ];
+
 	}
 
 
@@ -308,11 +384,15 @@ class Settings {
 	 * @return string
 	 */
 	public static function site_capability() {
+
 		if ( self::is_network_mode() && ! self::site_admins_can_customize() ) {
+
 			return 'manage_network_options';
+
 		}
 
 		return 'manage_options';
+
 	}
 
 
@@ -323,10 +403,13 @@ class Settings {
 	 * @return array The network values.
 	 */
 	public static function maybe_seed_network() {
+
 		$existing = get_site_option( self::NETWORK_OPTION, false );
 
 		if ( is_array( $existing ) ) {
+
 			return $existing;
+
 		}
 
 		$main_id = function_exists( 'get_main_site_id' ) ? (int) get_main_site_id() : 1;
@@ -338,13 +421,17 @@ class Settings {
 
 		// A new network starts with sub-site customization limited to super admins.
 		if ( ! isset( $values[ self::POLICY_SITE_ADMINS ] ) ) {
+
 			$values[ self::POLICY_SITE_ADMINS ] = '0';
+
 		}
 
 		add_site_option( self::NETWORK_OPTION, $values );
+
 		self::flush();
 
 		return $values;
+
 	}
 
 
@@ -364,39 +451,54 @@ class Settings {
 	 * @return void
 	 */
 	public static function maybe_migrate_site() {
+
 		if ( ! self::is_network_mode() || '1' === get_option( self::LAYER_FLAG ) ) {
+
 			return;
+
 		}
 
 		$network = array_merge( self::$defaults, self::maybe_seed_network() );
 		$own     = self::site_values();
 
 		if ( ! empty( $own ) && false === get_option( self::BACKUP_OPTION, false ) ) {
+
 			add_option( self::BACKUP_OPTION, $own, '', false );
+
 		}
 
 		$overrides = [];
 		$main_id   = function_exists( 'get_main_site_id' ) ? (int) get_main_site_id() : 1;
 
 		if ( get_current_blog_id() !== $main_id ) {
+
 			foreach ( $own as $key => $value ) {
+
 				if ( in_array( $key, self::NETWORK_ONLY, true ) ) {
+
 					continue;
+
 				}
 
 				$default = array_key_exists( $key, self::$defaults ) ? self::$defaults[ $key ] : null;
 
 				if ( self::same_value( $value, $default ) || ( array_key_exists( $key, $network ) && self::same_value( $value, $network[ $key ] ) ) ) {
+
 					continue;
+
 				}
 
 				$overrides[ $key ] = $value;
+
 			}
+
 		}
 
 		update_option( self::SITE_OPTION, $overrides );
 		update_option( self::LAYER_FLAG, '1' );
+
 		self::flush();
+
 	}
 
 
@@ -409,11 +511,16 @@ class Settings {
 	 * @return bool
 	 */
 	public static function same_value( $a, $b ) {
+
 		if ( ( is_scalar( $a ) || null === $a ) && ( is_scalar( $b ) || null === $b ) ) {
+
 			return (string) $a === (string) $b;
+
 		}
 
 		// phpcs:ignore Universal.Operators.StrictComparisons.LooseEqual -- Arrays of strings saved by the form.
 		return $a == $b;
+
 	}
+
 }

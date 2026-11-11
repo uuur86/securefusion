@@ -10,6 +10,77 @@
 (function ($) {
 
 	$(document).ready(function () {
+		// Enhance sanitized source groups; keep content readable without JavaScript.
+		$('.fsf-csp-toggle').each(function (index) {
+			var $button = $(this);
+			var $content = $button.next('.fsf-csp-content');
+			var id = 'fsf-csp-content-' + index;
+
+			$content.attr('id', id).hide();
+			$button.attr({ 'aria-controls': id, 'aria-expanded': 'false' });
+
+			$button.on('click', function () {
+				var opening = $button.attr('aria-expanded') !== 'true';
+				var duration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 180;
+				$button.attr('aria-expanded', String(opening));
+				$content.stop(true, true)[opening ? 'slideDown' : 'slideUp'](duration);
+			});
+		});
+
+		// Hidden source editors keep their values and remain part of form submission.
+		var $csp = $('#fynd-sf-security_policies');
+
+		function csp_row(name) {
+			return $csp.find('[name$="[' + name + ']"]').closest('tr');
+		}
+
+		// Fields that do not apply yet stay visible and editable, and say what activates them.
+		function csp_mark($row, active, note) {
+			$row.toggleClass('fsf-csp-inactive', !active);
+			$row.children('th').find('.fsf-csp-badge').remove();
+
+			if (!active) {
+				$row.children('th').append($('<span class="fsf-csp-badge"></span>').text(note));
+			}
+		}
+
+		function update_csp_sources() {
+			var level = $csp.find('input[name$="[csp_level]"]:checked').val() || 'basic';
+			var limited = level !== 'off';
+			var verified = limited && $csp.find('input[name$="[csp_allow_inline]"]:checked').val() !== '1';
+			var text = window.securefusionInline || {};
+
+			csp_mark(csp_row('csp_mode'), level !== 'off', text.needsLevel);
+
+			['csp_scope_members', 'csp_scope_admins', 'csp_allow_eval', 'csp_allow_inline'].forEach(function (name) {
+				csp_mark(csp_row(name), limited, text.needsLevel);
+			});
+
+			['csp_inline_method', 'csp_block_event_handlers'].forEach(function (name) {
+				csp_mark(csp_row(name), verified, limited ? text.needsStrict : text.needsLevel);
+			});
+
+			$csp.find('input[name*="[csp_allowed_"]').each(function () {
+				var match = this.name.match(/\[csp_allowed_(.+)_sources\]/);
+
+				if (!match) {
+					return;
+				}
+
+				// Styles are only limited while inline code is verified; every other list
+				// works whenever protection is on.
+				if (match[1] === 'style') {
+					csp_mark($(this).closest('tr'), verified, limited ? text.needsStrict : text.needsLevel);
+					return;
+				}
+
+				csp_mark($(this).closest('tr'), limited, text.needsLevel);
+			});
+		}
+
+		$csp.on('change', 'input[type="radio"]', update_csp_sources);
+		update_csp_sources();
+
 		var STORAGE_KEY = 'securefusion_active_tab';
 
 		/**
@@ -171,36 +242,6 @@
 			function validateUrl(value) {
 				if (!value) return false;
 
-				// CSP quoted keywords.
-				var csp_keywords = [
-					"'self'",
-					"'unsafe-inline'",
-					"'unsafe-eval'",
-					"'none'",
-					"'strict-dynamic'",
-					"'unsafe-hashes'",
-					"'report-sample'",
-					"'wasm-unsafe-eval'"
-				];
-				if (csp_keywords.indexOf(value) !== -1) {
-					return true;
-				}
-
-				// Wildcard.
-				if (value === '*') {
-					return true;
-				}
-
-				// Nonces.
-				if (/^'nonce-[A-Za-z0-9+\/=]+'$/.test(value)) {
-					return true;
-				}
-
-				// Hashes.
-				if (/^'sha(256|384|512)-[A-Za-z0-9+\/=]+'$/.test(value)) {
-					return true;
-				}
-
 				// Scheme-only.
 				if (/^[a-z][a-z0-9+\-.]*:$/i.test(value)) {
 					return true;
@@ -235,11 +276,11 @@
 				if (!val) return;
 
 				if (fieldType === 'url') {
-					// Allow quoted CSP values (like 'self', 'unsafe-inline', 'unsafe-eval', etc.)
-					if (val === "'self'" || val === "self") {
-						showError('Self is already in list!');
+					// Allow lists hold hosts and schemes; the protection level owns every keyword.
+					if (val === 'self' || val === '*' || val.charAt(0) === "'") {
+						showError('Hosts only: inline code and keywords are set by the protection level.');
 						return;
-					} else if (val.charAt(0) === "'" || val === 'blob:' || val === 'filesystem:' || val === 'https:' || val === 'http:' || val.indexOf('data:') === 0) {
+					} else if (val === 'blob:' || val === 'filesystem:' || val === 'https:' || val === 'http:' || val.indexOf('data:') === 0) {
 						// Accept as-is
 					} else if (!validateUrl(val)) {
 						showError('Invalid URL format');
@@ -281,3 +322,12 @@
 		});
 	});
 })(jQuery);
+// Search within an advanced panel without changing field values or disabled states.
+jQuery(function ($) {
+	$('.fsf-settings-search').on('input', function () {
+		var query = this.value.toLowerCase().trim();
+		$(this).closest('.fsf-settings-advanced').find('tr').each(function () {
+			$(this).prop('hidden', !!query && $(this).text().toLowerCase().indexOf(query) === -1);
+		});
+	});
+});

@@ -11,7 +11,9 @@
 namespace SecureFusion\Lib;
 
 if ( ! defined( 'ABSPATH' ) ) {
+
 	exit; // Exit if accessed directly.
+
 }
 
 use SecureFusion\Lib\Traits\WPCommon;
@@ -44,8 +46,10 @@ class IPRules {
 	 * @return void
 	 */
 	public function register_ajax() {
+
 		add_action( 'wp_ajax_securefusion_add_ip_rule', [ $this, 'ajax_add_rule' ] );
 		add_action( 'wp_ajax_securefusion_delete_ip_rule', [ $this, 'ajax_delete_rule' ] );
+
 	}
 
 
@@ -55,6 +59,7 @@ class IPRules {
 	 * @return void
 	 */
 	public function enqueue_assets() {
+
 		wp_enqueue_style(
 			'securefusion-security-log-css',
 			plugins_url( 'assets/css/security-log.css', SECUREFUSION_BASENAME ),
@@ -84,6 +89,7 @@ class IPRules {
 				'invalidFormat' => esc_html__( 'Invalid IP address or CIDR range format.', 'secuplug' ),
 			]
 		);
+
 	}
 
 
@@ -94,21 +100,33 @@ class IPRules {
 	 * @return bool True if valid format.
 	 */
 	private function validate_ip_or_cidr( $value ) {
+
 		if ( filter_var( $value, FILTER_VALIDATE_IP ) ) {
+
 			return true;
+
 		}
 
 		if ( preg_match( '/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}$/', $value ) ) {
+
 			list( $subnet, $mask ) = explode( '/', $value );
+
 			if ( filter_var( $subnet, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 ) ) {
+
 				$mask = (int) $mask;
+
 				if ( $mask >= 0 && $mask <= 32 ) {
+
 					return true;
+
 				}
+
 			}
+
 		}
 
 		return false;
+
 	}
 
 
@@ -118,46 +136,71 @@ class IPRules {
 	 * @return void
 	 */
 	public function ajax_add_rule() {
+
 		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['nonce'] ) ), self::NONCE_ACTION ) ) {
+
 			wp_send_json_error( [ 'message' => esc_html__( 'Security check failed.', 'secuplug' ) ] );
+
 			return;
+
 		}
 
 		if ( ! current_user_can( 'manage_options' ) ) {
+
 			wp_send_json_error( [ 'message' => esc_html__( 'Permission denied.', 'secuplug' ) ] );
+
 			return;
+
 		}
 
 		$ip        = isset( $_POST['ip'] ) ? sanitize_text_field( wp_unslash( $_POST['ip'] ) ) : '';
 		$rule_type = isset( $_POST['rule_type'] ) ? sanitize_text_field( wp_unslash( $_POST['rule_type'] ) ) : '';
 
 		if ( ! $this->validate_ip_or_cidr( $ip ) ) {
+
 			wp_send_json_error( [ 'message' => esc_html__( 'Invalid IP address or CIDR range format.', 'secuplug' ) ] );
+
 			return;
+
 		}
 
 		if ( ! in_array( $rule_type, [ 'blocked', 'whitelisted' ], true ) ) {
+
 			wp_send_json_error( [ 'message' => esc_html__( 'Invalid rule type.', 'secuplug' ) ] );
+
 			return;
+
 		}
 
 		$db = new BruteForceDB();
 
 		if ( $rule_type === 'blocked' ) {
+
 			if ( $db->is_ip_whitelisted( $ip ) ) {
+
 				wp_send_json_error( [ 'message' => esc_html__( 'This IP/range is whitelisted and cannot be blocked.', 'secuplug' ) ] );
+
 				return;
+
 			}
 			$success = $db->block_ip( $ip );
+
 		} else {
+
 			$success = $db->whitelist_ip( $ip );
+
 		}
 
 		if ( $success ) {
+
 			wp_send_json_success( [ 'message' => esc_html__( 'Rule has been added successfully.', 'secuplug' ) ] );
+
 		} else {
+
 			wp_send_json_error( [ 'message' => esc_html__( 'Failed to add rule.', 'secuplug' ) ] );
+
 		}
+
 	}
 
 
@@ -167,31 +210,46 @@ class IPRules {
 	 * @return void
 	 */
 	public function ajax_delete_rule() {
+
 		if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['nonce'] ) ), self::NONCE_ACTION ) ) {
+
 			wp_send_json_error( [ 'message' => esc_html__( 'Security check failed.', 'secuplug' ) ] );
+
 			return;
+
 		}
 
 		if ( ! current_user_can( 'manage_options' ) ) {
+
 			wp_send_json_error( [ 'message' => esc_html__( 'Permission denied.', 'secuplug' ) ] );
+
 			return;
+
 		}
 
 		$ip = isset( $_POST['ip'] ) ? sanitize_text_field( wp_unslash( $_POST['ip'] ) ) : '';
 
 		if ( empty( $ip ) ) {
+
 			wp_send_json_error( [ 'message' => esc_html__( 'Invalid IP or range.', 'secuplug' ) ] );
+
 			return;
+
 		}
 
 		$db      = new BruteForceDB();
 		$success = $db->delete_ip_rule( $ip );
 
 		if ( $success ) {
+
 			wp_send_json_success( [ 'message' => esc_html__( 'Rule has been deleted successfully.', 'secuplug' ) ] );
+
 		} else {
+
 			wp_send_json_error( [ 'message' => esc_html__( 'Failed to delete rule.', 'secuplug' ) ] );
+
 		}
+
 	}
 
 
@@ -202,7 +260,9 @@ class IPRules {
 	 * @return string 'ASC' or 'DESC'.
 	 */
 	private function normalize_order( $order ) {
+
 		return strtoupper( $order ) === 'ASC' ? 'ASC' : 'DESC';
+
 	}
 
 
@@ -212,6 +272,7 @@ class IPRules {
 	 * @return void
 	 */
 	public function render() {
+
 		$db = new BruteForceDB();
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -299,6 +360,7 @@ class IPRules {
 										],
 										$page_url
 									);
+
 									$sort_class = $is_sorted ? 'sorted ' . strtolower( $order ) : 'sortable desc';
 									?>
 									<th scope="col" class="manage-column column-<?php echo esc_attr( $col_key ); ?> <?php echo esc_attr( $sort_class ); ?>">
@@ -330,33 +392,50 @@ class IPRules {
 									<td class="column-duration">
 										<?php
 										if ( $row->rule_type === 'whitelisted' ) {
+
 											echo esc_html__( 'Permanent', 'secuplug' );
+
 										} else {
+
 											$expiration = isset( $row->expiration ) ? (int) $row->expiration : 0;
+
 											if ( $expiration === 0 ) {
+
 												echo esc_html__( 'Permanent', 'secuplug' );
+
 											} else {
+
 												/* translators: %s: Formatted expiration date and time */
 												printf( esc_html__( 'Until %s', 'secuplug' ), esc_html( wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $expiration ) ) );
+
 											}
+
 										}
 										?>
 									</td>
 									<td class="column-created_at">
 										<?php
 										$timestamp = (int) $row->created_at;
+
 										if ( $timestamp > 0 ) {
+
 											echo esc_html(
 												wp_date(
 													get_option( 'date_format' ) . ' ' . get_option( 'time_format' ),
 													$timestamp
 												)
 											);
+
 											echo '<br><small class="fynd-sf-time-ago">';
+
 											echo esc_html( human_time_diff( $timestamp, time() ) . ' ' . __( 'ago', 'secuplug' ) );
+
 											echo '</small>';
+
 										} else {
+
 											echo '—';
+
 										}
 										?>
 									</td>
@@ -426,4 +505,5 @@ class IPRules {
 		</div>
 		<?php
 	}
+
 }

@@ -8,19 +8,26 @@
 namespace SecureFusion\Lib;
 
 if ( ! defined( 'ABSPATH' ) ) {
+
 	exit; // Exit if accessed directly.
+
 }
 
 use SecureFusion\Lib\Traits\WPCommon;
-use SecureFusion\Lib\CSP;
 
 /**
  * Middleware functionality class.
  */
 class Middleware {
 
-
 	use WPCommon;
+	use RequestFirewall;
+
+	use RestAccess;
+
+	use LoginTracking;
+
+
 
 
 	/**
@@ -29,6 +36,34 @@ class Middleware {
 	 * @var BruteForceDB
 	 */
 	private $brute_force_db;
+
+
+	/**
+	 * Policy inputs for this response, kept so a later hook can correct them: settings, generated, context.
+	 *
+	 * @var array|null
+	 */
+	private $csp = null;
+
+
+	/**
+	 * Whether this response carries our X-Frame-Options header.
+	 *
+	 * @var bool
+	 */
+	private $frame_header_sent = false;
+
+
+	/**
+	 * Period in which oversized requests from one address are counted, in seconds.
+	 */
+	const OVERSIZED_WINDOW = 600;
+
+
+	/**
+	 * Longest block an oversized request can cause: 7 days, in minutes.
+	 */
+	const OVERSIZED_MAX_BLOCK_MINUTES = 10080;
 
 
 	/**
@@ -66,12 +101,19 @@ class Middleware {
 
 
 	/**
-	 * True between authentication and dispatch of the HTTP REST request, so only that
-	 * request is checked and server-side rest_do_request() calls keep working.
-	 *
-	 * @var bool
+	 * Allowed HSTS durations in seconds, shortest first: 1 day, 30 days, 1 year, 2 years.
 	 */
-	private $rest_check_armed = false;
+	const HSTS_MAX_AGES = [ 86400, 2592000, 31536000, 63072000 ];
+
+
+	/**
+	 * Create the storage service here so hooks can never run without it.
+	 */
+	public function __construct() {
+
+		$this->brute_force_db = new BruteForceDB();
+
+	}
 
 
 	/**
@@ -80,16 +122,19 @@ class Middleware {
 	 * @return void
 	 */
 	public function init() {
+
 		if ( defined( 'WP_CLI' ) && \WP_CLI ) {
+
 			return;
+
 		}
 
 		global $wp;
 
-		$this->brute_force_db = new BruteForceDB();
-
 		if ( ! function_exists( 'wp_get_current_user' ) ) {
+
 			include ABSPATH . '/wp-includes/pluggable.php';
+
 		}
 
 		// Get client IP early for blocking checks.
@@ -97,180 +142,44 @@ class Middleware {
 
 		// Block check: deny blocked IPs before any processing.
 		if ( $ip && $this->brute_force_db->is_ip_blocked( $ip ) ) {
+
 			status_header( 403 );
+
 			exit( 'Access Denied' );
+
 		}
 
 		if ( \current_user_can( 'manage_options' ) ) {
+
 			// Automatically whitelist admin IPs if public.
 			if ( $ip && $this->is_public_ip( $ip ) ) {
+
 				$this->brute_force_db->whitelist_ip( $ip );
+
 			}
+
 			return;
+
 		}
 
 		// Payload size limit check (excluding multipart/form-data uploads).
 		$this->check_payload_size_limit( $ip );
 
 		if ( $this->get_settings( 'filter_bad_requests' ) ) {
+
 			$this->filter_bad_requests();
+
 		}
 
 		if ( $this->get_settings( 'disable_rest_api' ) ) {
+
 			// Match on the route WordPress resolved, not on REQUEST_URI: this covers
 			// sub-directory sites (/site1/wp-json/...), ?rest_route= and index.php/wp-json/.
 			add_filter( 'rest_authentication_errors', [ $this, 'arm_rest_route_check' ], 1 );
 			add_filter( 'rest_pre_dispatch', [ $this, 'restrict_rest_route' ], 5, 3 );
-		}
-	}
 
-
-	/**
-	 * Check payload size limit and block IP if exceeded.
-	 *
-	 * Skips multipart/form-data requests (file uploads) to avoid
-	 * interfering with legitimate upload operations.
-	 *
-	 * @param string|false $ip Client IP address.
-	 * @return void
-	 */
-	private function check_payload_size_limit( $ip ) {
-		if ( ! $ip ) {
-			return;
 		}
 
-		$max_payload_size = (int) $this->get_settings( 'max_payload_size' );
-
-		if ( $max_payload_size <= 0 ) {
-			return;
-		}
-
-		// Skip if IP is whitelisted (exact or range).
-		if ( $this->brute_force_db->is_ip_whitelisted( $ip ) ) {
-			return;
-		}
-
-		// Skip if it is an API request sent with credentials.
-		// 1. Check HTTP Authorization headers (Basic Auth, Application Passwords, Bearer/OAuth tokens).
-		$has_credentials = ! empty( $_SERVER['HTTP_AUTHORIZATION'] ) || ! empty( $_SERVER['PHP_AUTH_USER'] ) || ! empty( $_SERVER['PHP_AUTH_PW'] );
-
-		// 2. Check WooCommerce API key parameters.
-		// Use filter_input() to avoid direct superglobal processing while still
-		// detecting API credential requests.
-		if ( ! $has_credentials ) {
-			$consumer_key_get  = filter_input( INPUT_GET, 'consumer_key', FILTER_UNSAFE_RAW );
-			$consumer_key_post = filter_input( INPUT_POST, 'consumer_key', FILTER_UNSAFE_RAW );
-
-			if ( ! empty( $consumer_key_get ) || ! empty( $consumer_key_post ) ) {
-				$has_credentials = true;
-			}
-		}
-
-		// 3. Check WordPress authentication cookies
-		if ( ! $has_credentials && ! empty( $_COOKIE ) ) {
-			foreach ( $_COOKIE as $cookie_name => $cookie_value ) {
-				if ( strpos( $cookie_name, 'wordpress_logged_in_' ) === 0 ) {
-					$has_credentials = true;
-					break;
-				}
-			}
-		}
-
-		if ( $has_credentials ) {
-			// Only skip if it's an API request (wp-json, xmlrpc.php, or admin-ajax.php).
-			$request_uri    = isset( $_SERVER['REQUEST_URI'] ) ? sanitize_url( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
-			$is_api_request = ( strpos( $request_uri, '/wp-json/' ) !== false ) || ( strpos( $request_uri, 'xmlrpc.php' ) !== false ) || ( strpos( $request_uri, 'admin-ajax.php' ) !== false );
-
-			if ( $is_api_request ) {
-				return;
-			}
-		}
-
-		// Skip multipart uploads entirely.
-		$content_type = isset( $_SERVER['CONTENT_TYPE'] ) ? sanitize_text_field( wp_unslash( $_SERVER['CONTENT_TYPE'] ) ) : '';
-
-		if ( stripos( $content_type, 'multipart/form-data' ) !== false ) {
-			return;
-		}
-
-		// Calculate total payload: query string + request body.
-		// phpcs:ignore -- We need raw access to these superglobals for accurate size calculation.
-		$query_string_size = isset( $_SERVER['QUERY_STRING'] ) ? strlen( $_SERVER['QUERY_STRING'] ) : 0;
-		$body_size         = isset( $_SERVER['CONTENT_LENGTH'] ) ? (int) $_SERVER['CONTENT_LENGTH'] : 0;
-		$total_size        = $query_string_size + $body_size;
-
-		if ( $total_size > $max_payload_size ) {
-			$user_agent   = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
-			$request_uri  = isset( $_SERVER['REQUEST_URI'] ) ? sanitize_url( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
-			$payload_info = sprintf( 'Size: %d bytes (limit: %d) | URI: %s', $total_size, $max_payload_size, $request_uri );
-
-			$this->brute_force_db->block_ip( $ip );
-			$this->brute_force_db->log_attempt_with_details( $ip, BruteForceDB::TYPE_BAD_REQUEST, $user_agent, $payload_info );
-
-			wp_die(
-				esc_html__( 'SecureFusion: Request payload exceeds the allowed limit. Your IP has been blocked.', 'secuplug' ),
-				esc_html__( 'Payload Too Large', 'secuplug' ),
-				[
-					'response'  => 403,
-					'back_link' => false,
-				]
-			);
-		}
-	}
-
-
-	/**
-	 * Check requested path for malicious or sensitive files.
-	 *
-	 * Detects scanner bots probing for exposed configuration files,
-	 * shell scripts, backups, and backdoor PHP scripts. Only intercepts
-	 * requests already routed through WordPress (non-existent files on disk).
-	 * Does NOT modify .htaccess or interfere with server configuration.
-	 *
-	 * @return void
-	 */
-	private function check_malicious_path() {
-		$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? sanitize_url( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
-		$url_path    = wp_parse_url( $request_uri, PHP_URL_PATH );
-
-		if ( empty( $url_path ) ) {
-			return;
-		}
-
-		// Decode URL-encoded characters to prevent bypass via %2e (%2eenv → .env).
-		$url_path = urldecode( $url_path );
-
-		$malicious_path_patterns = [
-			// Exposed configuration and hidden files.
-			'\.(env|git|htaccess|htpasswd|gitignore|gitattributes|dockerignore|editorconfig|npmrc)(?:\.|$|\/|\?)',
-			// Shell scripts, SQL dumps, backups, CGI, executables.
-			'\.(sh|bash|sql|bak|log|cgi|exe|pl|py)$',
-			// WordPress config backups.
-			'wp-config\.(bak|old|txt|temp|tmp|zip)$',
-			// Common backup archives.
-			'backup\.(zip|tar|gz|sql|rar|bak)$',
-			// Known backdoor / webshell PHP filenames.
-			'(malicious-script|shell|webshell|c99|r57|cmd|backdoor|eval-stdin|wp-theme-check|alfashell|0x|01xa|adminer)\.php$',
-		];
-
-		$malicious_path_pattern = '#(' . implode( '|', $malicious_path_patterns ) . ')#siu';
-
-		if ( preg_match( $malicious_path_pattern, $url_path ) ) {
-			$ip = $this->get_client_ip();
-			if ( $ip ) {
-				$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
-				$this->brute_force_db->log_attempt_with_details( $ip, BruteForceDB::TYPE_BAD_REQUEST, $user_agent, $request_uri );
-			}
-
-			wp_die(
-				esc_html__( 'SecureFusion Firewall has denied access to this resource.', 'secuplug' ),
-				esc_html__( 'Access Denied', 'secuplug' ),
-				[
-					'response'  => 403,
-					'back_link' => false,
-				]
-			);
-		}
 	}
 
 
@@ -280,738 +189,333 @@ class Middleware {
 	 * @return void
 	 */
 	public function headers() {
+
 		// Do not apply security headers in the admin area to avoid conflicts with plugins.
 		if ( is_admin() ) {
+
 			return;
+
 		}
 
 		$hide_versions = $this->get_settings( 'hide_versions' );
 		$bad_bots      = $this->get_settings( 'bad_bots' );
 		$http_headers  = $this->get_settings( 'http_headers' );
 
-		// Helper to resolve null to a default for backward compatibility before settings are re-saved.
-		$resolve_csp_toggle = function ( $key, $fallback ) {
-			$val = $this->get_settings( $key );
-			return ( null === $val ) ? $fallback : $val;
-		};
-
-		$enable_csp_style       = $resolve_csp_toggle( 'enable_csp_style', '0' );
-		$enable_csp_script      = $resolve_csp_toggle( 'enable_csp_script', '0' );
-		$enable_csp_font        = $resolve_csp_toggle( 'enable_csp_font', '0' );
-		$enable_csp_frame       = $resolve_csp_toggle( 'enable_csp_frame', '0' );
-		$enable_csp_worker      = $resolve_csp_toggle( 'enable_csp_worker', '0' );
-		$enable_csp_img         = $resolve_csp_toggle( 'enable_csp_img', '0' );
-		$enable_csp_connect     = $resolve_csp_toggle( 'enable_csp_connect', '0' );
-		$enable_csp_media       = $resolve_csp_toggle( 'enable_csp_media', '0' );
-		$enable_csp_form_action = $resolve_csp_toggle( 'enable_csp_form_action', '0' );
-		$enable_csp_base_uri    = $resolve_csp_toggle( 'enable_csp_base_uri', '0' );
-		$enable_csp_report_only = $resolve_csp_toggle( 'enable_csp_report_only', '0' );
-		$csp_report_uri         = $this->get_settings( 'csp_report_uri' );
-
-		$csp_upgrade_insecure_requests = $resolve_csp_toggle( 'csp_upgrade_insecure_requests', '1' );
-		$csp_block_all_mixed_content   = $resolve_csp_toggle( 'csp_block_all_mixed_content', '1' );
-		$csp_sandbox                   = $resolve_csp_toggle( 'csp_sandbox', '0' );
-
-		$enable_coop            = $this->get_settings( 'enable_coop' );
-		$enable_hsts_preload    = $this->get_settings( 'enable_hsts_preload' );
-		$enable_hsts_subdomains = $this->get_settings( 'enable_hsts_subdomains' );
-		$recaptcha_enable       = $this->get_settings( 'recaptcha_enable' );
-
-		// CSP Sources.
-		$csp_allowed_style_sources       = $this->get_settings( 'csp_allowed_style_sources' );
-		$csp_allowed_style_sources       = str_replace( '|', ' ', $csp_allowed_style_sources );
-		$csp_allowed_script_sources      = $this->get_settings( 'csp_allowed_script_sources' );
-		$csp_allowed_script_sources      = str_replace( '|', ' ', $csp_allowed_script_sources );
-		$csp_allowed_font_sources        = $this->get_settings( 'csp_allowed_font_sources' );
-		$csp_allowed_font_sources        = str_replace( '|', ' ', $csp_allowed_font_sources );
-		$csp_allowed_frame_sources       = $this->get_settings( 'csp_allowed_frame_sources' );
-		$csp_allowed_frame_sources       = str_replace( '|', ' ', $csp_allowed_frame_sources );
-		$csp_allowed_worker_sources      = $this->get_settings( 'csp_allowed_worker_sources' );
-		$csp_allowed_worker_sources      = str_replace( '|', ' ', $csp_allowed_worker_sources );
-		$csp_allowed_img_sources         = $this->get_settings( 'csp_allowed_img_sources' );
-		$csp_allowed_img_sources         = str_replace( '|', ' ', $csp_allowed_img_sources );
-		$csp_allowed_connect_sources     = $this->get_settings( 'csp_allowed_connect_sources' );
-		$csp_allowed_connect_sources     = str_replace( '|', ' ', $csp_allowed_connect_sources );
-		$csp_allowed_media_sources       = $this->get_settings( 'csp_allowed_media_sources' );
-		$csp_allowed_media_sources       = str_replace( '|', ' ', $csp_allowed_media_sources );
-		$csp_allowed_form_action_sources = $this->get_settings( 'csp_allowed_form_action_sources' );
-		$csp_allowed_form_action_sources = str_replace( '|', ' ', $csp_allowed_form_action_sources );
-		$csp_allowed_base_uri_sources    = $this->get_settings( 'csp_allowed_base_uri_sources' );
-		$csp_allowed_base_uri_sources    = str_replace( '|', ' ', $csp_allowed_base_uri_sources );
+		$enable_coop = $this->get_settings( 'enable_coop' );
 
 		if ( $bad_bots ) {
+
 			$bad_bots   = get_option( 'bad_bots_list', '^libwww-perl.*' );
 			$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
 
 			if ( preg_match( "/{$bad_bots}/i", $user_agent ) ) {
+
 				// Log the bad bot event with details.
 				$ip = $this->get_client_ip();
+
 				if ( $ip ) {
-					$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? sanitize_url( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
-					$this->brute_force_db->log_attempt_with_details( $ip, BruteForceDB::TYPE_BAD_BOT, $user_agent, $request_uri );
+
+					$this->brute_force_db->log_attempt_with_details( $ip, BruteForceDB::TYPE_BAD_BOT, $user_agent, $this->request_path_for_log() );
+
 				}
 
 				status_header( 403 );
+
 				exit( 'Access Denied' );
+
 			}
+
 		}
 
 		// Output already started (another plugin, WP-CLI, cron, tests): header() would only add
 		// "headers already sent" warnings to the log.
 		if ( headers_sent() ) {
+
 			return;
+
 		}
 
 		if ( $hide_versions ) {
+
 			header( 'Server: ' );
 			header_remove( 'X-Powered-By' );
+
 		}
 
 		if ( $http_headers ) {
+
 			// Cross-Origin Opener Policy (COOP).
 			if ( $enable_coop ) {
+
 				header( 'Cross-Origin-Opener-Policy: same-origin' );
+
 			}
 
-			// Clickjacking Mitigation & Other Headers.
 			header( 'X-Frame-Options: SAMEORIGIN' );
 			header( 'X-Content-Type-Options: nosniff' );
-			header( 'Referrer-Policy: no-referrer-when-downgrade' );
 
-			// Strict-Transport-Security (HSTS).
-			$hsts_max_age = 60 * 60 * 24 * 30 * 24; // 2 years
-			$hsts_header  = 'max-age=' . $hsts_max_age;
-			if ( $enable_hsts_subdomains ) {
-				$hsts_header .= '; includeSubDomains';
-			}
-			if ( $enable_hsts_preload ) {
-				$hsts_header .= '; preload';
-			}
-			header( 'Strict-Transport-Security: ' . $hsts_header );
+			$this->frame_header_sent = true;
 
-			/**
-			 * Content Security Policy (CSP)
-			 * Helps prevent Cross-Site Scripting (XSS) and data injection attacks.
-			 * This policy is more specific to reduce risks highlighted by security scanners.
-			 */
-			if ( $recaptcha_enable ) {
-				$csp_allowed_script_sources .= ' https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/';
-				$csp_allowed_frame_sources  .= ' https://www.google.com/recaptcha/ https://www.google.com';
-				$csp_allowed_style_sources  .= ' https://www.google.com/recaptcha/';
-			}
+			header( 'Referrer-Policy: strict-origin-when-cross-origin' );
 
-			// Normalize all active CSP source domains (handling www vs non-www automatically).
-			$csp_allowed_frame_sources_norm       = CSP::normalize_csp_sources( $csp_allowed_frame_sources );
-			$csp_allowed_worker_sources_norm      = CSP::normalize_csp_sources( $csp_allowed_worker_sources );
-			$csp_allowed_script_sources_norm      = CSP::normalize_csp_sources( $csp_allowed_script_sources );
-			$csp_allowed_style_sources_norm       = CSP::normalize_csp_sources( $csp_allowed_style_sources );
-			$csp_allowed_img_sources_norm         = CSP::normalize_csp_sources( $csp_allowed_img_sources );
-			$csp_allowed_font_sources_norm        = CSP::normalize_csp_sources( $csp_allowed_font_sources );
-			$csp_allowed_connect_sources_norm     = CSP::normalize_csp_sources( $csp_allowed_connect_sources );
-			$csp_allowed_media_sources_norm       = CSP::normalize_csp_sources( $csp_allowed_media_sources );
-			$csp_allowed_form_action_sources_norm = CSP::normalize_csp_sources( $csp_allowed_form_action_sources );
-			$csp_allowed_base_uri_sources_norm    = CSP::normalize_csp_sources( $csp_allowed_base_uri_sources );
-
-			$csp_policy = '';
-
-			if ( $enable_csp_frame && ! empty( $csp_allowed_frame_sources_norm ) ) {
-				$csp_policy .= "frame-src 'self' " . $csp_allowed_frame_sources_norm . '; ';
-			}
-
-			if ( $enable_csp_worker && ! empty( $csp_allowed_worker_sources_norm ) ) {
-				$csp_policy .= "worker-src 'self' " . $csp_allowed_worker_sources_norm . '; ';
-			}
-
-			if ( $enable_csp_script && ! empty( $csp_allowed_script_sources_norm ) ) {
-				$csp_policy .= "script-src 'self' " . $csp_allowed_script_sources_norm . '; ';
-			}
-
-			if ( $enable_csp_style && ! empty( $csp_allowed_style_sources_norm ) ) {
-				$csp_policy .= "style-src 'self' " . $csp_allowed_style_sources_norm . '; ';
-			}
-
-			if ( $enable_csp_img && ! empty( $csp_allowed_img_sources_norm ) ) {
-				$csp_policy .= "img-src 'self' " . $csp_allowed_img_sources_norm . '; ';
-			}
-
-			if ( $enable_csp_font && ! empty( $csp_allowed_font_sources_norm ) ) {
-				$csp_policy .= "font-src 'self' " . $csp_allowed_font_sources_norm . '; ';
-			}
-
-			if ( $enable_csp_connect && ! empty( $csp_allowed_connect_sources_norm ) ) {
-				$csp_policy .= "connect-src 'self' " . $csp_allowed_connect_sources_norm . '; ';
-			}
-
-			if ( $enable_csp_media && ! empty( $csp_allowed_media_sources_norm ) ) {
-				$csp_policy .= "media-src 'self' " . $csp_allowed_media_sources_norm . '; ';
-			}
-
-			if ( $enable_csp_form_action && ! empty( $csp_allowed_form_action_sources_norm ) ) {
-				$csp_policy .= "form-action 'self' " . $csp_allowed_form_action_sources_norm . '; ';
-			}
-
-			if ( $enable_csp_base_uri && ! empty( $csp_allowed_base_uri_sources_norm ) ) {
-				$csp_policy .= "base-uri 'self' " . $csp_allowed_base_uri_sources_norm . '; ';
-			}
-
-			if ( ! empty( $csp_policy ) ) {
-				if ( $csp_upgrade_insecure_requests ) {
-					$csp_policy .= 'upgrade-insecure-requests; ';
-				}
-
-				if ( $csp_block_all_mixed_content ) {
-					$csp_policy .= 'block-all-mixed-content; ';
-				}
-
-				if ( $csp_sandbox ) {
-					$csp_policy .= 'sandbox; ';
-				}
-
-				$csp_policy = str_replace( array( "\r\n", "\r", "\n", "\t" ), '', $csp_policy );
-
-				// Disallows plugins like Flash.
-				$csp_policy .= "object-src 'none'; ";
-
-				// Mitigates clickjacking.
-				$csp_policy .= "frame-ancestors 'self'; ";
-
-				$csp_policy = "default-src 'self'; " . $csp_policy;
-
-				// Append report-uri if configured.
-				if ( ! empty( $csp_report_uri ) ) {
-					$csp_policy .= 'report-uri ' . esc_url( $csp_report_uri ) . '; ';
-				}
-
-				if ( $enable_csp_report_only ) {
-					header( 'Content-Security-Policy-Report-Only: ' . $csp_policy );
-				} else {
-					header( 'Content-Security-Policy: ' . $csp_policy );
-				}
-			}
 		}
+
+		$this->send_hsts();
+		$this->send_csp();
+
+		// Framing stays blocked until WordPress itself confirms the embed card. The request URL is
+		// not proof: any page accepts "?embed=1" and still renders in full.
+		add_action( 'wp', [ $this, 'allow_embed_framing' ], 0 );
+
 	}
 
 
 	/**
-	 * Filter bad requests.
+	 * Let other sites frame the WordPress embed card, and nothing else.
 	 *
 	 * @return void
 	 */
-	public function filter_bad_requests() {
-		global $wp, $pagenow;
+	public function allow_embed_framing() {
 
-		// http://vulnsite.com/script.php etc.
-		// wp-config.php etc.
-		// ../../../../etc/pwd etc.
-		// ../../../unwanted.php.
+		if ( ! is_embed() || headers_sent() ) {
 
-		if ( ! $this->get_settings( 'filter_bad_requests' ) ) {
 			return;
+
 		}
 
-		if ( current_user_can( 'manage_options' ) ) {
+		if ( $this->frame_header_sent ) {
+
+			header_remove( 'X-Frame-Options' );
+
+		}
+
+		if ( null === $this->csp ) {
+
 			return;
+
 		}
 
-		// If REQUEST_METHOD is not set or empty, it means there is no security concern.
-		if ( ! isset( $_SERVER['REQUEST_METHOD'] ) || empty( $_SERVER['REQUEST_METHOD'] ) ) {
-			return;
-		}
+		// The card prints its own inline code outside the traced hooks, so it only gets the always-on rules.
+		$this->csp['context']['embed']    = true;
+		$this->csp['context']['baseline'] = true;
 
-		// Check requested path for malicious/sensitive files (e.g. .env, .sh, backdoor .php scripts).
-		// Only intercepts requests already routed through WordPress (non-existent files);
-		// does NOT modify .htaccess or interfere with files physically served by the web server.
-		$this->check_malicious_path();
+		header_remove( 'Content-Security-Policy-Report-Only' );
 
-		// All HTTP Methods: GET / POST / PUT / HEAD / DELETE / PATCH / OPTIONS / CONNECT / TRACE.
-		$method = \in_array(
-			$_SERVER['REQUEST_METHOD'],
-			// Methods that have the same function as POST.
-			array( 'POST', 'PUT', 'PATCH' ),
-			true
-		) ? 'POST' : 'GET';
+		$this->emit_csp( $this->csp['settings'], [], $this->csp['context'] );
 
-		$custom_cookie_patterns  = $this->get_settings( 'cookie_patterns' );
-		$custom_request_patterns = $this->get_settings( 'request_patterns' );
-
-		$pattern_arr = array( '/[\#]/', '/[\|]/' );
-		$replace_arr = array( '\\\\#', '\\\\|' );
-
-		if ( $custom_cookie_patterns ) {
-			$custom_cookie_patterns = preg_split( '/\r\n|\n/', $custom_cookie_patterns );
-			$custom_cookie_patterns = array_map(
-				function ( $val ) use ( $pattern_arr, $replace_arr ) {
-					return preg_replace( $pattern_arr, $replace_arr, $val );
-				},
-				$custom_cookie_patterns
-			);
-		}
-
-		if ( $custom_request_patterns ) {
-			$custom_request_patterns = preg_split( '/\r\n|\n/', $custom_request_patterns );
-			$custom_request_patterns = array_map(
-				function ( $val ) use ( $pattern_arr, $replace_arr ) {
-					return preg_replace( $pattern_arr, $replace_arr, $val );
-				},
-				$custom_request_patterns
-			);
-		}
-
-		$custom_cookie_patterns  = is_array( $custom_cookie_patterns ) ? $custom_cookie_patterns : array();
-		$custom_request_patterns = is_array( $custom_request_patterns ) ? $custom_request_patterns : array();
-
-		// Cookie security.
-		$cookie_filter_items = apply_filters( 'securefusion_cookie_filter_items', $custom_cookie_patterns );
-
-		if ( ! empty( $cookie_filter_items ) ) {
-			$cookie_pattern = '#' . implode( '|', $cookie_filter_items ) . '#siu';
-		}
-
-		if ( ! empty( $_COOKIE ) ) {
-			if ( ! empty( $cookie_pattern ) ) {
-				if ( $this->bad_request_control( $_COOKIE, $cookie_pattern ) ) {
-					// Log bad cookie with details.
-					$ip = $this->get_client_ip();
-					if ( $ip ) {
-						$user_agent  = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
-						$cookie_data = http_build_query( $_COOKIE );
-						$this->brute_force_db->log_attempt_with_details( $ip, BruteForceDB::TYPE_BAD_COOKIE, $user_agent, $cookie_data );
-					}
-
-					wp_die(
-						esc_html__( 'SecureFusion Firewall has denied this cookie request.', 'secuplug' ),
-						esc_html__( 'Cookie Failure', 'secuplug' ),
-						[
-							'response'  => 403,
-							'back_link' => true,
-						]
-					);
-				}
-			}
-		}
-
-		// phpcs:ignore -- No validation needed.
-		if ( $method === 'GET' && empty( $_GET ) ) {
-			return;
-		}
-
-		// GET and POST security.
-		$http_pattern = '(?:(?:http|https)?\:\/\/)?';
-		$url_pattern  = $http_pattern . '(?:[a-z0-9_\-\.]+\/+)([a-z0-9_\-\.\/]+)?';
-
-		$default_regex_arr = [
-			// SQL Global Variables.
-			'@@[\w\.\$]+',
-			'eval\(\s*[\'\"][\w\s\(\)]+[\'\"]\s*\)',
-			'base64_(encode|decode)\s*\(',
-			'shell_exec\(\s*[\'\"][\w\s\-\.\/]+[\'\"]\s*\)',
-			'phpinfo\(\s*\)',
-			'^file_get_contents\(\s*[\'\"][\w\s\-\.\/]+[\'\"]\s*\)',
-			$url_pattern . '\.(htaccess|exe|run|cgi)',
-			$url_pattern . '(config|boot|vuln|load)\.(php|ini)',
-			'mosConfig_[a-zA-Z_]{1,20}',
-			// sql injections.
-			'(union\s+)?(select|insert|delete)\s+\w+(\s*,\s*\w+)*\s+from\s+\w+(\s+where\s+\w+\s*(=|<|>|\!=)\s*[\w\'\"]+)?',
-			// special characters " ' < > \ { |.
-			'.*(&\#x22;|&\#x27;|&\#x3C;|&\#x3E;|&\#x5C;|&\#x7B;|&\#x7C;).*',
-			// prevents ../ url patterns.
-			$http_pattern . '(\/*[a-z0-9_\-\.]+)?(\.\.\/)+([a-z0-9_\-\.])*',
-		];
-
-		$request_regex_arr = array_merge( $default_regex_arr, $custom_request_patterns );
-
-		$request_filter_items = apply_filters( 'securefusion_request_filter_items', $request_regex_arr );
-
-		$request_pattern = '#' . implode( '|', $request_filter_items ) . '#siu';
-
-		// phpcs:ignore -- Input is validated in bad_request_control().
-		if ( $method === 'POST' && ! empty( $_POST ) ) {
-			// phpcs:ignore -- Input is validated in bad_request_control().
-			$input = $_POST;
-		} else {
-			// phpcs:ignore -- Input is validated in bad_request_control().
-			$input = $_SERVER['QUERY_STRING'];
-		}
-
-		if ( $this->bad_request_control( $input, $request_pattern ) ) {
-			// Log bad request with details.
-			$ip = $this->get_client_ip();
-			if ( $ip ) {
-				$user_agent  = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
-				$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? sanitize_url( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
-				$payload     = is_array( $input ) ? http_build_query( $input ) : $input;
-				$this->brute_force_db->log_attempt_with_details( $ip, BruteForceDB::TYPE_BAD_REQUEST, $user_agent, $request_uri . ' | ' . $payload );
-			}
-
-			// Comments.
-			if ( $pagenow === 'wp-comments-post.php' ) {
-				wp_die(
-					esc_html__( 'SecureFusion Firewall has denied this comment submission.', 'secuplug' ),
-					esc_html__( 'Comment Submission Failure', 'secuplug' ),
-					[
-						'response'  => 403,
-						'back_link' => true,
-					]
-				);
-			}
-
-			wp_die(
-				esc_html__( 'SecureFusion Firewall has denied this request.', 'secuplug' ),
-				esc_html__( 'Request Failure', 'secuplug' ),
-				[
-					'response'  => 403,
-					'back_link' => true,
-				]
-			);
-		}
-
-		if ( empty( $wp->query_vars ) ) {
-			return;
-		}
-
-		// WP Query security.
-		if ( $this->bad_request_control( $wp->query_vars, $request_pattern ) ) {
-			// Log bad query with details.
-			$ip = $this->get_client_ip();
-			if ( $ip ) {
-				$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
-				$payload    = http_build_query( $wp->query_vars );
-				$this->brute_force_db->log_attempt_with_details( $ip, BruteForceDB::TYPE_BAD_QUERY, $user_agent, $payload );
-			}
-
-			wp_die(
-				esc_html__( 'SecureFusion Firewall has denied this WP Query.', 'secuplug' ),
-				esc_html__( 'WP Query Failure', 'secuplug' ),
-				[
-					'response'  => 403,
-					'back_link' => true,
-				]
-			);
-		}
 	}
 
 
 	/**
-	 * Filter out bad requests based on the given pattern.
+	 * Send Strict-Transport-Security when the owner opted in and this request is on HTTPS.
 	 *
-	 * @param array|string $input  The input to filter out.
-	 * @param string       $pattern The pattern to filter out.
-	 * @return bool Whether the input should be filtered out.
+	 * @return void
 	 */
-	private function bad_request_control( $input, $pattern ) {
-		if ( is_array( $input ) ) {
-			$input = http_build_query( $input );
+	private function send_hsts() {
+
+		if ( ! $this->get_settings( 'enable_hsts' ) || ! is_ssl() ) {
+
+			return;
+
 		}
 
-		$input = urldecode( $input );
+		$max_age = (int) $this->get_settings( 'hsts_max_age' );
 
-		$checker = preg_match( $pattern, $input );
+		if ( ! in_array( $max_age, self::HSTS_MAX_AGES, true ) ) {
 
-		// detect unwanted requests.
-		if ( $checker === 1 ) {
-			return true;
+			$max_age = self::HSTS_MAX_AGES[0];
+
 		}
 
-		return false;
+		$value      = 'max-age=' . $max_age;
+		$subdomains = (bool) $this->get_settings( 'enable_hsts_subdomains' );
+
+		if ( $subdomains ) {
+
+			$value .= '; includeSubDomains';
+
+		}
+
+		// Browser preload lists reject anything shorter or without subdomains.
+		if ( $subdomains && $max_age >= YEAR_IN_SECONDS && $this->get_settings( 'enable_hsts_preload' ) ) {
+
+			$value .= '; preload';
+
+		}
+
+		header( 'Strict-Transport-Security: ' . $value );
+
 	}
 
 
 	/**
-	 * Arms the route check for the HTTP REST request.
+	 * Whether this request renders a login screen, which prints code no scan ever sees.
 	 *
-	 * Fired on 'rest_authentication_errors', which WordPress runs only for REST requests
-	 * served over HTTP, right before dispatching them. The value is passed through untouched.
-	 *
-	 * @param \WP_Error|null|true $errors Authentication result so far.
-	 * @return \WP_Error|null|true Unchanged result.
-	 */
-	public function arm_rest_route_check( $errors ) {
-		if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
-			$this->rest_check_armed = true;
-		}
-
-		return $errors;
-	}
-
-
-	/**
-	 * Blocks anonymous access to the protected core REST services.
-	 *
-	 * Fired on 'rest_pre_dispatch'. Only the request armed by arm_rest_route_check() is
-	 * checked, so internal rest_do_request() calls made by themes and plugins are not affected.
-	 *
-	 * @param mixed            $result  Response to replace the requested version with.
-	 * @param \WP_REST_Server  $server  Server instance.
-	 * @param \WP_REST_Request $request Request used to generate the response.
-	 * @return mixed Unchanged result, or a WP_Error when the request is blocked.
-	 */
-	public function restrict_rest_route( $result, $server, $request ) {
-		if ( ! $this->rest_check_armed ) {
-			return $result;
-		}
-
-		$this->rest_check_armed = false;
-
-		if ( is_wp_error( $result ) || ! $request instanceof \WP_REST_Request ) {
-			return $result;
-		}
-
-		// CORS preflight requests never carry credentials; blocking them would break
-		// authenticated cross-origin clients (application passwords).
-		if ( 'OPTIONS' === $request->get_method() ) {
-			return $result;
-		}
-
-		if ( ! self::is_protected_rest_route( $request->get_route() ) ) {
-			return $result;
-		}
-
-		if ( $this->is_rest_api_access_allowed( $request ) ) {
-			return $result;
-		}
-
-		return new \WP_Error(
-			'rest_disabled',
-			esc_html__( 'The REST API on this site has been disabled.', 'secuplug' ),
-			array( 'status' => rest_authorization_required_code() )
-		);
-	}
-
-
-	/**
-	 * Whether a REST route belongs to a protected core service.
-	 *
-	 * Matches the wp/v1 and wp/v2 namespace indexes and every route of the services in
-	 * REST_PROTECTED_SERVICES, case-insensitively, as WordPress routes do.
-	 *
-	 * @param string $route Route as returned by WP_REST_Request::get_route(), e.g. "/wp/v2/users/1".
+	 * @param string $uri Request URI.
 	 * @return bool
 	 */
-	public static function is_protected_rest_route( $route ) {
-		if ( ! is_string( $route ) || '' === $route ) {
-			return false;
+	private function is_login_request( $uri ) {
+
+		// WordPress compares the login URL with SCRIPT_NAME, and an empty name matches every URL.
+		// Servers that leave it empty would turn every page into a login screen here.
+		if ( ! empty( $_SERVER['SCRIPT_NAME'] ) && is_login() ) {
+
+			return true;
+
 		}
 
-		// Only the prefix matters, so long routes are cut before any regex runs.
-		$route = substr( $route, 0, self::REST_ROUTE_MAX_LENGTH );
-		$route = '/' . trim( (string) preg_replace( '#/{2,}#', '/', $route ), '/' );
+		$slug = trim( (string) $this->get_settings( 'custom_login_url' ), '/' );
+		$path = trim( (string) wp_parse_url( $uri, PHP_URL_PATH ), '/' );
 
-		/**
-		 * Filters the core REST services (under wp/v1 and wp/v2) blocked for anonymous visitors.
-		 *
-		 * @param string[] $services Service names, e.g. "users", "posts".
-		 */
-		$services = apply_filters( 'securefusion_rest_protected_services', self::REST_PROTECTED_SERVICES );
+		return '' !== $slug && ( $path === $slug || '/' . $slug === substr( $path, -strlen( $slug ) - 1 ) );
 
-		$quoted = [];
-		foreach ( (array) $services as $service ) {
-			if ( is_string( $service ) && '' !== $service ) {
-				$quoted[] = preg_quote( $service, '#' );
-			}
-		}
-
-		$pattern = empty( $quoted )
-			? '#^/wp/v[12]$#i'
-			: '#^/wp/v[12](?:$|/(?:' . implode( '|', $quoted ) . ')(?:/|$))#i';
-
-		$matched = preg_match( $pattern, $route );
-
-		// A regex failure must not open the API silently.
-		return false === $matched ? true : 1 === $matched;
 	}
 
 
 	/**
-	 * Verify if the current REST API request should be allowed based on security bypass rules.
+	 * Whether a page builder or the Customizer is drawing this page for an editor.
 	 *
-	 * Runs only for protected routes, after WordPress has authenticated the request
-	 * (cookie + nonce, application passwords), so is_user_logged_in() is reliable here.
+	 * Builders print large amounts of their own inline code. Only asked for users who can edit, so
+	 * a visitor cannot drop the policy by adding one of these parameters.
 	 *
-	 * @param \WP_REST_Request|null $request Current request.
-	 * @return bool True if allowed, false if blocked.
+	 * @return bool
 	 */
-	private function is_rest_api_access_allowed( $request = null ) {
-		// 1. Allow authenticated users.
+	private function is_builder_request() {
+
+		if ( function_exists( 'is_customize_preview' ) && is_customize_preview() ) {
+
+			return true;
+
+		}
+
+		$markers = [ 'customize_changeset_uuid', 'elementor-preview', 'et_fb', 'fl_builder', 'ct_builder', 'bricks', 'vc_editable', 'brizy-edit', 'tve', 'breakdance', 'oxygen_iframe' ];
+
+		/**
+		 * Filters the query parameters that mark a page builder request.
+		 *
+		 * @param string[] $markers Query parameter names.
+		 */
+		$markers = (array) apply_filters( 'securefusion_csp_builder_parameters', $markers );
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Only the presence of a parameter name is read.
+		return (bool) array_intersect_key( $_GET, array_flip( array_filter( $markers, 'is_string' ) ) );
+
+	}
+
+
+	/**
+	 * Send the Content-Security-Policy for this audience.
+	 *
+	 * @return void
+	 */
+	private function send_csp() {
+
+		$settings = Settings::all();
+		$role     = 'visitor';
+
 		if ( is_user_logged_in() ) {
-			return true;
+
+			$role = current_user_can( 'manage_options' ) ? 'admin' : 'member';
+
 		}
 
-		// 2. Allow internal WordPress executions (Admin dashboard, AJAX, Cron, WP-CLI).
-		if ( is_admin() || ( defined( 'DOING_AJAX' ) && DOING_AJAX ) || ( defined( 'DOING_CRON' ) && DOING_CRON ) || ( defined( 'WP_CLI' ) && \WP_CLI ) ) {
-			return true;
+		$level = CSPPolicy::level( $settings );
+		$uri   = isset( $_SERVER['REQUEST_URI'] ) ? sanitize_url( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '/';
+
+		$exempt  = CSPPolicy::exempt( $settings, $role );
+		$context = [
+			'level'    => $level,
+			'https'    => is_ssl(),
+			'embed'    => false,
+			'baseline' => $this->is_login_request( $uri ) || ( 'visitor' !== $role && current_user_can( 'edit_posts' ) && $this->is_builder_request() ),
+			'observe'  => false,
+		];
+
+		if ( $exempt && ! $context['baseline'] ) {
+
+			// An exempt administrator still gets the rules as a test, so notifications can show what
+			// visitors would lose. Nothing is blocked for them.
+			$context['observe']  = 'admin' === $role && Notifier::wants( $settings, 'csp' );
+			$context['baseline'] = ! $context['observe'];
+
 		}
 
-		// 3. Allow loopback requests from the server itself. No DNS lookup here: it would
-		// run on visitor requests and slow down or stall the site when DNS is slow.
-		$ip        = $this->get_client_ip();
-		$server_ip = isset( $_SERVER['SERVER_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['SERVER_ADDR'] ) ) : '';
+		// The always-on rules name no hosts, so the provider catalog is only read when a host list is sent.
+		$deferred  = ! $context['baseline'] && CSPPolicy::limits_code( $settings, $level );
+		$generated = $deferred ? CSPIntegrations::sources( $settings ) : [];
 
-		$is_loopback = (
-			'127.0.0.1' === $ip ||
-			'::1' === $ip ||
-			( ! empty( $server_ip ) && $ip === $server_ip )
+		if ( $deferred ) {
+
+			foreach ( CSPInline::boot( $settings, $level, $context['observe'] ) as $type => $sources ) {
+
+				$generated[ $type ] = array_merge( $generated[ $type ] ?? [], $sources );
+
+			}
+
+		}
+
+		$this->csp = [
+			'settings'  => $settings,
+			'generated' => $generated,
+			'context'   => $context,
+		];
+
+		if ( ! $deferred ) {
+
+			$this->emit_csp( $settings, $generated, $context );
+
+			return;
+
+		}
+
+		// The always-on rules are valid before the page exists; the full policy replaces them once the page is known.
+		$this->emit_csp( $settings, [], array_merge( $context, [ 'baseline' => true ] ) );
+
+		CSPInline::on_finish(
+			function ( $learned, $verified = true ) {
+
+				$context = array_merge( $this->csp['context'], [ 'unverified' => ! $verified ] );
+
+				return $this->emit_csp( $this->csp['settings'], array_merge_recursive( $this->csp['generated'], $learned ), $context );
+
+			}
 		);
 
-		if ( $is_loopback ) {
-			$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
-			if ( 0 === strpos( $user_agent, 'WordPress/' ) ) {
-				return true;
-			}
-		}
+	}
 
-		// 4. Allow requests with a valid REST API Nonce (e.g. from legitimate forms on the site).
-		$nonce = null;
-		if ( isset( $_SERVER['HTTP_X_WP_NONCE'] ) ) {
-			$nonce = sanitize_text_field( wp_unslash( $_SERVER['HTTP_X_WP_NONCE'] ) );
-		} elseif ( isset( $_REQUEST['_wpnonce'] ) ) {
-			$nonce = sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) );
-		}
 
-		if ( $nonce && wp_verify_nonce( $nonce, 'wp_rest' ) ) {
-			return true;
-		}
+	/**
+	 * Send policy headers for one set of sources.
+	 *
+	 * @param array $settings Resolved settings.
+	 * @param array $generated Sources by type.
+	 * @param array $context Policy context.
+	 * @return array<string,string> Headers sent.
+	 */
+	private function emit_csp( $settings, $generated, $context ) {
 
 		/**
-		 * Filters whether an anonymous request to a protected REST route is allowed.
+		 * Filters the largest policy sent, in bytes.
 		 *
-		 * Use it for trusted integrations, e.g. a monitoring service or a server whose
-		 * loopback requests arrive from a public IP behind NAT.
+		 * Nginx answers 502 when all response headers together exceed its buffer, 4 KB by default.
+		 * Raise this only on a server whose buffers are known to be larger.
 		 *
-		 * @param bool                  $allowed Default false.
-		 * @param \WP_REST_Request|null $request Current request.
-		 * @param string|false          $ip      Client IP.
+		 * @param int $limit Bytes.
 		 */
-		return (bool) apply_filters( 'securefusion_rest_allow_request', false, $request, $ip );
+		$context['limit'] = min( 16384, (int) apply_filters( 'securefusion_csp_max_header', CSPPolicy::MAX_HEADER ) );
+
+		$result = CSPPolicy::headers( $settings, $generated, $context );
+
+		foreach ( $result['headers'] as $name => $value ) {
+
+			header( $name . ': ' . $value );
+
+		}
+
+		CSPInline::note( $result['reduced'] );
+
+		return $result['headers'];
+
 	}
 
-
-	/**
-	 * Track failed login attempts.
-	 *
-	 * Fired on 'wp_login_failed' action.
-	 *
-	 * @param string         $username Username attempted.
-	 * @param \WP_Error|null $error Optional. Error object.
-	 * @return void
-	 */
-	public function track_login_failed( $username, $error = null ) {
-		// phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed -- Required by hook action.
-		unset( $error );
-
-		$ip = $this->get_client_ip();
-
-		if ( ! $ip ) {
-			return;
-		}
-
-		// Log with full details (IP, UA, payload).
-		$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
-
-		// Construct payload: username and sanitized POST data excluding passwords.
-		// phpcs:ignore -- We need raw access to these superglobals for accurate logging, but we sanitize them before use.
-		$post_data = wp_unslash( $_POST );
-
-		if ( isset( $post_data['pwd'] ) ) {
-			$post_data['pwd'] = '******';
-		}
-
-		if ( isset( $post_data['password'] ) ) {
-			$post_data['password'] = '******';
-		}
-
-		// Serialize payload safely.
-		$payload = 'Username: ' . sanitize_text_field( $username );
-
-		if ( ! empty( $post_data ) && is_array( $post_data ) ) {
-			$payload .= ' | POST: ' . http_build_query( $post_data );
-		}
-
-		$this->brute_force_db->log_attempt_with_details(
-			$ip,
-			BruteForceDB::TYPE_FAILED_LOGIN,
-			$user_agent,
-			$payload
-		);
-	}
-
-	/**
-	 * Limit login attempts.
-	 *
-	 * @param string $username Username.
-	 *
-	 * @return string Username.
-	 */
-	public function track_limit_login_attempts( $username ) {
-		// Get client IP.
-		$ip = $this->get_client_ip();
-
-		if ( ! $ip ) {
-			return $username;
-		}
-
-		if ( $this->brute_force_db->is_ip_whitelisted( $ip ) ) {
-			return $username;
-		}
-
-		$ip_login_limit    = $this->get_settings( 'ip_login_limit' );
-		$ip_attempt_window = $this->get_settings( 'ip_attempt_window' );
-		$ip_time_limit     = $this->get_settings( 'ip_time_limit' );
-
-		if ( ! $ip_login_limit ) {
-			return $username;
-		}
-
-		$ip_attempt_window = ! empty( $ip_attempt_window ) ? absint( $ip_attempt_window ) : 1;
-		$ip_time_limit     = ! empty( $ip_time_limit ) ? absint( $ip_time_limit ) : 2;
-
-		$window_seconds = $ip_attempt_window * MINUTE_IN_SECONDS;
-		$attempts       = $this->brute_force_db->get_failed_login_attempts_in_window( $ip, $window_seconds );
-
-		// Failed login attempts.
-		if ( $attempts >= $ip_login_limit ) {
-			$duration_seconds = $ip_time_limit * HOUR_IN_SECONDS;
-			$this->brute_force_db->block_ip( $ip, $duration_seconds );
-
-			wp_die(
-				esc_html__( '<strong>ERROR</strong>: You have reached the login attempts limit. Your IP has been locked out.', 'secuplug' ),
-				esc_html__( 'Too many failed login attempts', 'secuplug' ),
-				[
-					'response'  => 403,
-					'back_link' => false,
-				]
-			);
-		}
-
-		return $username;
-	}
-
-
-	/**
-	 * Track successful login attempts.
-	 *
-	 * Fired on 'wp_login' action.
-	 *
-	 * @param string   $user_login Username.
-	 * @param \WP_User $user       User object.
-	 * @return void
-	 */
-	public function track_login_successful( $user_login, $user ) {
-		$ip = $this->get_client_ip();
-
-		if ( ! $ip ) {
-			return;
-		}
-
-		$user_agent = isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '';
-
-		// Construct payload safely (Username & User ID).
-		$payload = sprintf( 'User: %s (ID: %d)', sanitize_text_field( $user_login ), $user->ID );
-
-		$this->brute_force_db->log_attempt_with_details(
-			$ip,
-			BruteForceDB::TYPE_SUCCESSFUL_LOGIN,
-			$user_agent,
-			$payload
-		);
-	}
 }

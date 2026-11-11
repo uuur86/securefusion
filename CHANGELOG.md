@@ -1,19 +1,24 @@
 # Changelog
 
-## 2.0.4 (unreleased)
-* Added: Warn before leaving settings with unsaved edits; respect cancelled saves, inherited values and immediately saved single-field resets.
-* Fixed: Remove nested radio control borders and refresh cached styles after CSS updates.
-* Improved: Move account transition guidance into an expandable Dashboard card, shown only for a site administrator with ID 1.
-* Improved: Prepare database identifiers and values, remove blanket coding-standard suppressions, and enforce LF line endings.
-* Fixed: Verify database columns and indexes before marking installation complete; surface failures and retry after a cooldown, including previously unverified installations.
-* Fixed: Shorten SSL connection timeout, cache failed checks, close certificate streams and avoid treating failure markers as valid certificates.
-* Fixed: Consistent Yes/No selected states and label spacing for network-inherited settings.
-* Changed: Replaced direct administrator ID rewriting with an account transition guide using WordPress user management. Legacy ID settings are ignored; existing accounts are preserved.
-* Fixed: "Disable REST API for Visitors" could be bypassed on multisite sub-directory sites (`/site/wp-json/wp/v2/users`) and with `?rest_route=/wp/v2/users`. Requests are now checked by REST route.
-* Improved: Removed a DNS lookup that ran on every REST API request from visitors.
-* Added: `securefusion_rest_protected_services` and `securefusion_rest_allow_request` filters.
-* Added: "Hide Usernames from Visitors" (on by default). `?author=N` answers 404 instead of redirecting to the author archive, anonymous visitors cannot read the REST users endpoint (also through `_embed`), administrators are left out of the users sitemap, and oEmbed author data and comment CSS classes no longer reveal login names. Author archives keep working.
-* Improved: Settings page redesign. On network sub-sites every setting shows the network value; changing a value customizes it for this site and "Use network setting" brings the network value back. Clearer names and descriptions for every setting.
+## 3.0.0 (unreleased)
+* Changed: Content Security Policy is one switch with a test mode. Scripts run only from the site, from hosts that WordPress, the theme or active plugins load, from allowed services, or when approved; `eval` is blocked unless a page needs it. Earlier settings are mapped, and updated sites start in test mode.
+* Added: Service lists (reCAPTCHA, Turnstile, Google Fonts, Cloudflare, tag managers and more). Services that serve code from any account need approval.
+* Added: Page cache support: hashes behind a detected page cache, an optional cache driver in `wp-config.php` for fresh nonces, and cache clearing when the policy changes.
+* Added: Administrator notifications for blocked hosts and features, with one-click fixes. Visitors never load them.
+* Added: Optional site scan that lists only what needs a decision.
+* Added: Hide usernames from visitors, on by default.
+* Added: Network defaults with per-site overrides on multisite, and a redesigned settings screen.
+* Added: Filters for notices, page builders, `eval` handles, page caches, policy size and REST access.
+* Changed: Allow lists accept hosts only. Oversized policies are reduced in steps instead of risking a 502 error.
+* Changed: HSTS moved to the HTTPS tab with a selectable duration. Referrer-Policy is strict-origin-when-cross-origin.
+* Changed: Administrator ID rewriting is replaced by an account transition guide.
+* Fixed: Adding `?embed=1` to an address removed framing protection.
+* Fixed: The REST API block could be bypassed on sub-directory multisite and with `?rest_route=`.
+* Fixed: `data:` could become a script source through an allow list or the site scan.
+* Fixed: Inline hashes broke behind HTML optimizers, and the policy was cut short when output buffers closed early.
+* Fixed: Bundled translations were not loaded.
+* Fixed: Database tables are verified before installation is marked complete; SSL checks time out sooner.
+* Improved: No DNS lookup on REST API requests from visitors.
 
 ## 2.0.3
 * Fixed: Google reCAPTCHA not displaying and preventing login on custom login paths.

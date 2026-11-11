@@ -1,0 +1,372 @@
+<?php
+/**
+ * Site-scoped inline code inventory and explicit authorization rules.
+ *
+ * @package securefusion
+ */
+
+namespace SecureFusion\Lib;
+
+if ( ! defined( 'ABSPATH' ) ) {
+
+	exit;
+
+}
+
+/**
+ * Keep observations separate from administrator approval.
+ */
+class CSPInlineRules {
+
+	const OPTION = 'securefusion_inline_rules';
+	const LIMIT  = 200;
+
+	/**
+	 * Sources excluded from automatic trust. Everything installed is trusted unless listed here.
+	 */
+	const BLOCK_OPTION = 'securefusion_inline_blocked_sources';
+
+	/**
+	 * External host record types and the directive each one extends.
+	 */
+	const HOST_TYPES = [
+		'host_script' => 'script',
+		'host_style'  => 'style',
+		'host_frame'  => 'frame',
+	];
+
+	/**
+	 * Most exact paths one record keeps; code seen on more pages is proposed for every page.
+	 */
+	const PATH_LIMIT = 10;
+
+	/**
+	 * Read the bounded inventory.
+	 *
+	 * @return array
+	 */
+	public static function all() {
+
+		$rows = get_option( self::OPTION, [] );
+
+		return is_array( $rows ) ? array_slice( $rows, 0, self::LIMIT, true ) : [];
+
+	}
+
+	/**
+	 * Hosts the owner approved in the review, by the source type each one extends.
+	 *
+	 * @return array<string,string[]>
+	 */
+	public static function approved_hosts() {
+
+		$result = [];
+
+		foreach ( self::all() as $row ) {
+
+			$type = self::HOST_TYPES[ $row['type'] ?? '' ] ?? '';
+
+			if ( '' !== $type && ! empty( $row['approved'] ) && is_string( $row['digest'] ?? null ) ) {
+
+				$result[ $type ][] = $row['digest'];
+
+			}
+
+		}
+
+		return $result;
+
+	}
+
+	/**
+	 * Hash the exact browser-visible text, including whitespace.
+	 *
+	 * @param string $code Inline text.
+	 * @return string
+	 */
+	public static function digest( $code ) {
+		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode -- CSP requires base64-encoded SHA-256 digests.
+		return base64_encode( hash( 'sha256', str_replace( [ "\r\n", "\r" ], "\n", $code ), true ) );
+
+	}
+
+	/**
+	 * Identify a record: registered output by its producer, everything else by its content.
+	 *
+	 * @param string $type Record type.
+	 * @param string $digest Content digest, or host for host records.
+	 * @param string $origin Registered producer identity, or empty.
+	 * @return string
+	 */
+	public static function key( $type, $digest, $origin ) {
+
+		return hash( 'sha256', $type . ':' . ( '' !== (string) $origin ? $origin : $digest ) );
+
+	}
+
+	/**
+	 * Read the sources excluded from automatic trust.
+	 *
+	 * @return array<string,bool>
+	 */
+	public static function blocked() {
+
+		$value = get_option( self::BLOCK_OPTION, [] );
+
+		return is_array( $value ) ? $value : [];
+
+	}
+
+	/**
+	 * Exclude a source from automatic trust, or restore it.
+	 *
+	 * @param string $source Source key.
+	 * @param bool   $blocked New state.
+	 * @return void
+	 */
+	public static function set_blocked( $source, $blocked ) {
+
+		$value = self::blocked();
+
+		if ( $blocked ) {
+
+			$value[ $source ] = true;
+
+		} else {
+
+			unset( $value[ $source ] );
+
+		}
+
+		update_option( self::BLOCK_OPTION, $value, false );
+
+	}
+
+	/**
+	 * Read a record's path scope; records from older versions hold a single path.
+	 *
+	 * @param array $row Inventory record.
+	 * @return string[] Exact paths, or a single '*'.
+	 */
+	public static function paths( $row ) {
+
+		if ( ! empty( $row['paths'] ) && is_array( $row['paths'] ) ) {
+
+			return array_values( $row['paths'] );
+
+		}
+
+		return isset( $row['path'] ) && '' !== $row['path'] ? [ $row['path'] ] : [];
+
+	}
+
+	/**
+	 * Whether an approved exact-text record applies on a path.
+	 *
+	 * @param array  $row Inventory record.
+	 * @param string $path Request path without query parameters.
+	 * @return bool
+	 */
+	public static function allows( $row, $path ) {
+
+		if ( empty( $row['approved'] ) || ! empty( $row['origin'] ) || ! in_array( $row['type'] ?? '', [ 'script', 'style' ], true ) ) {
+
+			return false;
+
+		}
+
+		$paths = self::paths( $row );
+
+		return in_array( '*', $paths, true ) || in_array( $path, $paths, true );
+
+	}
+
+	/**
+	 * Approve or revoke every record of one source, or of all sources with "*".
+	 *
+	 * @param string $source Source key or "*".
+	 * @param bool   $approved New state.
+	 * @return bool Whether the inventory was updated.
+	 */
+	public static function bulk( $source, $approved ) {
+
+		return self::update(
+			static function ( $rows ) use ( $source, $approved ) {
+
+				foreach ( $rows as $id => $row ) {
+
+					$key = $row['source'] ?? CSPInlineSources::UNKNOWN;
+
+					if ( '*' !== $source && $key !== $source ) {
+
+						continue;
+
+					}
+
+					$rows[ $id ] = self::with_approval( $row, $approved );
+
+					unset( $rows[ $id ]['revoked'] );
+
+				}
+
+				return $rows;
+
+			}
+		);
+
+	}
+
+	/**
+	 * Apply an approval decision. An approved record covers every page unless the owner edited its scope.
+	 *
+	 * @param array $row Inventory record.
+	 * @param bool  $approved New state.
+	 * @return array
+	 */
+	public static function with_approval( $row, $approved ) {
+
+		$row['approved'] = $approved;
+
+		if ( $approved && empty( $row['scoped'] ) ) {
+
+			$row['paths'] = [ '*' ];
+			$row['path']  = '*';
+
+		}
+
+		return $row;
+
+	}
+
+	/**
+	 * Forget pending records a completed scan no longer found.
+	 *
+	 * @param int $since Scan start time.
+	 * @return bool Whether the inventory was updated.
+	 */
+	public static function prune( $since ) {
+
+		return self::update(
+			static function ( $rows ) use ( $since ) {
+
+				return array_filter(
+					$rows,
+					static function ( $row ) use ( $since ) {
+
+						return ! empty( $row['approved'] ) || (int) ( $row['last_seen'] ?? 0 ) >= $since;
+
+					}
+				);
+
+			}
+		);
+
+	}
+
+	/**
+	 * Persist a mutation against the latest inventory, under an atomic lease.
+	 *
+	 * @param callable $callback Receives the latest rows and returns the new rows.
+	 * @return bool Whether the mutation acquired the lease.
+	 */
+	public static function update( $callback ) {
+
+		return CSPInlineLock::run(
+			'rules',
+			static function () use ( $callback ) {
+
+				wp_cache_delete( self::OPTION, 'options' );
+
+				$rows = $callback( self::all() );
+
+				if ( ! is_array( $rows ) ) {
+
+					return false;
+
+				}
+
+				update_option( self::OPTION, $rows, false );
+
+				return true;
+
+			}
+		);
+
+	}
+
+	/**
+	 * Add one observed page to a pending record's scope.
+	 *
+	 * @param array  $row  Pending inventory record.
+	 * @param string $path Page where the code was seen.
+	 * @return array
+	 */
+	private static function with_observed_path( $row, $path ) {
+
+		$paths = self::paths( $row );
+
+		if ( in_array( '*', $paths, true ) || in_array( $path, $paths, true ) ) {
+
+			return $row;
+
+		}
+
+		$paths[]      = $path;
+		$row['paths'] = count( $paths ) > self::PATH_LIMIT ? [ '*' ] : $paths;
+		$row['path']  = $row['paths'][0];
+
+		return $row;
+
+	}
+
+	/**
+	 * Add pending observations, preserving approvals and scopes the administrator saved.
+	 *
+	 * Discovery widens only pending records nobody has edited, and never approves one.
+	 *
+	 * @param array $observations Captured records.
+	 * @return bool Whether the inventory was updated.
+	 */
+	public static function observe( $observations ) {
+
+		return self::update(
+			static function ( $rows ) use ( $observations ) {
+
+				foreach ( $observations as $row ) {
+
+					$id = self::key( $row['type'], $row['digest'], $row['origin'] );
+
+					if ( isset( $rows[ $id ] ) ) {
+
+						$rows[ $id ]['last_seen'] = time();
+						$rows[ $id ]['source']    = $row['source'] ?? ( $rows[ $id ]['source'] ?? CSPInlineSources::UNKNOWN );
+
+						if ( empty( $rows[ $id ]['approved'] ) && empty( $rows[ $id ]['scoped'] ) ) {
+
+							$rows[ $id ] = self::with_observed_path( $rows[ $id ], $row['path'] );
+
+						}
+
+					} elseif ( count( $rows ) < self::LIMIT ) {
+
+						$rows[ $id ] = array_merge(
+							$row,
+							[
+								'approved'  => false,
+								'source'    => $row['source'] ?? CSPInlineSources::UNKNOWN,
+								'last_seen' => time(),
+							]
+						);
+
+					}
+
+				}
+
+				return $rows;
+
+			}
+		);
+
+	}
+
+}

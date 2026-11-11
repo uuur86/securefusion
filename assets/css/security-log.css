@@ -348,6 +348,11 @@
 	color: #856404;
 }
 
+.fynd-sf-login-log .fynd-sf-type-badge.fynd-sf-type-oversized_request {
+	background: #fff3cd;
+	color: #856404;
+}
+
 .fynd-sf-login-log .fynd-sf-type-badge.fynd-sf-type-bad_request {
 	background: #fcf0f1;
 	color: #dc3545;

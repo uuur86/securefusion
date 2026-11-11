@@ -20,7 +20,9 @@ use WaspCreators\Wasp;
 
 // If uninstall not called from WordPress, then exit.
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
+
 	exit;
+
 }
 
 require_once __DIR__ . '/vendor/autoload.php';
@@ -35,6 +37,7 @@ require_once __DIR__ . '/vendor/autoload.php';
  * @return void
  */
 function securefusion_uninstall_site_data() {
+
 	global $wpdb;
 
 	// ──────────────────────────────────────────────
@@ -49,8 +52,18 @@ function securefusion_uninstall_site_data() {
 	$wasp->remove_settings();
 
 	delete_option( 'securefusion_db_version' );
+	delete_option( 'securefusion_db_verified' );
+	delete_option( 'securefusion_db_error' );
+	delete_option( 'securefusion_log_redaction' );
+	delete_option( 'securefusion_inline_rules' );
+	delete_option( 'securefusion_inline_blocked_sources' );
+	delete_option( 'securefusion_inline_scan' );
 	delete_option( 'securefusion_settings_layer' );
 	delete_option( 'securefusion_settings_backup_premultisite' );
+	delete_option( 'securefusion_cloudflare_seen' );
+
+	// Dismissed notifications, stored per user and site.
+	delete_metadata( 'user', 0, $wpdb->get_blog_prefix() . 'securefusion_notices', '', true );
 
 	// ──────────────────────────────────────────────
 	// 2. Per-site Transients.
@@ -89,6 +102,7 @@ function securefusion_uninstall_site_data() {
 	foreach ( $tables_to_drop as $table ) {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
 		$wpdb->query( 'DROP TABLE IF EXISTS ' . esc_sql( $table ) );
+
 	}
 
 	// ──────────────────────────────────────────────
@@ -105,14 +119,20 @@ function securefusion_uninstall_site_data() {
 	];
 
 	foreach ( $cache_keys as $key ) {
+
 		wp_cache_delete( $key, $cache_group );
+
 	}
 
 	// Flush entire cache group if the persistent cache backend supports it (WP 6.1+).
 	if ( function_exists( 'wp_cache_flush_group' ) ) {
+
 		wp_cache_flush_group( $cache_group );
+
 	}
+
 }
+
 
 
 /**
@@ -125,6 +145,7 @@ function securefusion_uninstall_site_data() {
  * @return void
  */
 function securefusion_uninstall_network_data() {
+
 	global $wpdb;
 
 	// ──────────────────────────────────────────────
@@ -139,6 +160,11 @@ function securefusion_uninstall_network_data() {
 	$wasp->remove_settings();
 
 	delete_site_option( 'securefusion_db_version' );
+
+	// CSP cache driver: its block in wp-config.php and the self-test result.
+	\SecureFusion\Lib\CSPCacheSetup::remove();
+
+	delete_site_option( 'securefusion_csp_driver' );
 
 	// Network defaults (network-activated multisite).
 	delete_site_option( 'securefusion_network_settings' );
@@ -172,10 +198,14 @@ function securefusion_uninstall_network_data() {
 	];
 
 	foreach ( $pand_notice_ids as $notice_id ) {
+
 		$pand_cache_key = 'pand-' . md5( $notice_id );
+
 		delete_option( $pand_cache_key );
 		delete_site_option( $pand_cache_key );
+
 	}
+
 }
 
 
@@ -184,6 +214,7 @@ function securefusion_uninstall_network_data() {
 // or just the single site.
 // ──────────────────────────────────────────────────────
 if ( is_multisite() ) {
+
 	global $wpdb;
 
 	// 1. Clean up each blog's per-site data.
@@ -191,15 +222,18 @@ if ( is_multisite() ) {
 	$securefusion_blog_ids = $wpdb->get_col( "SELECT blog_id FROM {$wpdb->blogs}" );
 
 	foreach ( $securefusion_blog_ids as $securefusion_blog_id ) {
+
 		switch_to_blog( $securefusion_blog_id );
 		securefusion_uninstall_site_data();
 		restore_current_blog();
+
 	}
 
 	// 2. Clean up network-wide data (once, outside the loop).
 	securefusion_uninstall_network_data();
 
 } else {
+
 	// Single site: all data is per-site.
 	securefusion_uninstall_site_data();
 
@@ -209,7 +243,11 @@ if ( is_multisite() ) {
 	];
 
 	foreach ( $securefusion_pand_notice_ids as $securefusion_pand_notice_id ) {
+
 		$securefusion_pand_cache_key = 'pand-' . md5( $securefusion_pand_notice_id );
+
 		delete_option( $securefusion_pand_cache_key );
+
 	}
+
 }

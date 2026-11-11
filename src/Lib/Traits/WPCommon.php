@@ -9,7 +9,9 @@
 namespace SecureFusion\Lib\Traits;
 
 if ( ! defined( 'ABSPATH' ) ) {
+
 	exit; // Exit if accessed directly.
+
 }
 
 use Exception;
@@ -32,17 +34,23 @@ trait WPCommon {
 	 * @return bool True if the current screen is in the menu pages, false otherwise.
 	 */
 	public function check_admin_menu_screen( $menu_pages ) {
+
 		$screen = get_current_screen();
 
-		if ( ! is_array( $menu_pages ) ) {
+		if ( ! $screen instanceof \WP_Screen || ! is_array( $menu_pages ) ) {
+
 			return false;
+
 		}
 
 		if ( \in_array( $screen->id, $menu_pages, true ) ) {
+
 			return true;
+
 		}
 
 		return false;
+
 	}
 
 
@@ -58,11 +66,15 @@ trait WPCommon {
 	 * @return array|string|null Plugin settings or specific setting value.
 	 */
 	public function get_settings( $name = null ) {
+
 		if ( ! empty( $name ) ) {
+
 			return Settings::get( $name );
+
 		}
 
 		return Settings::all();
+
 	}
 
 
@@ -78,10 +90,12 @@ trait WPCommon {
 	 * @return bool True if settings were updated, false otherwise.
 	 */
 	public function set_settings( $name, $value ) {
+
 		$settings          = Settings::site_values();
 		$settings[ $name ] = $value;
 
 		return update_option( Settings::SITE_OPTION, $settings );
+
 	}
 
 
@@ -93,14 +107,18 @@ trait WPCommon {
 	 * @return string Requested page.
 	 */
 	public function get_requested_page() {
+
 		if ( ! isset( $_SERVER['REQUEST_URI'] ) ) {
+
 			return '';
+
 		}
 
-		$requests       = wp_parse_url( sanitize_url( wp_unslash( $_SERVER['REQUEST_URI'] ) ) );
-		$requested_page = trim( basename( $requests['path'] ), '\\/' );
+		// A malformed address such as "//" has no path.
+		$path = wp_parse_url( sanitize_url( wp_unslash( $_SERVER['REQUEST_URI'] ) ), PHP_URL_PATH );
 
-		return $requested_page;
+		return is_string( $path ) ? trim( basename( $path ), '\\/' ) : '';
+
 	}
 
 
@@ -111,7 +129,9 @@ trait WPCommon {
 	 * @return string New login URL.
 	 */
 	public function get_new_login_url() {
+
 		return trim( $this->get_settings( 'custom_login_url' ), '\\/' );
+
 	}
 
 
@@ -124,6 +144,7 @@ trait WPCommon {
 	 * @return bool True if it's a login page, false otherwise.
 	 */
 	public function is_login_page( $old = true ) {
+
 		global $pagenow;
 
 		$login_dir      = [ 'wp-admin', 'admin', 'login' ];
@@ -134,10 +155,13 @@ trait WPCommon {
 		$is_login_page = ( $wp_login || $is_login_page );
 
 		if ( $old ) {
+
 			return $is_login_page;
+
 		}
 
 		return ( $requested_page === $this->get_new_login_url() );
+
 	}
 
 
@@ -150,18 +174,25 @@ trait WPCommon {
 	 * @throws Exception If there is no filesystem in this WordPress version.
 	 */
 	protected function filesystem() {
+
 		global $wp_filesystem;
 
 		if ( empty( $wp_filesystem ) ) {
+
 			require_once ABSPATH . '/wp-admin/includes/file.php';
+
 			\WP_Filesystem();
+
 		}
 
 		if ( empty( $wp_filesystem ) ) {
+
 			throw new Exception( 'There is no filesystem in this WordPress version' );
+
 		}
 
 		return $wp_filesystem;
+
 	}
 
 
@@ -174,13 +205,17 @@ trait WPCommon {
 	 * @return array Merged array.
 	 */
 	protected function array_merge_values( array $arrays ) {
+
 		$result = [];
 
 		foreach ( $arrays as $array ) {
+
 			$result = array_merge( $result, $array );
+
 		}
 
 		return $result;
+
 	}
 
 
@@ -192,7 +227,9 @@ trait WPCommon {
 	 * @return bool True if private/local, false otherwise.
 	 */
 	public function is_private_ip( $ip ) {
+
 		return filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE ) === false;
+
 	}
 
 
@@ -204,7 +241,9 @@ trait WPCommon {
 	 * @return bool True if public, false otherwise.
 	 */
 	public function is_public_ip( $ip ) {
+
 		return filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE ) !== false;
+
 	}
 
 
@@ -220,25 +259,32 @@ trait WPCommon {
 	 * @return string The CIDR notation (e.g. '192.168.1.0/28') or exact IP (e.g. '192.168.1.5').
 	 */
 	public function calculate_cidr( $range_prefix, $min_last_octet, $max_last_octet ) {
+
 		$min = (int) $min_last_octet;
 		$max = (int) $max_last_octet;
 
 		if ( $min === $max ) {
+
 			return $range_prefix . '.' . $min;
+
 		}
 
 		$diff = $min ^ $max;
 		$mask = 32;
 
 		while ( $diff > 0 ) {
+
 			$diff >>= 1;
+
 			--$mask;
+
 		}
 
 		$shift_amount       = 32 - $mask;
 		$network_last_octet = $min & ( ~ ( ( 1 << $shift_amount ) - 1 ) & 0xFF );
 
 		return $range_prefix . '.' . $network_last_octet . '/' . $mask;
+
 	}
 
 
@@ -252,8 +298,11 @@ trait WPCommon {
 	 * @return bool
 	 */
 	public function ip_in_cidr( $ip, $cidr ) {
+
 		if ( strpos( $cidr, '/' ) === false ) {
+
 			$cidr .= ( strpos( $cidr, ':' ) === false ? '/32' : '/128' );
+
 		}
 		list( $subnet, $bits ) = explode( '/', $cidr );
 
@@ -261,24 +310,35 @@ trait WPCommon {
 		$subnet_bytes = inet_pton( $subnet );
 
 		if ( $ip_bytes === false || $subnet_bytes === false ) {
+
 			return false;
+
 		}
 
 		if ( strlen( $ip_bytes ) !== strlen( $subnet_bytes ) ) {
+
 			return false;
+
 		}
 
 		$ip_bin = '';
+
 		foreach ( str_split( $ip_bytes ) as $char ) {
+
 			$ip_bin .= str_pad( decbin( ord( $char ) ), 8, '0', STR_PAD_LEFT );
+
 		}
 
 		$subnet_bin = '';
+
 		foreach ( str_split( $subnet_bytes ) as $char ) {
+
 			$subnet_bin .= str_pad( decbin( ord( $char ) ), 8, '0', STR_PAD_LEFT );
+
 		}
 
 		return substr( $ip_bin, 0, (int) $bits ) === substr( $subnet_bin, 0, (int) $bits );
+
 	}
 
 
@@ -291,7 +351,49 @@ trait WPCommon {
 	 * @return bool True if trusted, false otherwise.
 	 */
 	public function is_trusted_proxy_ip( $ip ) {
-		$trusted_proxies = [
+
+		if ( $this->is_cloudflare_ip( $ip ) ) {
+
+			return true;
+
+		}
+
+		$sucuri_ranges = [
+			// Sucuri IPv4.
+			'192.88.134.0/23',
+			'185.93.228.0/22',
+			'66.248.200.0/22',
+			'208.109.0.0/22',
+			// Sucuri IPv6.
+			'2a02:fe80::/29',
+		];
+
+		foreach ( $sucuri_ranges as $proxy ) {
+
+			if ( $this->ip_in_cidr( $ip, $proxy ) ) {
+
+				return true;
+
+			}
+
+		}
+
+		return false;
+
+	}
+
+
+
+	/**
+	 * Check if IP belongs to Cloudflare's edge network.
+	 *
+	 * @param string $ip The IP to check.
+	 *
+	 * @return bool True if it is a Cloudflare address, false otherwise.
+	 */
+	private function is_cloudflare_ip( $ip ) {
+
+		$cloudflare_ranges = [
 			// Cloudflare IPv4.
 			'173.245.48.0/20',
 			'103.21.244.0/22',
@@ -316,22 +418,20 @@ trait WPCommon {
 			'2405:8100::/32',
 			'2a06:98c0::/29',
 			'2c0f:f248::/32',
-			// Sucuri IPv4.
-			'192.88.134.0/23',
-			'185.93.228.0/22',
-			'66.248.200.0/22',
-			'208.109.0.0/22',
-			// Sucuri IPv6.
-			'2a02:fe80::/29',
 		];
 
-		foreach ( $trusted_proxies as $proxy ) {
+		foreach ( $cloudflare_ranges as $proxy ) {
+
 			if ( $this->ip_in_cidr( $ip, $proxy ) ) {
+
 				return true;
+
 			}
+
 		}
 
 		return false;
+
 	}
 
 
@@ -342,49 +442,111 @@ trait WPCommon {
 	 * @return string Client IP.
 	 */
 	protected function get_client_ip() {
+
 		$server_var  = wp_unslash( $_SERVER );
 		$remote_addr = isset( $server_var['REMOTE_ADDR'] ) ? trim( $server_var['REMOTE_ADDR'] ) : '';
 
-		// If REMOTE_ADDR is a known trusted proxy (e.g. Cloudflare, Sucuri), we should check forwarding headers.
+		if ( ! filter_var( $remote_addr, FILTER_VALIDATE_IP ) ) {
+
+			return '';
+
+		}
+
 		$is_trusted_proxy = $this->is_trusted_proxy_ip( $remote_addr );
 
-		// If REMOTE_ADDR is a public IP and NOT a trusted proxy, trust it directly to prevent spoofing via custom headers.
-		if ( ! empty( $remote_addr ) && $this->is_public_ip( $remote_addr ) && ! $is_trusted_proxy ) {
+		// A public peer that is not a known proxy is the client; its headers prove nothing.
+		if ( $this->is_public_ip( $remote_addr ) && ! $is_trusted_proxy ) {
+
 			return $remote_addr;
+
 		}
 
-		// Otherwise, if REMOTE_ADDR is a private IP (e.g. Docker proxy, local env) OR a trusted proxy, check forwarding headers.
-		$ipaddress = '';
+		// Cloudflare overwrites this header at its edge, so it is reliable only from Cloudflare.
+		if ( $this->is_cloudflare_ip( $remote_addr ) && isset( $server_var['HTTP_CF_CONNECTING_IP'] ) ) {
 
-		if ( isset( $server_var['HTTP_CF_CONNECTING_IP'] ) ) {
-			$ipaddress = $server_var['HTTP_CF_CONNECTING_IP'];
-		} elseif ( isset( $server_var['HTTP_TRUE_CLIENT_IP'] ) ) {
-			$ipaddress = $server_var['HTTP_TRUE_CLIENT_IP'];
-		} elseif ( isset( $server_var['HTTP_CLIENT_IP'] ) ) {
-			$ipaddress = $server_var['HTTP_CLIENT_IP'];
-		} elseif ( isset( $server_var['HTTP_X_FORWARDED_FOR'] ) ) {
-			$ipaddress = $server_var['HTTP_X_FORWARDED_FOR'];
-		} elseif ( isset( $server_var['HTTP_X_FORWARDED'] ) ) {
-			$ipaddress = $server_var['HTTP_X_FORWARDED'];
-		} elseif ( isset( $server_var['HTTP_FORWARDED_FOR'] ) ) {
-			$ipaddress = $server_var['HTTP_FORWARDED_FOR'];
-		} elseif ( isset( $server_var['HTTP_FORWARDED'] ) ) {
-			$ipaddress = $server_var['HTTP_FORWARDED'];
-		} else {
-			$ipaddress = $remote_addr;
+			$connecting_ip = filter_var( trim( $server_var['HTTP_CF_CONNECTING_IP'] ), FILTER_VALIDATE_IP );
+
+			if ( $connecting_ip ) {
+
+				return $connecting_ip;
+
+			}
+
 		}
 
-		// Multiple IP addresses can be returned, so let's take the first one.
-		if ( strpos( $ipaddress, ',' ) !== false ) {
-			$ipaddress = explode( ',', $ipaddress );
-			$ipaddress = $ipaddress[0] ?? '';
+		// Client-IP, True-Client-IP and similar headers are ignored: proxies pass them through unchanged.
+		if ( isset( $server_var['HTTP_X_FORWARDED_FOR'] ) ) {
+
+			$forwarded_ip = $this->client_from_forwarded_chain( $server_var['HTTP_X_FORWARDED_FOR'] );
+
+			if ( '' !== $forwarded_ip ) {
+
+				return $forwarded_ip;
+
+			}
+
 		}
 
-		$ipaddress = trim( $ipaddress );
-		$ipaddress = filter_var( $ipaddress, FILTER_VALIDATE_IP );
+		// Local reverse proxies commonly set only this header.
+		if ( ! $is_trusted_proxy && isset( $server_var['HTTP_X_REAL_IP'] ) ) {
 
-		return $ipaddress ? $ipaddress : $remote_addr;
+			$real_ip = filter_var( trim( $server_var['HTTP_X_REAL_IP'] ), FILTER_VALIDATE_IP );
+
+			if ( $real_ip ) {
+
+				return $real_ip;
+
+			}
+
+		}
+
+		return $remote_addr;
+
 	}
+
+
+
+	/**
+	 * Resolve the client from X-Forwarded-For, reading from the right.
+	 *
+	 * Proxies append the peer they saw, so entries on the left are client-supplied. The first
+	 * public address that is not a known proxy is the client. In an all-private chain, such as
+	 * an intranet, the leftmost address is used.
+	 *
+	 * @param string $header X-Forwarded-For value.
+	 *
+	 * @return string Client IP, or empty if the chain holds no usable address.
+	 */
+	private function client_from_forwarded_chain( $header ) {
+
+		$private_ip = '';
+
+		foreach ( array_reverse( array_slice( explode( ',', (string) $header ), -20 ) ) as $entry ) {
+
+			$entry = trim( $entry );
+
+			if ( ! filter_var( $entry, FILTER_VALIDATE_IP ) ) {
+
+				continue;
+
+			}
+
+			if ( $this->is_private_ip( $entry ) ) {
+
+				$private_ip = $entry;
+
+			} elseif ( ! $this->is_trusted_proxy_ip( $entry ) ) {
+
+				return $entry;
+
+			}
+
+		}
+
+		return $private_ip;
+
+	}
+
 	/**
 	 * Render the unified plugin page header.
 	 *
@@ -398,6 +560,7 @@ trait WPCommon {
 	 * @return void
 	 */
 	public function render_header( $title, $description, $custom_actions = [] ) {
+
 		$plugin_url    = \plugins_url( '/', SECUREFUSION_BASENAME );
 		$changelog_url = 'https://fyndsoft.com/portfolio/securefusion/#changelog';
 		$products_url  = 'https://fyndsoft.com/portfolio/';
@@ -441,6 +604,7 @@ trait WPCommon {
 								'rel'    => [],
 							],
 						];
+
 						echo wp_kses( $action_html, $allowed_tags );
 						?>
 					<?php endforeach; ?>
@@ -455,4 +619,5 @@ trait WPCommon {
 		</header>
 		<?php
 	}
+
 }

@@ -12,7 +12,9 @@
 namespace SecureFusion\Lib;
 
 if ( ! defined( 'ABSPATH' ) ) {
+
 	exit; // Exit if accessed directly.
+
 }
 
 use SecureFusion\Lib\Traits\WPCommon;
@@ -37,8 +39,11 @@ class UserEnumeration {
 	 * @return void
 	 */
 	public function init() {
+
 		if ( ! $this->get_settings( 'hide_usernames' ) ) {
+
 			return;
+
 		}
 
 		add_filter( 'request', [ $this, 'block_author_query' ] );
@@ -46,6 +51,7 @@ class UserEnumeration {
 		add_filter( 'oembed_response_data', [ $this, 'filter_oembed_author' ], 10, 2 );
 		add_filter( 'comment_class', [ $this, 'filter_comment_class' ], 10, 4 );
 		add_filter( 'rest_pre_dispatch', [ $this, 'restrict_users_route' ], 5, 3 );
+
 	}
 
 
@@ -62,15 +68,21 @@ class UserEnumeration {
 	public function block_author_query( $query_vars ) {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Presence check only, nothing is processed.
 		if ( is_admin() || ! isset( $_GET['author'] ) ) {
+
 			return $query_vars;
+
 		}
 
 		if ( '' === (string) get_option( 'permalink_structure' ) ) {
+
 			return $query_vars;
+
 		}
 
 		if ( current_user_can( 'list_users' ) ) {
+
 			return $query_vars;
+
 		}
 
 		unset( $query_vars['author'] );
@@ -79,6 +91,7 @@ class UserEnumeration {
 		$query_vars['error'] = '404';
 
 		return $query_vars;
+
 	}
 
 
@@ -93,6 +106,7 @@ class UserEnumeration {
 	 * @return array Query arguments.
 	 */
 	public function exclude_admins_from_sitemap( $args ) {
+
 		$excluded = isset( $args['role__not_in'] ) ? (array) $args['role__not_in'] : [];
 
 		$excluded[] = 'administrator';
@@ -100,6 +114,7 @@ class UserEnumeration {
 		$args['role__not_in'] = array_values( array_unique( $excluded ) );
 
 		return $args;
+
 	}
 
 
@@ -112,25 +127,35 @@ class UserEnumeration {
 	 * @return array Response data.
 	 */
 	public function filter_oembed_author( $data, $post ) {
+
 		if ( ! is_array( $data ) || ! $post instanceof \WP_Post ) {
+
 			return $data;
+
 		}
 
 		$user = get_userdata( (int) $post->post_author );
 
 		if ( ! $user instanceof \WP_User ) {
+
 			return $data;
+
 		}
 
 		if ( isset( $data['author_name'] ) && self::name_reveals_login( $data['author_name'], $user ) ) {
+
 			unset( $data['author_name'] );
+
 		}
 
 		if ( isset( $data['author_url'] ) && self::nicename_reveals_login( $user ) ) {
+
 			unset( $data['author_url'] );
+
 		}
 
 		return $data;
+
 	}
 
 
@@ -145,14 +170,19 @@ class UserEnumeration {
 	 * @return string[] Comment classes.
 	 */
 	public function filter_comment_class( $classes, $css_class = '', $comment_id = 0, $comment = null ) {
+
 		if ( ! is_array( $classes ) || ! $comment instanceof \WP_Comment || empty( $comment->user_id ) ) {
+
 			return $classes;
+
 		}
 
 		$user = get_userdata( (int) $comment->user_id );
 
 		if ( ! $user instanceof \WP_User || ! self::nicename_reveals_login( $user ) ) {
+
 			return $classes;
+
 		}
 
 		$leaking = 'comment-author-' . sanitize_html_class( $user->user_nicename, (string) $user->ID );
@@ -161,10 +191,13 @@ class UserEnumeration {
 			array_filter(
 				$classes,
 				static function ( $css ) use ( $leaking ) {
+
 					return $css !== $leaking;
+
 				}
 			)
 		);
+
 	}
 
 
@@ -182,26 +215,37 @@ class UserEnumeration {
 	 * @return mixed Unchanged result, or a WP_Error when the request is blocked.
 	 */
 	public function restrict_users_route( $result, $server, $request ) {
+
 		if ( ! $this->is_serving_rest_request() ) {
+
 			return $result;
+
 		}
 
 		if ( is_wp_error( $result ) || ! $request instanceof \WP_REST_Request ) {
+
 			return $result;
+
 		}
 
 		// CORS preflight requests never carry credentials.
 		if ( 'OPTIONS' === $request->get_method() ) {
+
 			return $result;
+
 		}
 
 		if ( is_user_logged_in() || ! self::is_users_route( $request->get_route() ) ) {
+
 			return $result;
+
 		}
 
 		// Same filter as Middleware::is_rest_api_access_allowed() (documented there).
 		if ( apply_filters( 'securefusion_rest_allow_request', false, $request, $this->get_client_ip() ) ) {
+
 			return $result;
+
 		}
 
 		return new \WP_Error(
@@ -209,6 +253,7 @@ class UserEnumeration {
 			esc_html__( 'Sorry, you are not allowed to list users.', 'secuplug' ),
 			array( 'status' => rest_authorization_required_code() )
 		);
+
 	}
 
 
@@ -219,7 +264,9 @@ class UserEnumeration {
 	 * @return bool
 	 */
 	protected function is_serving_rest_request() {
+
 		return defined( 'REST_REQUEST' ) && REST_REQUEST;
+
 	}
 
 
@@ -231,8 +278,11 @@ class UserEnumeration {
 	 * @return bool
 	 */
 	public static function is_users_route( $route ) {
+
 		if ( ! is_string( $route ) || '' === $route ) {
+
 			return false;
+
 		}
 
 		$route = substr( $route, 0, self::REST_ROUTE_MAX_LENGTH );
@@ -242,6 +292,7 @@ class UserEnumeration {
 
 		// A regex failure must not open the endpoint silently.
 		return false === $matched ? true : 1 === $matched;
+
 	}
 
 
@@ -256,14 +307,18 @@ class UserEnumeration {
 	 * @return bool
 	 */
 	public static function nicename_reveals_login( \WP_User $user ) {
+
 		$login    = (string) $user->user_login;
 		$nicename = (string) $user->user_nicename;
 
 		if ( '' === $login || '' === $nicename ) {
+
 			return false;
+
 		}
 
 		return strtolower( $login ) === strtolower( $nicename ) || sanitize_title( $login ) === $nicename;
+
 	}
 
 
@@ -276,13 +331,18 @@ class UserEnumeration {
 	 * @return bool
 	 */
 	public static function name_reveals_login( $name, \WP_User $user ) {
+
 		$name  = trim( (string) $name );
 		$login = (string) $user->user_login;
 
 		if ( '' === $name || '' === $login ) {
+
 			return false;
+
 		}
 
 		return strtolower( $name ) === strtolower( $login ) || sanitize_title( $name ) === sanitize_title( $login );
+
 	}
+
 }

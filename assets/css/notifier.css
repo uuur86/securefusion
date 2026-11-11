@@ -1,0 +1,193 @@
+/**
+ * Security notifications (Bastion). Printed on the site and in wp-admin for administrators only.
+ *
+ * It lives on pages styled by any theme, so every rule starts from "all: unset" or "all: initial"
+ * and names its own values instead of inheriting them.
+ *
+ * @package securefusion
+ */
+
+.securefusion-toasts {
+	all: initial;
+	position: fixed;
+	z-index: 100001; /* above the admin bar */
+	right: 16px;
+	bottom: 16px;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	width: 340px;
+	max-width: calc(100vw - 32px);
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+	font-size: 13px;
+	line-height: 1.45;
+	color: #1f2a2e;
+}
+
+.securefusion-toast,
+.securefusion-toast * {
+	all: unset;
+	box-sizing: border-box;
+	font-family: inherit;
+}
+
+.securefusion-toast {
+	display: block;
+	padding: 12px 12px 10px 14px;
+	background: #fff;
+	border: 1px solid #b3c1c3;
+	border-left: 4px solid #1e928b;
+	border-radius: 6px;
+	box-shadow: 0 6px 20px rgba(31, 42, 46, 0.18);
+	font-size: 13px;
+	line-height: 1.45;
+	color: #1f2a2e;
+	animation: securefusion-toast-in 180ms ease-out;
+}
+
+.securefusion-toast--csp {
+	border-left-color: #a15c00;
+}
+
+.securefusion-toast[aria-busy="true"] {
+	opacity: 0.7;
+}
+
+.securefusion-toast__head {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 8px;
+}
+
+.securefusion-toast__title {
+	display: block;
+	font-weight: 600;
+	font-size: 13px;
+	color: #1f2a2e;
+}
+
+.securefusion-toast__close {
+	flex: none;
+	width: 24px;
+	height: 24px;
+	margin: -4px -4px 0 0;
+	border-radius: 4px;
+	font-size: 18px;
+	line-height: 24px;
+	text-align: center;
+	color: #5d6b71;
+	cursor: pointer;
+}
+
+.securefusion-toast__close:hover {
+	background: #f3f7f7;
+	color: #1f2a2e;
+}
+
+.securefusion-toast__subject {
+	display: block;
+	margin-top: 4px;
+	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+	font-size: 12px;
+	color: #1f2a2e;
+	overflow-wrap: anywhere;
+}
+
+.securefusion-toast__text {
+	display: block;
+	margin-top: 4px;
+	color: #3b4a50;
+}
+
+.securefusion-toast__actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-top: 10px;
+}
+
+.securefusion-toast__actions:empty {
+	display: none;
+}
+
+.securefusion-toast__button {
+	display: inline-flex;
+	align-items: center;
+	height: 28px;
+	padding: 0 10px;
+	background: #fff;
+	border: 1px solid #b3c1c3;
+	border-radius: 4px;
+	font-size: 12px;
+	font-weight: 600;
+	color: #1f2a2e;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+.securefusion-toast__button:hover {
+	background: #f3f7f7;
+	color: #1f2a2e;
+}
+
+.securefusion-toast__button--primary {
+	background: #0a7e78;
+	border-color: #0a7e78;
+	color: #fff;
+}
+
+.securefusion-toast__button--primary:hover {
+	background: #036d69;
+	border-color: #036d69;
+	color: #fff;
+}
+
+.securefusion-toast__mute {
+	display: inline-block;
+	margin-top: 8px;
+	font-size: 11px;
+	color: #5d6b71;
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+.securefusion-toast__mute:hover {
+	color: #036d69;
+}
+
+.securefusion-toast button:disabled {
+	opacity: 0.6;
+	cursor: default;
+}
+
+.securefusion-toast__close:focus-visible,
+.securefusion-toast__button:focus-visible,
+.securefusion-toast__mute:focus-visible {
+	outline: 2px solid #1e928b;
+	outline-offset: 2px;
+}
+
+@keyframes securefusion-toast-in {
+	from {
+		opacity: 0;
+		transform: translateY(8px);
+	}
+
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.securefusion-toast {
+		animation: none;
+	}
+}
+
+@media print {
+	.securefusion-toasts {
+		display: none;
+	}
+}

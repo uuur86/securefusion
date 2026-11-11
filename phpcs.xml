@@ -23,7 +23,7 @@
 	<exclude-pattern>dist/*</exclude-pattern>
 
 	<!-- Include the WordPress ruleset, with exclusions for strict checks if desired -->
-	<rule ref="WordPress">
+	<rule ref="../../../shared/dev/phpcs/wordpress.xml">
 		<!-- Allow short array syntax [] instead of array() -->
 		<exclude name="Universal.Arrays.DisallowShortArraySyntax"/>
 		<!-- Allow PSR-4 Class file naming instead of class-*.php -->

@@ -396,6 +396,20 @@
 	color: var(--fsf-ink-2);
 }
 
+.fsf .form-table .fsf-field-warning {
+	display: block;
+	max-width: 64ch;
+	margin-block-start: var(--fsf-2);
+	padding: var(--fsf-2) var(--fsf-3);
+	border-inline-start: 3px solid var(--fsf-high);
+	background: var(--fsf-high-wash);
+	color: var(--fsf-ink);
+}
+
+.fsf .form-table .fsf-field-warning__label {
+	font-weight: 600;
+}
+
 .fsf .form-table .url-text {
 	color: var(--fsf-ink-3);
 	font-family: var(--fsf-mono);
@@ -842,3 +856,235 @@
 		transition: none !important;
 	}
 }
+
+/* CSP rows use a fixed label column; providers remain compact cards. */
+.fsf .form-table tbody:has(input[name*="[csp_service_"]) {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+}
+
+.fsf .form-table tbody:has(input[name*="[csp_service_"]) > tr {
+	display: grid;
+	grid-template-columns: 240px minmax(0, 1fr);
+	width: 100%;
+}
+
+.fsf .form-table tbody:has(input[name*="[csp_service_"]) > tr > th,
+.fsf .form-table tbody:has(input[name*="[csp_service_"]) > tr > td {
+	width: auto;
+	min-width: 0;
+	padding: 16px 20px;
+}
+
+.fsf .form-table tr:has(input[name*="[csp_service_"]) {
+	grid-template-columns: minmax(0, 1fr) !important;
+	flex: 1 1 240px;
+	max-width: 330px;
+	align-self: flex-start;
+	padding: 12px;
+	border: 1px solid var(--fsf-line);
+	border-radius: var(--fsf-radius-box);
+}
+
+.fsf .form-table tr:has(input[name*="[csp_service_"]) > th,
+.fsf .form-table tr:has(input[name*="[csp_service_"]) > td {
+	padding: 4px !important;
+}
+
+.fsf .fsf-csp-content {
+	display: none;
+}
+
+.fsf .fsf-csp-detection {
+	display: block;
+	margin-top: 6px;
+	font-size: 12px;
+}
+
+.fsf .fsf-csp-sources {
+	margin-top: 8px;
+	font-size: 12px;
+	overflow-wrap: anywhere;
+}
+
+.fsf .fsf-csp-directive {
+	margin: 12px 0;
+	line-height: 1.6;
+}
+
+.fsf .fsf-csp-directive-name {
+	font-weight: 600;
+}
+
+.fsf .fsf-csp-doc {
+	margin-top: 12px;
+	padding-top: 10px;
+	border-top: 1px solid var(--fsf-line);
+}
+
+.fsf .fsf-csp-doc a {
+	display: inline-block;
+	padding: 4px 0;
+}
+
+.fsf .fsf-csp-disabled {
+	display: none !important;
+}
+
+@media (max-width: 782px) {
+	.fsf .form-table tbody:has(input[name*="[csp_service_"]) > tr {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.fsf .form-table tr:has(input[name*="[csp_service_"]) {
+		max-width: none;
+	}
+}
+
+/* Inline inventory controls use native disclosures and a stable stacked layout. */
+.fsf .fsf-inline-manager {
+	margin: 24px;
+	padding: 20px;
+	border: 1px solid var(--fsf-line);
+	border-radius: var(--fsf-radius-box);
+}
+
+.fsf .fsf-inline-manager summary {
+	cursor: pointer;
+	font-weight: 600;
+	padding: 8px 0;
+}
+
+.fsf .fsf-inline-record,
+.fsf .fsf-inline-manual {
+	margin-top: 12px;
+	padding: 12px 16px;
+	border: 1px solid var(--fsf-line);
+	border-radius: var(--fsf-radius-box);
+}
+
+.fsf .fsf-inline-manager label {
+	display: block;
+	margin: 12px 0;
+}
+
+.fsf .fsf-inline-manager input[type="text"],
+.fsf .fsf-inline-manager textarea,
+.fsf .fsf-inline-manager select {
+	display: block;
+	width: 100%;
+	max-width: 640px;
+	margin-top: 6px;
+}
+
+.fsf .fsf-inline-manager code,
+.fsf .fsf-inline-manager p {
+	overflow-wrap: anywhere;
+}
+
+.fsf .fsf-inline-manager pre {
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+}
+
+.fsf .fsf-inline-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-top: 12px;
+}
+
+.fsf .fsf-inline-status {
+	min-height: 1.5em;
+}
+
+/* Inline discovery: separate progress, current page and actionable failures. */
+.fsf-inline-scan-status { padding: var(--fsf-3) var(--fsf-4); background: var(--fsf-surface-2); border-inline-start: 3px solid var(--fsf-brand); font-weight: 600; }
+.fsf-inline-scan-current { overflow-wrap: anywhere; margin: var(--fsf-1) 0 0; color: var(--fsf-ink-3); font-family: var(--fsf-mono); font-size: var(--fsf-text-sm); }
+.fsf-inline-issues { padding: var(--fsf-3) var(--fsf-4); border: 1px solid var(--fsf-line); border-inline-start: 3px solid var(--fsf-high); border-radius: var(--fsf-radius-box); margin: var(--fsf-3) 0; }
+.fsf-inline-issues[hidden] { display: none; }
+.fsf .fsf-csp-overview { margin: var(--fsf-4) 0; padding: var(--fsf-3) var(--fsf-4); border: 1px solid var(--fsf-line); border-radius: var(--fsf-radius-box); }
+.fsf .fsf-csp-overview h3 { margin: 0 0 var(--fsf-2); font-size: var(--fsf-text-md); font-weight: 600; }
+.fsf .fsf-csp-policy { display: block; padding: var(--fsf-2) var(--fsf-3); background: var(--fsf-surface-2); font-family: var(--fsf-mono); font-size: var(--fsf-text-sm); overflow-wrap: anywhere; user-select: all; }
+.fsf .fsf-csp-policy--block { margin: var(--fsf-2) 0; white-space: pre-wrap; }
+.fsf .fsf-csp-cache__status:empty { display: none; }
+.fsf .fsf-csp-cache--idle { color: var(--fsf-ink-3); border-style: dashed; }
+.fsf .fsf-csp-note { display: block; margin-block-end: var(--fsf-1); }
+.fsf .fsf-csp-badge { display: block; margin-block-start: var(--fsf-1); color: var(--fsf-ink-3); font-size: var(--fsf-text-xs); font-weight: 400; }
+.fsf .form-table tr.fsf-csp-inactive > th { color: var(--fsf-ink-3); }
+.fsf .fsf-inline-filters { display: flex; flex-wrap: wrap; gap: var(--fsf-4); align-items: end; margin: var(--fsf-3) 0; }
+.fsf .fsf-inline-filters label { margin: 0; }
+.fsf .fsf-inline-pending { display: inline-flex; gap: var(--fsf-1); align-items: center; }
+.fsf .fsf-inline-group { border: 1px solid var(--fsf-line); border-radius: var(--fsf-radius-box); margin-block-end: var(--fsf-2); padding: var(--fsf-2) var(--fsf-3); }
+.fsf .fsf-inline-trusted { border: 1px solid var(--fsf-line); border-radius: var(--fsf-radius-box); margin-block-end: var(--fsf-3); padding: var(--fsf-2) var(--fsf-3); }
+.fsf .fsf-inline-trusted > summary { cursor: pointer; font-weight: 600; }
+.fsf .fsf-inline-trusted__row { display: flex; flex-wrap: wrap; gap: var(--fsf-2); align-items: center; padding-block: var(--fsf-1); border-block-start: 1px solid var(--fsf-line); }
+.fsf .fsf-inline-trusted__row .fsf-inline-actions { margin-inline-start: auto; margin-block: 0; }
+.fsf .fsf-inline-group[hidden], .fsf .fsf-inline-record[hidden] { display: none; }
+.fsf .fsf-inline-group > summary { display: flex; flex-wrap: wrap; gap: var(--fsf-2); align-items: center; cursor: pointer; }
+.fsf .fsf-inline-group__name { font-weight: 600; }
+.fsf .fsf-inline-group__count { margin-inline-start: auto; color: var(--fsf-ink-3); font-size: var(--fsf-text-sm); font-variant-numeric: tabular-nums; }
+.fsf .fsf-inline-record > summary { display: flex; flex-wrap: wrap; gap: var(--fsf-2); align-items: center; cursor: pointer; }
+.fsf .fsf-inline-record__name { font-family: var(--fsf-mono); font-size: var(--fsf-text-sm); overflow-wrap: anywhere; }
+.fsf .fsf-inline-tag { padding: 0 var(--fsf-1); border: 1px solid var(--fsf-line); border-radius: var(--fsf-radius); color: var(--fsf-ink-3); font-size: var(--fsf-text-xs); }
+.fsf .fsf-inline-state { font-size: var(--fsf-text-sm); font-weight: 600; }
+.fsf .fsf-inline-state--on { color: var(--fsf-pass); }
+.fsf .fsf-inline-state--off { color: var(--fsf-high); }
+.fsf .fsf-inline-excerpt { max-height: 80px; margin: var(--fsf-2) 0; padding: var(--fsf-2); overflow: auto; background: var(--fsf-surface-2); font-family: var(--fsf-mono); font-size: var(--fsf-text-sm); white-space: pre-wrap; overflow-wrap: anywhere; }
+.fsf-inline-issues summary { font-weight: 600; cursor: pointer; }
+.fsf-inline-scan-errors { padding-left: 20px; list-style: disc; overflow-wrap: anywhere; }
+
+.fsf .fsf-settings-summary {
+	margin: var(--fsf-6);
+	padding: var(--fsf-4) var(--fsf-6);
+	background: var(--fsf-surface-2);
+	border-radius: var(--fsf-radius-box);
+	line-height: 1.65;
+}
+.fsf .fsf-settings-advanced {
+	box-sizing: border-box;
+	min-width: 0;
+	margin: var(--fsf-6);
+	padding: var(--fsf-6);
+	border: 1px solid var(--fsf-line);
+	border-radius: var(--fsf-radius-box);
+}
+.fsf .fsf-settings-advanced > summary {
+	cursor: pointer;
+	font-weight: 600;
+	padding: var(--fsf-2) var(--fsf-3);
+	border-radius: var(--fsf-radius);
+}
+
+.fsf .fsf-settings-advanced > summary:focus-visible {
+	outline: 2px solid var(--fsf-brand-strong);
+	outline-offset: 2px;
+}
+
+/* The disclosure supplies the outer gutter for both cards and the inventory. */
+.fsf .fsf-settings-advanced .fsf-inline-manager {
+	margin: var(--fsf-6) 0 0;
+}
+
+.fsf .tab-content > .form-table:has(input[name*="[csp_service_"]) {
+	width: calc(100% - 2 * var(--fsf-6));
+	margin-inline: var(--fsf-6);
+}
+
+@media (max-width: 782px) {
+	.fsf .fsf-settings-summary,
+	.fsf .fsf-settings-advanced {
+		margin: var(--fsf-4);
+		padding: var(--fsf-4);
+	}
+
+	.fsf .tab-content > .form-table:has(input[name*="[csp_service_"]) {
+		width: calc(100% - 2 * var(--fsf-4));
+		margin-inline: var(--fsf-4);
+	}
+}
+.fsf-settings-advanced input[type="search"] { display: block; width: min(100%, 420px); margin: 8px 0 16px; }
+.fsf-inline-filters { display: flex; gap: 16px; flex-wrap: wrap; margin: 18px 0; }
+.fsf-settings-advanced [hidden] { display: none !important; }
+
