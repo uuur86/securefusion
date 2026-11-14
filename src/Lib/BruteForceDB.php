@@ -47,6 +47,27 @@ class BruteForceDB {
 	const CACHE_TTL = 300;
 
 	/**
+	 * Most range (CIDR) rules read on one request.
+	 *
+	 * Whitelisted ranges are read first, then the newest blocked ranges. New range rules are
+	 * refused once this many exist, and the IP Rules screen warns if older data holds more.
+	 *
+	 * @var int
+	 */
+	const MAX_RANGE_RULES = 200;
+
+	/**
+	 * Schema revision recorded in `securefusion_db_verified` after a verified install.
+	 *
+	 * Raising it runs the install and migration once more on every site, through
+	 * Main::maybe_update_plugin(). Revision 2: `is_range` column, `range_rules` and
+	 * `rule_expiration` indexes on the IP rules table.
+	 *
+	 * @var string
+	 */
+	const SCHEMA_REVISION = '2';
+
+	/**
 	 * Maximum user agent length stored in DB (truncation limit).
 	 *
 	 * @var int

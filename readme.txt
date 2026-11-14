@@ -130,6 +130,7 @@ None, unless you turn on reCAPTCHA. See External services.
 == Changelog ==
 
 = 3.0.0 =
+* Changed: Fewer notifications. Everything blocked on a page shares one box per kind, all hosts in a box are allowed with one click, inline code can be approved from it directly, nothing changes until you press a button, the test-mode reminder waits until a week passes without a new exception, a failing cache driver can be tested again from the notice, and the activity summary comes at most weekly and only in the dashboard.
 * Changed: Content Security Policy is one switch with a test mode. Scripts run only from the site, from hosts that WordPress, the theme or active plugins load, from allowed services, or when approved; `eval` is blocked unless a page needs it. Earlier settings are mapped, and updated sites start in test mode.
 * Added: Service lists (reCAPTCHA, Turnstile, Google Fonts, Cloudflare, tag managers and more). Services that serve code from any account need approval.
 * Added: Page cache support: hashes behind a detected page cache, an optional cache driver in `wp-config.php` for fresh nonces, and cache clearing when the policy changes.
@@ -144,10 +145,15 @@ None, unless you turn on reCAPTCHA. See External services.
 * Fixed: Adding `?embed=1` to an address removed framing protection.
 * Fixed: The REST API block could be bypassed on sub-directory multisite and with `?rest_route=`.
 * Fixed: `data:` could become a script source through an allow list or the site scan.
-* Fixed: Inline hashes broke behind HTML optimizers, and the policy was cut short when output buffers closed early.
+* Fixed: Trusted inline code broke behind HTML optimizers that rewrite it, trim it or defer it into `data:` addresses, and the policy was cut short when output buffers closed early.
 * Fixed: Bundled translations were not loaded. German, French, Spanish and Turkish are complete, and other German locales use the German translation.
 * Fixed: Database tables are verified before installation is marked complete; SSL checks time out sooner.
 * Improved: No DNS lookup on REST API requests from visitors.
+* Improved: Less work on every page view: the XML-RPC server code loads only for XML-RPC requests, and pages that cannot contain approved or revoked inline code are no longer parsed for it.
+* Fixed: The login attempt limit now also applies to XML-RPC and every other password login, and a locked-out address is refused before its password is checked.
+* Fixed: IPv6 range rules, such as the /64 ranges blocked from the comments screen, never matched.
+* Improved: Checking a visitor against IP rules reads only that address and at most 200 range rules, with new indexes; expired blocks are removed by the daily cleanup on every site instead of during page views, and no longer appear as active.
+* Fixed: On network sites, choosing Enforce for the Content Security Policy on a single site was saved as Test, and turning off browser security headers on a single site also turned off its Content Security Policy.
 
 Older versions: see CHANGELOG.md in the plugin folder.
 

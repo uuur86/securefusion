@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-11-11T03:01:39+00:00\n"
+"POT-Creation-Date: 2026-11-14T01:06:37+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: secuplug\n"
@@ -24,7 +24,7 @@ msgstr ""
 
 #. Plugin URI of the plugin
 #: secuplug.php
-msgid "https://fyndsoft.com/portfolio/securefusion"
+msgid "https://fyndsoft.com/digital-products/securefusion/"
 msgstr ""
 
 #. Description of the plugin
@@ -211,32 +211,32 @@ msgstr ""
 msgid "Invalid regex pattern"
 msgstr ""
 
-#: src/Lib/Admin.php:552
+#: src/Lib/Admin.php:553
 msgid "Saved."
 msgstr ""
 
-#: src/Lib/Admin.php:553
-#: src/Lib/Notifier.php:182
+#: src/Lib/Admin.php:554
+#: src/Lib/Notifier.php:244
 msgid "Working…"
 msgstr ""
 
-#: src/Lib/Admin.php:554
+#: src/Lib/Admin.php:555
 msgid "The request failed. Your changes were not confirmed."
 msgstr ""
 
-#: src/Lib/Admin.php:555
+#: src/Lib/Admin.php:556
 msgid "Not used while protection is Off"
 msgstr ""
 
-#: src/Lib/Admin.php:556
+#: src/Lib/Admin.php:557
 msgid "Not used while all inline code is allowed"
 msgstr ""
 
-#: src/Lib/Admin.php:669
+#: src/Lib/Admin.php:670
 msgid "Restore the default value of this setting?"
 msgstr ""
 
-#: src/Lib/Admin.php:670
+#: src/Lib/Admin.php:671
 msgid "Restore default"
 msgstr ""
 
@@ -829,7 +829,7 @@ msgid "Blocked content"
 msgstr ""
 
 #: src/Lib/AdminSections/NotificationSettings.php:55
-msgid "When the Content Security Policy blocks something on the page you are viewing, or would block it while testing, with a button to allow it. Also works when the policy does not apply to administrators."
+msgid "When the Content Security Policy blocks something on the page you are viewing, or would block it while testing. Everything blocked on one page is gathered in one box, with a button to allow it. Also works when the policy does not apply to administrators."
 msgstr ""
 
 #: src/Lib/AdminSections/NotificationSettings.php:59
@@ -837,7 +837,7 @@ msgid "Protection status"
 msgstr ""
 
 #: src/Lib/AdminSections/NotificationSettings.php:60
-msgid "Things that need a decision, such as a policy that is still only being tested or a cache driver that stopped working."
+msgid "Only things that need a decision, such as a tested policy that is ready to be turned on or a cache driver that stopped working."
 msgstr ""
 
 #: src/Lib/AdminSections/NotificationSettings.php:64
@@ -845,7 +845,7 @@ msgid "Activity summary"
 msgstr ""
 
 #: src/Lib/AdminSections/NotificationSettings.php:65
-msgid "At most once a day: how many addresses were stopped or logged since the last summary."
+msgid "At most once a week, in the dashboard only: how many addresses were stopped or logged since the last summary."
 msgstr ""
 
 #: src/Lib/AdminSections/RecaptchaSettings.php:19
@@ -1523,7 +1523,7 @@ msgstr ""
 #: src/Lib/CSPInlineAdmin.php:141
 #: src/Lib/IPRules.php:150
 #: src/Lib/IPRules.php:224
-#: src/Lib/Notifier.php:237
+#: src/Lib/Notifier.php:364
 #: src/Lib/SecurityLog.php:168
 msgid "Permission denied."
 msgstr ""
@@ -1782,7 +1782,7 @@ msgid "Type"
 msgstr ""
 
 #: src/Lib/CSPInlineAdmin.php:536
-#: src/Lib/Notifier.php:185
+#: src/Lib/Notifier.php:247
 msgid "Script"
 msgstr ""
 
@@ -2275,187 +2275,229 @@ msgstr ""
 msgid "SecureFusion database setup is incomplete. Logging and IP protection may not work correctly. Check database permissions and server logs. Setup will retry on a request after five minutes."
 msgstr ""
 
-#: src/Lib/Notifier.php:166
+#: src/Lib/Notifier.php:224
 msgid "SecureFusion notifications"
 msgstr ""
 
-#: src/Lib/Notifier.php:167
+#: src/Lib/Notifier.php:225
 msgid "Blocked by your security policy"
 msgstr ""
 
-#: src/Lib/Notifier.php:168
+#: src/Lib/Notifier.php:226
 msgid "Would be blocked (test mode)"
 msgstr ""
 
-#: src/Lib/Notifier.php:169
-msgid "Allow it only if you know this host and your site needs it."
+#: src/Lib/Notifier.php:227
+msgid "Allow only hosts you know and your site needs."
 msgstr ""
 
-#: src/Lib/Notifier.php:170
-msgid "Code written directly into this page is not approved. Review it under Exceptions."
+#: src/Lib/Notifier.php:228
+msgid "Code written directly into this page is not approved yet. Check how it starts and allow it only if you recognize it."
 msgstr ""
 
-#: src/Lib/Notifier.php:171
+#: src/Lib/Notifier.php:229
+msgid "Code written directly into this page is not approved yet. The review lists it with where it came from."
+msgstr ""
+
+#: src/Lib/Notifier.php:230
 msgid "Inline code"
 msgstr ""
 
-#: src/Lib/Notifier.php:172
+#: src/Lib/Notifier.php:231
+msgid "Allow this code"
+msgstr ""
+
+#. translators: %s: number of further items.
+#: src/Lib/Notifier.php:233
+#, php-format
+msgid "and %s more"
+msgstr ""
+
+#: src/Lib/Notifier.php:234
 msgid "A script on this page builds code while it runs. Allow it only if something on the page stopped working."
 msgstr ""
 
-#: src/Lib/Notifier.php:173
+#: src/Lib/Notifier.php:235
 msgid "Code built at runtime (eval)"
 msgstr ""
 
-#: src/Lib/Notifier.php:174
+#: src/Lib/Notifier.php:236
 msgid "This page uses attributes such as onclick or onload. Allow them only if something on the page stopped working."
 msgstr ""
 
-#: src/Lib/Notifier.php:175
+#: src/Lib/Notifier.php:237
 msgid "Inline event handler"
 msgstr ""
 
-#: src/Lib/Notifier.php:176
+#: src/Lib/Notifier.php:238
 msgid "Allow"
 msgstr ""
 
-#: src/Lib/Notifier.php:177
+#: src/Lib/Notifier.php:239
 msgid "Do not ask again"
 msgstr ""
 
-#: src/Lib/Notifier.php:178
+#: src/Lib/Notifier.php:240
 msgid "Review"
 msgstr ""
 
-#: src/Lib/Notifier.php:179
+#: src/Lib/Notifier.php:241
 msgid "Reload page"
 msgstr ""
 
-#: src/Lib/Notifier.php:180
+#: src/Lib/Notifier.php:242
 msgid "Dismiss"
 msgstr ""
 
-#: src/Lib/Notifier.php:181
+#: src/Lib/Notifier.php:243
 msgid "Turn off notifications like this"
 msgstr ""
 
-#: src/Lib/Notifier.php:183
+#: src/Lib/Notifier.php:245
 msgid "The request failed. Nothing was changed."
 msgstr ""
 
-#: src/Lib/Notifier.php:186
+#: src/Lib/Notifier.php:248
 msgid "Stylesheet"
 msgstr ""
 
-#: src/Lib/Notifier.php:187
+#: src/Lib/Notifier.php:249
 msgid "Image"
 msgstr ""
 
-#: src/Lib/Notifier.php:188
+#: src/Lib/Notifier.php:250
 msgid "Font"
 msgstr ""
 
-#: src/Lib/Notifier.php:189
+#: src/Lib/Notifier.php:251
 msgid "Embed"
 msgstr ""
 
-#: src/Lib/Notifier.php:190
+#: src/Lib/Notifier.php:252
 msgid "Connection"
 msgstr ""
 
-#: src/Lib/Notifier.php:191
+#: src/Lib/Notifier.php:253
 msgid "Audio or video"
 msgstr ""
 
-#: src/Lib/Notifier.php:192
+#: src/Lib/Notifier.php:254
 msgid "Background worker"
 msgstr ""
 
-#: src/Lib/Notifier.php:193
+#: src/Lib/Notifier.php:255
 msgid "Form target"
 msgstr ""
 
-#: src/Lib/Notifier.php:271
+#: src/Lib/Notifier.php:398
 msgid "Turned off. You can turn it back on under SecureFusion > Settings > Notifications."
 msgstr ""
 
-#: src/Lib/Notifier.php:283
+#: src/Lib/Notifier.php:410
 msgid "The policy is now enforced. Notifications will tell you when something is blocked."
 msgstr ""
 
-#: src/Lib/Notifier.php:290
+#: src/Lib/Notifier.php:420
+msgid "The cache driver passed its test and is in use again."
+msgstr ""
+
+#: src/Lib/Notifier.php:420
+msgid "The cache driver still fails its test. The Page cache box in the settings says why."
+msgstr ""
+
+#: src/Lib/Notifier.php:441
 msgid "Code built at runtime is now allowed on every page."
 msgstr ""
 
-#: src/Lib/Notifier.php:291
+#: src/Lib/Notifier.php:442
 msgid "Inline event handlers are now allowed."
 msgstr ""
 
-#: src/Lib/Notifier.php:328
+#: src/Lib/Notifier.php:501
 msgid "This request could not be used. Reload the page and try again."
 msgstr ""
 
-#. translators: %s: service name, for example "Google Analytics".
-#: src/Lib/Notifier.php:366
+#. translators: %s: comma-separated service names, for example "Google Analytics, Stripe".
+#: src/Lib/Notifier.php:608
 #, php-format
 msgid "%s is now allowed under Services."
-msgstr ""
+msgid_plural "%s are now allowed under Services."
+msgstr[0] ""
+msgstr[1] ""
 
-#. translators: %s: host, for example "https://cdn.example.com".
-#: src/Lib/Notifier.php:382
+#. translators: %s: comma-separated hosts, for example "https://cdn.example.com".
+#: src/Lib/Notifier.php:615
 #, php-format
 msgid "%s is now allowed."
-msgstr ""
+msgid_plural "%s are now allowed."
+msgstr[0] ""
+msgstr[1] ""
 
-#: src/Lib/Notifier.php:503
+#. translators: %s: number of approved code blocks.
+#: src/Lib/Notifier.php:658
+#, php-format
+msgid "%s code block is now approved on every page. You can take it back under Exceptions."
+msgid_plural "%s code blocks are now approved on every page. You can take them back under Exceptions."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/Lib/Notifier.php:897
 msgid "Open settings"
 msgstr ""
 
-#: src/Lib/Notifier.php:513
-msgid "Your security policy is only being tested"
+#: src/Lib/Notifier.php:910
+msgid "Your security policy is ready to protect visitors"
 msgstr ""
 
-#: src/Lib/Notifier.php:514
-msgid "Nothing is blocked yet, so visitors are not protected by it. Browse your pages: a notification appears for anything that would be blocked. When everything works, enforce the policy."
+#. translators: %s: number of days.
+#: src/Lib/Notifier.php:913
+#, php-format
+msgid "It has been tested for %s day without needing a new exception, but it still blocks nothing. Turn it on now; anything blocked later shows up here with a fix."
+msgid_plural "It has been tested for %s days without needing a new exception, but it still blocks nothing. Turn it on now; anything blocked later shows up here with a fix."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/Lib/Notifier.php:918
+msgid "Turn on protection"
 msgstr ""
 
-#: src/Lib/Notifier.php:517
-msgid "Enforce now"
-msgstr ""
-
-#: src/Lib/Notifier.php:533
+#: src/Lib/Notifier.php:933
 msgid "A page was sent with fewer security rules"
 msgstr ""
 
-#: src/Lib/Notifier.php:548
+#: src/Lib/Notifier.php:948
 msgid "The cache driver is not in use"
 msgstr ""
 
-#: src/Lib/Notifier.php:549
-msgid "It did not pass its test, so it is not used. The Page cache box in the settings says why."
+#: src/Lib/Notifier.php:949
+msgid "It did not pass its test, so it is not used. Test it again after changing your cache settings."
 msgstr ""
 
-#: src/Lib/Notifier.php:561
+#: src/Lib/Notifier.php:952
+msgid "Test again"
+msgstr ""
+
+#: src/Lib/Notifier.php:968
 msgid "Database setup is incomplete"
 msgstr ""
 
-#: src/Lib/Notifier.php:562
+#: src/Lib/Notifier.php:969
 msgid "Logging and address blocking may not work. Check the database permissions; setup is retried automatically."
 msgstr ""
 
-#: src/Lib/Notifier.php:604
+#: src/Lib/Notifier.php:1011
 msgid "Security summary"
 msgstr ""
 
 #. translators: 1: number of addresses, 2: time span, for example "3 days".
-#: src/Lib/Notifier.php:607
+#: src/Lib/Notifier.php:1014
 #, php-format
 msgid "%1$s address was stopped or logged in the last %2$s."
 msgid_plural "%1$s addresses were stopped or logged in the last %2$s."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/Lib/Notifier.php:613
+#: src/Lib/Notifier.php:1020
 msgid "Open security log"
 msgstr ""
 

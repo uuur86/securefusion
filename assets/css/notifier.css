@@ -92,6 +92,11 @@
 	font-size: 12px;
 	color: #1f2a2e;
 	overflow-wrap: anywhere;
+	white-space: pre-line;
+}
+
+.securefusion-toast__subject:empty {
+	display: none;
 }
 
 .securefusion-toast__text {

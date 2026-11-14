@@ -24,19 +24,6 @@ class Login {
 
 
 	/**
-	 * Legacy compatibility entry point. Existing IDs and stored legacy values are left untouched.
-	 *
-	 * @deprecated Use the administrator account transition guide.
-	 * @return void
-	 */
-	public function change_admin_id() {
-
-		// Intentionally inert: user IDs must never be rewritten.
-
-	}
-
-
-	/**
 	 * Hide WP login function.
 	 *
 	 * @return bool

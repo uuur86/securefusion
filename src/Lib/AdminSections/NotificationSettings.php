@@ -52,17 +52,17 @@ return [
 		$securefusion_notify_field(
 			'notify_csp',
 			esc_html__( 'Blocked content', 'secuplug' ),
-			__( 'When the Content Security Policy blocks something on the page you are viewing, or would block it while testing, with a button to allow it. Also works when the policy does not apply to administrators.', 'secuplug' )
+			__( 'When the Content Security Policy blocks something on the page you are viewing, or would block it while testing. Everything blocked on one page is gathered in one box, with a button to allow it. Also works when the policy does not apply to administrators.', 'secuplug' )
 		),
 		$securefusion_notify_field(
 			'notify_status',
 			esc_html__( 'Protection status', 'secuplug' ),
-			__( 'Things that need a decision, such as a policy that is still only being tested or a cache driver that stopped working.', 'secuplug' )
+			__( 'Only things that need a decision, such as a tested policy that is ready to be turned on or a cache driver that stopped working.', 'secuplug' )
 		),
 		$securefusion_notify_field(
 			'notify_activity',
 			esc_html__( 'Activity summary', 'secuplug' ),
-			__( 'At most once a day: how many addresses were stopped or logged since the last summary.', 'secuplug' )
+			__( 'At most once a week, in the dashboard only: how many addresses were stopped or logged since the last summary.', 'secuplug' )
 		),
 	],
 ];

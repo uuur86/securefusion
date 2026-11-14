@@ -4,8 +4,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SecureFusion 3.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/plugin\n"
-"POT-Creation-Date: 2026-11-11T03:01:39+00:00\n"
-"PO-Revision-Date: 2026-11-11 03:01:39+00:00\n"
+"POT-Creation-Date: 2026-11-14T01:06:37+00:00\n"
+"PO-Revision-Date: 2026-11-14 01:08:57+00:00\n"
 "Language-Team: Spanish\n"
 "Language: es_ES\n"
 "MIME-Version: 1.0\n"
@@ -22,8 +22,8 @@ msgstr "SecureFusion"
 
 #. Plugin URI of the plugin
 #: secuplug.php
-msgid "https://fyndsoft.com/portfolio/securefusion"
-msgstr "https://fyndsoft.com/portfolio/securefusion"
+msgid "https://fyndsoft.com/digital-products/securefusion/"
+msgstr "https://fyndsoft.com/digital-products/securefusion/"
 
 #. Description of the plugin
 #: secuplug.php
@@ -200,31 +200,31 @@ msgstr "Formato de URL no válido"
 msgid "Invalid regex pattern"
 msgstr "Expresión regular no válida"
 
-#: src/Lib/Admin.php:552
+#: src/Lib/Admin.php:553
 msgid "Saved."
 msgstr "Guardado."
 
-#: src/Lib/Admin.php:553 src/Lib/Notifier.php:182
+#: src/Lib/Admin.php:554 src/Lib/Notifier.php:244
 msgid "Working…"
 msgstr "Procesando…"
 
-#: src/Lib/Admin.php:554
+#: src/Lib/Admin.php:555
 msgid "The request failed. Your changes were not confirmed."
 msgstr "La petición ha fallado. Sus cambios no se han confirmado."
 
-#: src/Lib/Admin.php:555
+#: src/Lib/Admin.php:556
 msgid "Not used while protection is Off"
 msgstr "No se usa mientras la protección esté desactivada"
 
-#: src/Lib/Admin.php:556
+#: src/Lib/Admin.php:557
 msgid "Not used while all inline code is allowed"
 msgstr "No se usa mientras se permita todo el código en línea"
 
-#: src/Lib/Admin.php:669
+#: src/Lib/Admin.php:670
 msgid "Restore the default value of this setting?"
 msgstr "¿Restaurar el valor predeterminado de este ajuste?"
 
-#: src/Lib/Admin.php:670
+#: src/Lib/Admin.php:671
 msgid "Restore default"
 msgstr "Restaurar predeterminado"
 
@@ -741,24 +741,24 @@ msgid "Blocked content"
 msgstr "Contenido bloqueado"
 
 #: src/Lib/AdminSections/NotificationSettings.php:55
-msgid "When the Content Security Policy blocks something on the page you are viewing, or would block it while testing, with a button to allow it. Also works when the policy does not apply to administrators."
-msgstr "Cuando la política de seguridad de contenido bloquea algo en la página que está viendo, o lo bloquearía en modo de prueba, con un botón para permitirlo. También funciona cuando la política no se aplica a los administradores."
+msgid "When the Content Security Policy blocks something on the page you are viewing, or would block it while testing. Everything blocked on one page is gathered in one box, with a button to allow it. Also works when the policy does not apply to administrators."
+msgstr "Cuando la Política de seguridad de contenido bloquea algo en la página que está viendo, o lo bloquearía durante la prueba. Todo lo bloqueado en una página se reúne en un solo cuadro, con un botón para permitirlo. También funciona cuando la política no se aplica a los administradores."
 
 #: src/Lib/AdminSections/NotificationSettings.php:59
 msgid "Protection status"
 msgstr "Estado de la protección"
 
 #: src/Lib/AdminSections/NotificationSettings.php:60
-msgid "Things that need a decision, such as a policy that is still only being tested or a cache driver that stopped working."
-msgstr "Asuntos que requieren una decisión, como una política que todavía solo se está probando o un controlador de caché que ha dejado de funcionar."
+msgid "Only things that need a decision, such as a tested policy that is ready to be turned on or a cache driver that stopped working."
+msgstr "Solo lo que requiere una decisión, como una política probada que está lista para activarse o un controlador de caché que dejó de funcionar."
 
 #: src/Lib/AdminSections/NotificationSettings.php:64
 msgid "Activity summary"
 msgstr "Resumen de actividad"
 
 #: src/Lib/AdminSections/NotificationSettings.php:65
-msgid "At most once a day: how many addresses were stopped or logged since the last summary."
-msgstr "Como mucho una vez al día: cuántas direcciones se han detenido o registrado desde el último resumen."
+msgid "At most once a week, in the dashboard only: how many addresses were stopped or logged since the last summary."
+msgstr "Como máximo una vez por semana y solo en el escritorio: cuántas direcciones se detuvieron o registraron desde el último resumen."
 
 #: src/Lib/AdminSections/RecaptchaSettings.php:19 src/Lib/AdminSettingsView.php:70
 msgid "reCAPTCHA"
@@ -1400,7 +1400,7 @@ msgstr "Procesando..."
 msgid "Security check failed."
 msgstr "La comprobación de seguridad ha fallado."
 
-#: src/Lib/CommentsBlock.php:215 src/Lib/CommentsBlock.php:283 src/Lib/CSPCacheAdmin.php:51 src/Lib/CSPInlineAdmin.php:141 src/Lib/IPRules.php:150 src/Lib/IPRules.php:224 src/Lib/Notifier.php:237 src/Lib/SecurityLog.php:168
+#: src/Lib/CommentsBlock.php:215 src/Lib/CommentsBlock.php:283 src/Lib/CSPCacheAdmin.php:51 src/Lib/CSPInlineAdmin.php:141 src/Lib/IPRules.php:150 src/Lib/IPRules.php:224 src/Lib/Notifier.php:364 src/Lib/SecurityLog.php:168
 msgid "Permission denied."
 msgstr "Permiso denegado."
 
@@ -1654,7 +1654,7 @@ msgstr "Nombre"
 msgid "Type"
 msgstr "Tipo"
 
-#: src/Lib/CSPInlineAdmin.php:536 src/Lib/Notifier.php:185
+#: src/Lib/CSPInlineAdmin.php:536 src/Lib/Notifier.php:247
 msgid "Script"
 msgstr "Script"
 
@@ -2112,187 +2112,229 @@ msgstr "Demasiados intentos de acceso fallidos"
 msgid "SecureFusion database setup is incomplete. Logging and IP protection may not work correctly. Check database permissions and server logs. Setup will retry on a request after five minutes."
 msgstr "La configuración de la base de datos de SecureFusion está incompleta. El registro y la protección de IP pueden no funcionar bien. Compruebe los permisos de la base de datos y los registros del servidor. La configuración se reintentará en una petición pasados cinco minutos."
 
-#: src/Lib/Notifier.php:166
+#: src/Lib/Notifier.php:224
 msgid "SecureFusion notifications"
 msgstr "Notificaciones de SecureFusion"
 
-#: src/Lib/Notifier.php:167
+#: src/Lib/Notifier.php:225
 msgid "Blocked by your security policy"
 msgstr "Bloqueado por su política de seguridad"
 
-#: src/Lib/Notifier.php:168
+#: src/Lib/Notifier.php:226
 msgid "Would be blocked (test mode)"
 msgstr "Se bloquearía (modo de prueba)"
 
-#: src/Lib/Notifier.php:169
-msgid "Allow it only if you know this host and your site needs it."
-msgstr "Permítalo solo si conoce este host y su sitio lo necesita."
+#: src/Lib/Notifier.php:227
+msgid "Allow only hosts you know and your site needs."
+msgstr "Permita solo hosts que conozca y que su sitio necesite."
 
-#: src/Lib/Notifier.php:170
-msgid "Code written directly into this page is not approved. Review it under Exceptions."
-msgstr "El código escrito directamente en esta página no está aprobado. Revíselo en Excepciones."
+#: src/Lib/Notifier.php:228
+msgid "Code written directly into this page is not approved yet. Check how it starts and allow it only if you recognize it."
+msgstr "El código escrito directamente en esta página aún no está aprobado. Compruebe cómo empieza y permítalo solo si lo reconoce."
 
-#: src/Lib/Notifier.php:171
+#: src/Lib/Notifier.php:229
+msgid "Code written directly into this page is not approved yet. The review lists it with where it came from."
+msgstr "El código escrito directamente en esta página aún no está aprobado. La revisión lo muestra junto con su origen."
+
+#: src/Lib/Notifier.php:230
 msgid "Inline code"
 msgstr "Código en línea"
 
-#: src/Lib/Notifier.php:172
+#: src/Lib/Notifier.php:231
+msgid "Allow this code"
+msgstr "Permitir este código"
+
+#. translators: %s: number of further items.
+#: src/Lib/Notifier.php:233
+#, php-format
+msgid "and %s more"
+msgstr "y %s más"
+
+#: src/Lib/Notifier.php:234
 msgid "A script on this page builds code while it runs. Allow it only if something on the page stopped working."
 msgstr "Un script de esta página genera código mientras se ejecuta. Permítalo solo si algo de la página ha dejado de funcionar."
 
-#: src/Lib/Notifier.php:173
+#: src/Lib/Notifier.php:235
 msgid "Code built at runtime (eval)"
 msgstr "Código generado en tiempo de ejecución (eval)"
 
-#: src/Lib/Notifier.php:174
+#: src/Lib/Notifier.php:236
 msgid "This page uses attributes such as onclick or onload. Allow them only if something on the page stopped working."
 msgstr "Esta página usa atributos como onclick u onload. Permítalos solo si algo de la página ha dejado de funcionar."
 
-#: src/Lib/Notifier.php:175
+#: src/Lib/Notifier.php:237
 msgid "Inline event handler"
 msgstr "Manejador de eventos en línea"
 
-#: src/Lib/Notifier.php:176
+#: src/Lib/Notifier.php:238
 msgid "Allow"
 msgstr "Permitir"
 
-#: src/Lib/Notifier.php:177
+#: src/Lib/Notifier.php:239
 msgid "Do not ask again"
 msgstr "No volver a preguntar"
 
-#: src/Lib/Notifier.php:178
+#: src/Lib/Notifier.php:240
 msgid "Review"
 msgstr "Revisar"
 
-#: src/Lib/Notifier.php:179
+#: src/Lib/Notifier.php:241
 msgid "Reload page"
 msgstr "Recargar la página"
 
-#: src/Lib/Notifier.php:180
+#: src/Lib/Notifier.php:242
 msgid "Dismiss"
 msgstr "Descartar"
 
-#: src/Lib/Notifier.php:181
+#: src/Lib/Notifier.php:243
 msgid "Turn off notifications like this"
 msgstr "Desactivar las notificaciones de este tipo"
 
-#: src/Lib/Notifier.php:183
+#: src/Lib/Notifier.php:245
 msgid "The request failed. Nothing was changed."
 msgstr "La petición ha fallado. No se ha cambiado nada."
 
-#: src/Lib/Notifier.php:186
+#: src/Lib/Notifier.php:248
 msgid "Stylesheet"
 msgstr "Hoja de estilos"
 
-#: src/Lib/Notifier.php:187
+#: src/Lib/Notifier.php:249
 msgid "Image"
 msgstr "Imagen"
 
-#: src/Lib/Notifier.php:188
+#: src/Lib/Notifier.php:250
 msgid "Font"
 msgstr "Fuente"
 
-#: src/Lib/Notifier.php:189
+#: src/Lib/Notifier.php:251
 msgid "Embed"
 msgstr "Incrustación"
 
-#: src/Lib/Notifier.php:190
+#: src/Lib/Notifier.php:252
 msgid "Connection"
 msgstr "Conexión"
 
-#: src/Lib/Notifier.php:191
+#: src/Lib/Notifier.php:253
 msgid "Audio or video"
 msgstr "Audio o vídeo"
 
-#: src/Lib/Notifier.php:192
+#: src/Lib/Notifier.php:254
 msgid "Background worker"
 msgstr "Worker en segundo plano"
 
-#: src/Lib/Notifier.php:193
+#: src/Lib/Notifier.php:255
 msgid "Form target"
 msgstr "Destino de formulario"
 
-#: src/Lib/Notifier.php:271
+#: src/Lib/Notifier.php:398
 msgid "Turned off. You can turn it back on under SecureFusion > Settings > Notifications."
 msgstr "Desactivado. Puede volver a activarlo en SecureFusion > Ajustes > Notificaciones."
 
-#: src/Lib/Notifier.php:283
+#: src/Lib/Notifier.php:410
 msgid "The policy is now enforced. Notifications will tell you when something is blocked."
 msgstr "La política ya se aplica. Las notificaciones le avisarán cuando algo se bloquee."
 
-#: src/Lib/Notifier.php:290
+#: src/Lib/Notifier.php:420
+msgid "The cache driver passed its test and is in use again."
+msgstr "El controlador de caché superó su prueba y vuelve a usarse."
+
+#: src/Lib/Notifier.php:420
+msgid "The cache driver still fails its test. The Page cache box in the settings says why."
+msgstr "El controlador de caché sigue sin superar su prueba. El cuadro «Caché de páginas» de los ajustes explica por qué."
+
+#: src/Lib/Notifier.php:441
 msgid "Code built at runtime is now allowed on every page."
 msgstr "El código generado en tiempo de ejecución ya se permite en todas las páginas."
 
-#: src/Lib/Notifier.php:291
+#: src/Lib/Notifier.php:442
 msgid "Inline event handlers are now allowed."
 msgstr "Los manejadores de eventos en línea ya se permiten."
 
-#: src/Lib/Notifier.php:328
+#: src/Lib/Notifier.php:501
 msgid "This request could not be used. Reload the page and try again."
 msgstr "No se ha podido usar esta petición. Recargue la página e inténtelo de nuevo."
 
-#. translators: %s: service name, for example "Google Analytics".
-#: src/Lib/Notifier.php:366
+#. translators: %s: comma-separated service names, for example "Google Analytics, Stripe".
+#: src/Lib/Notifier.php:608
 #, php-format
 msgid "%s is now allowed under Services."
-msgstr "%s ya está permitido en Servicios."
+msgid_plural "%s are now allowed under Services."
+msgstr[0] "%s ahora está permitido en Servicios."
+msgstr[1] "%s ahora están permitidos en Servicios."
 
-#. translators: %s: host, for example "https://cdn.example.com".
-#: src/Lib/Notifier.php:382
+#. translators: %s: comma-separated hosts, for example "https://cdn.example.com".
+#: src/Lib/Notifier.php:615
 #, php-format
 msgid "%s is now allowed."
-msgstr "%s ya está permitido."
+msgid_plural "%s are now allowed."
+msgstr[0] "%s ahora está permitido."
+msgstr[1] "%s ahora están permitidos."
 
-#: src/Lib/Notifier.php:503
+#. translators: %s: number of approved code blocks.
+#: src/Lib/Notifier.php:658
+#, php-format
+msgid "%s code block is now approved on every page. You can take it back under Exceptions."
+msgid_plural "%s code blocks are now approved on every page. You can take them back under Exceptions."
+msgstr[0] "%s bloque de código ya está aprobado en todas las páginas. Puede revertirlo en Excepciones."
+msgstr[1] "%s bloques de código ya están aprobados en todas las páginas. Puede revertirlo en Excepciones."
+
+#: src/Lib/Notifier.php:897
 msgid "Open settings"
 msgstr "Abrir los ajustes"
 
-#: src/Lib/Notifier.php:513
-msgid "Your security policy is only being tested"
-msgstr "Su política de seguridad solo se está probando"
+#: src/Lib/Notifier.php:910
+msgid "Your security policy is ready to protect visitors"
+msgstr "Su política de seguridad está lista para proteger a los visitantes"
 
-#: src/Lib/Notifier.php:514
-msgid "Nothing is blocked yet, so visitors are not protected by it. Browse your pages: a notification appears for anything that would be blocked. When everything works, enforce the policy."
-msgstr "Todavía no se bloquea nada, así que no protege a los visitantes. Recorra sus páginas: aparecerá una notificación por cada cosa que se bloquearía. Cuando todo funcione, aplique la política."
+#. translators: %s: number of days.
+#: src/Lib/Notifier.php:913
+#, php-format
+msgid "It has been tested for %s day without needing a new exception, but it still blocks nothing. Turn it on now; anything blocked later shows up here with a fix."
+msgid_plural "It has been tested for %s days without needing a new exception, but it still blocks nothing. Turn it on now; anything blocked later shows up here with a fix."
+msgstr[0] "Se ha probado durante %s día sin necesitar una nueva excepción, pero todavía no bloquea nada. Actívela ahora; lo que se bloquee después aparecerá aquí con una solución."
+msgstr[1] "Se ha probado durante %s días sin necesitar una nueva excepción, pero todavía no bloquea nada. Actívela ahora; lo que se bloquee después aparecerá aquí con una solución."
 
-#: src/Lib/Notifier.php:517
-msgid "Enforce now"
-msgstr "Aplicar ahora"
+#: src/Lib/Notifier.php:918
+msgid "Turn on protection"
+msgstr "Activar la protección"
 
-#: src/Lib/Notifier.php:533
+#: src/Lib/Notifier.php:933
 msgid "A page was sent with fewer security rules"
 msgstr "Se envió una página con menos reglas de seguridad"
 
-#: src/Lib/Notifier.php:548
+#: src/Lib/Notifier.php:948
 msgid "The cache driver is not in use"
 msgstr "El controlador de caché no se está usando"
 
-#: src/Lib/Notifier.php:549
-msgid "It did not pass its test, so it is not used. The Page cache box in the settings says why."
-msgstr "No superó su prueba, así que no se usa. El recuadro Caché de páginas de los ajustes explica el motivo."
+#: src/Lib/Notifier.php:949
+msgid "It did not pass its test, so it is not used. Test it again after changing your cache settings."
+msgstr "No superó su prueba, así que no se usa. Pruébelo de nuevo después de cambiar los ajustes de caché."
 
-#: src/Lib/Notifier.php:561
+#: src/Lib/Notifier.php:952
+msgid "Test again"
+msgstr "Probar de nuevo"
+
+#: src/Lib/Notifier.php:968
 msgid "Database setup is incomplete"
 msgstr "La configuración de la base de datos está incompleta"
 
-#: src/Lib/Notifier.php:562
+#: src/Lib/Notifier.php:969
 msgid "Logging and address blocking may not work. Check the database permissions; setup is retried automatically."
 msgstr "El registro y el bloqueo de direcciones pueden no funcionar. Compruebe los permisos de la base de datos; la configuración se reintenta automáticamente."
 
-#: src/Lib/Notifier.php:604
+#: src/Lib/Notifier.php:1011
 msgid "Security summary"
 msgstr "Resumen de seguridad"
 
 #. translators: 1: number of addresses, 2: time span, for example "3 days".
-#: src/Lib/Notifier.php:607
+#: src/Lib/Notifier.php:1014
 #, php-format
 msgid "%1$s address was stopped or logged in the last %2$s."
 msgid_plural "%1$s addresses were stopped or logged in the last %2$s."
 msgstr[0] "%1$s dirección se ha detenido o registrado en los últimos %2$s."
 msgstr[1] "%1$s direcciones se han detenido o registrado en los últimos %2$s."
 
-#: src/Lib/Notifier.php:613
+#: src/Lib/Notifier.php:1020
 msgid "Open security log"
 msgstr "Abrir el registro de seguridad"
 

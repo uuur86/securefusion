@@ -67,6 +67,13 @@ class Middleware {
 
 
 	/**
+	 * Priority of the login lockout on 'authenticate': ahead of core (20 and 30) and of plugin
+	 * callbacks at the usual priorities, as the old 'wp_authenticate' action was.
+	 */
+	const LOGIN_LOCKOUT_PRIORITY = -1000;
+
+
+	/**
 	 * REST services under wp/v1 and wp/v2 that anonymous visitors may not use.
 	 *
 	 * @var string[]
@@ -434,8 +441,9 @@ class Middleware {
 		if ( $exempt && ! $context['baseline'] ) {
 
 			// An exempt administrator still gets the rules as a test, so notifications can show what
-			// visitors would lose. Nothing is blocked for them.
-			$context['observe']  = 'admin' === $role && Notifier::wants( $settings, 'csp' );
+			// visitors would lose. Nothing is blocked for them. Only for users who get the notifications
+			// (the same check as the script), so nobody receives a test policy that no box reports.
+			$context['observe']  = 'admin' === $role && Notifier::allowed() && Notifier::wants( $settings, 'csp' );
 			$context['baseline'] = ! $context['observe'];
 
 		}

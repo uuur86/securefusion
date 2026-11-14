@@ -25,10 +25,16 @@ class XMLRPC {
 	/**
 	 * Filter XMLRPC calls.
 	 *
+	 * WordPress applies this filter only while it serves an XML-RPC request, right before it
+	 * creates the server. The subclass and the core classes it extends are loaded here, so other
+	 * requests never parse them.
+	 *
 	 * @param string $call XMLRPC call.
 	 * @return string Filtered XMLRPC call.
 	 */
 	public function filter_xmlrpc( $call ) {
+
+		require_once dirname( __DIR__, 2 ) . '/xmlrpc_server.php';
 
 		return 'SecureFusion_' . $call . '_debug';
 

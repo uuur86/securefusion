@@ -30,18 +30,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Settings {
 
 	/**
-	 * Read older CSP configurations as a protection level, without writing a migration.
-	 *
-	 * @param array $values Stored values from one settings layer.
-	 * @return array
-	 */
-	public static function preserve_csp_profile( $values ) {
-
-		return CSPPolicy::upgrade_values( $values );
-
-	}
-
-	/**
 	 * Per-site option: all settings (single site) or overrides (network mode).
 	 *
 	 * @var string
@@ -279,7 +267,7 @@ class Settings {
 
 		$values = get_site_option( self::NETWORK_OPTION, [] );
 
-		return self::preserve_csp_profile( is_array( $values ) ? $values : [] );
+		return CSPPolicy::upgrade_values( is_array( $values ) ? $values : [] );
 
 	}
 
@@ -307,7 +295,7 @@ class Settings {
 
 		$values = get_option( self::SITE_OPTION, [] );
 
-		return self::preserve_csp_profile( is_array( $values ) ? $values : [] );
+		return CSPPolicy::upgrade_values( is_array( $values ) ? $values : [] );
 
 	}
 

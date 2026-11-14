@@ -67,6 +67,27 @@ class CSPInline {
 	private static $decided = [];
 
 	/**
+	 * Code trusted where it was printed on this response, without surrounding whitespace:
+	 * "type:digest" => true. Lets the finished page give the token back to trusted code that a
+	 * later rewrite stripped of it.
+	 *
+	 * @var array<string,bool>
+	 */
+	private static $trusted = [];
+
+	/**
+	 * How many elements got the response token while the page was printed.
+	 *
+	 * @var int
+	 */
+	private static $stamped = 0;
+
+	/**
+	 * Media types a data: address may use to carry a script.
+	 */
+	const SCRIPT_TYPES = [ 'text/javascript', 'application/javascript', 'application/x-javascript', 'text/ecmascript', 'application/ecmascript' ];
+
+	/**
 	 * Whether the administrator opted into discovery.
 	 *
 	 * @var bool
@@ -109,6 +130,22 @@ class CSPInline {
 	private static $approved = [];
 
 	/**
+	 * Needles of the approved and revoked code above: needle => true. A finished page that holds
+	 * none of them cannot hold that code inline.
+	 *
+	 * @var array<string,bool>
+	 */
+	private static $needles = [];
+
+	/**
+	 * Whether approved or revoked code without a usable needle applies to this response, so only
+	 * the tokenizer can tell whether a page holds it.
+	 *
+	 * @var bool
+	 */
+	private static $unindexed = false;
+
+	/**
 	 * Output buffer level of the held page, or 0 while nothing is held.
 	 *
 	 * @var int
@@ -123,8 +160,8 @@ class CSPInline {
 	private static $settled = false;
 
 	/**
-	 * Whether trusted code on this page cannot be covered by a hash: an optimizer moved it into
-	 * a data: address.
+	 * Whether trusted code on this page cannot be covered by a hash: it was moved into a data:
+	 * address after it was printed.
 	 *
 	 * @var bool
 	 */
@@ -212,9 +249,13 @@ class CSPInline {
 
 					self::$denied[ $key ] = true;
 
+					self::index( $row );
+
 				} elseif ( 'strict' === $level && CSPInlineRules::allows( $row, self::$path ) && preg_match( '#^[A-Za-z0-9+/]{43}=$#D', $row['digest'] ?? '' ) ) {
 
 					self::$approved[ $key ] = true;
+
+					self::index( $row );
 
 				}
 
@@ -280,6 +321,35 @@ class CSPInline {
 		$path = wp_parse_url( $uri, PHP_URL_PATH );
 
 		return is_string( $path ) && '' !== $path ? $path : '/';
+
+	}
+
+	/**
+	 * Remember how settle() can tell cheaply whether a page may hold an approved or revoked record.
+	 *
+	 * @param array $row Inventory record.
+	 * @return void
+	 */
+	private static function index( $row ) {
+
+		// Only script and style records can match the code settle() reads; host records never do.
+		if ( ! in_array( $row['type'] ?? '', [ 'script', 'style' ], true ) ) {
+
+			return;
+
+		}
+
+		$needle = CSPInlineRules::needle_of( $row );
+
+		if ( '' === $needle ) {
+
+			self::$unindexed = true;
+
+		} else {
+
+			self::$needles[ $needle ] = true;
+
+		}
 
 	}
 
@@ -566,8 +636,12 @@ class CSPInline {
 	 * Replace print-time decisions with what the finished page needs.
 	 *
 	 * Runs only when there is something to settle: the hash method (each trusted element becomes
-	 * a hash of its final text), code the owner approved by its exact text, or code they revoked.
-	 * One pass over a page of at most HOLD_LIMIT bytes.
+	 * a hash of its final text), code the owner approved by its exact text, code they revoked, or
+	 * fewer tokens on the page than were printed. Anything that rewrites the page after us (HTML
+	 * minifiers, optimizers that defer or rebuild script elements) may drop the attribute while
+	 * keeping the code, so trusted code is recognised by its text, never by its id or position.
+	 * One pass over a page of at most HOLD_LIMIT bytes. When only approved or revoked text calls for
+	 * it, a page that holds none of their needles and no data: address is left untouched.
 	 *
 	 * @param string $html Complete page.
 	 * @return string
@@ -576,7 +650,16 @@ class CSPInline {
 
 		$hash = 'hash' === self::$method;
 
-		if ( ! self::enabled() || '' === self::$nonce || ( ! $hash && ! self::$approved && ! self::$denied ) ) {
+		if ( ! self::enabled() || '' === self::$nonce ) {
+
+			return $html;
+
+		}
+
+		// Scan labels carry the token too ("token:source"); they are not trusted elements.
+		$lost = self::$stamped > substr_count( $html, self::$nonce ) - substr_count( $html, self::$nonce . ':' );
+
+		if ( ! $hash && ! $lost && ! self::$approved && ! self::$denied ) {
 
 			return $html;
 
@@ -588,19 +671,25 @@ class CSPInline {
 
 		}
 
+		// Approved or revoked text alone: tokenize only a page that can hold some of it.
+		if ( ! $hash && ! $lost && ! self::may_hold_listed( $html ) ) {
+
+			return $html;
+
+		}
+
 		$tags = new \WP_HTML_Tag_Processor( $html );
 
 		while ( $tags->next_tag() ) {
 
-			$type = self::code_type( $tags );
+			$type   = self::code_type( $tags );
+			$inline = '' !== $type;
+			$code   = $inline ? $tags->get_modifiable_text() : self::addressed_code( $tags );
 
-			if ( '' === $type ) {
+			if ( null === $code ) {
 
-				// Autoptimize defers inline scripts by moving their code into a data: address.
-				// The token came along, but no hash can stand in for it.
-				if ( $hash && 'SCRIPT' === $tags->get_tag() && self::$nonce === $tags->get_attribute( 'nonce' ) ) {
-
-					self::$opaque = self::$opaque || 0 === stripos( (string) $tags->get_attribute( 'src' ), 'data:' );
+				// A token that travelled to a script loaded from a file has no meaning under hashes.
+				if ( $hash && self::$nonce === $tags->get_attribute( 'nonce' ) ) {
 
 					$tags->remove_attribute( 'nonce' );
 
@@ -610,26 +699,37 @@ class CSPInline {
 
 			}
 
+			$type   = $inline ? $type : 'script';
 			$marked = self::$nonce === $tags->get_attribute( 'nonce' );
-			$code   = $tags->get_modifiable_text();
 			$key    = $type . ':' . CSPInlineRules::digest( $code );
 
-			if ( $marked && ( '' === trim( $code ) || isset( self::$denied[ $key ] ) ) ) {
+			if ( '' === trim( $code ) || isset( self::$denied[ $key ] ) ) {
 
 				// Empty elements need no permission; revoked text loses the one its producer earned.
+				if ( $marked ) {
+
+					$tags->remove_attribute( 'nonce' );
+
+				}
+
+				continue;
+
+			}
+
+			if ( ! $marked && ! isset( self::$approved[ $key ] ) && ! isset( self::$trusted[ $type . ':' . CSPInlineRules::digest( trim( $code ) ) ] ) ) {
+
+				continue;
+
+			}
+
+			if ( $hash && ! $inline ) {
+
+				// A nonce covers code in a data: address, a hash cannot. The page is sent unverified.
+				self::$opaque = true;
+
 				$tags->remove_attribute( 'nonce' );
 
-				continue;
-
-			}
-
-			if ( ! $marked && ! isset( self::$approved[ $key ] ) ) {
-
-				continue;
-
-			}
-
-			if ( $hash ) {
+			} elseif ( $hash ) {
 
 				self::$runtime[ $type ][] = "'sha256-" . substr( $key, strlen( $type ) + 1 ) . "'";
 
@@ -644,6 +744,155 @@ class CSPInline {
 		}
 
 		return $tags->get_updated_html();
+
+	}
+
+	/**
+	 * Whether a finished page may hold approved or revoked code, as inline text or in a data: address.
+	 *
+	 * False only when that is certain: no record lacks a needle, the page holds no needle (see
+	 * CSPInlineRules::needle()), and no script element can carry a data: address. At most LIMIT
+	 * substring searches plus one pass for character references.
+	 *
+	 * @param string $html Complete page.
+	 * @return bool
+	 */
+	private static function may_hold_listed( $html ) {
+
+		if ( self::$unindexed ) {
+
+			return true;
+
+		}
+
+		if ( ! self::$needles ) {
+
+			return false;
+
+		}
+
+		foreach ( self::$needles as $needle => $unused ) {
+
+			if ( false !== strpos( $html, (string) $needle ) ) {
+
+				return true;
+
+			}
+
+		}
+
+		return self::may_address_code( $html );
+
+	}
+
+	/**
+	 * Whether a page may hold a script element whose src addressed_code() reads as a data: address.
+	 *
+	 * The decoded value must start with "data:". Written out, those five bytes follow the quote that
+	 * opens the value, or for an unquoted value the "=" or whitespace before it. Otherwise a
+	 * character reference spells one of them: &colon; or a numeric reference, with or without
+	 * semicolon. A false answer is therefore certain; a true one only costs the tokenizer pass.
+	 *
+	 * @param string $html Page.
+	 * @return bool
+	 */
+	public static function may_address_code( $html ) {
+
+		if ( false !== stripos( $html, 'data:' ) ) {
+
+			$lower = strtolower( $html );
+
+			foreach ( [ '"', "'", '=', ' ', "\t", "\n", "\r", "\f" ] as $before ) {
+
+				if ( false !== strpos( $lower, $before . 'data:' ) ) {
+
+					return true;
+
+				}
+
+			}
+
+		}
+
+		if ( false !== stripos( $html, '&colon' ) ) {
+
+			return true;
+
+		}
+
+		// d, D, a, A, t, T and ":" as code points. Bounded by the page: each reference is read once.
+		$spelled = [ 0x64, 0x44, 0x61, 0x41, 0x74, 0x54, 0x3A ];
+
+		for ( $at = strpos( $html, '&#' ); false !== $at; $at = strpos( $html, '&#', $at ) ) {
+
+			$at += 2;
+			$hex = isset( $html[ $at ] ) && ( 'x' === $html[ $at ] || 'X' === $html[ $at ] );
+			$at += $hex ? 1 : 0;
+			$at += strspn( $html, '0', $at );
+			$run = strspn( $html, $hex ? '0123456789abcdefABCDEF' : '0123456789', $at );
+
+			if ( $run > 0 && $run <= 3 && in_array( $hex ? hexdec( substr( $html, $at, $run ) ) : (int) substr( $html, $at, $run ), $spelled, true ) ) {
+
+				return true;
+
+			}
+
+			$at += $run;
+
+		}
+
+		return false;
+
+	}
+
+	/**
+	 * Code a script element carries in a data: address, or null for anything else.
+	 *
+	 * Some optimizers defer inline code by moving it into the element's src. The address holds
+	 * the code itself, so it is judged like inline code.
+	 *
+	 * @param \WP_HTML_Tag_Processor $tags Tokenizer positioned on a tag.
+	 * @return string|null
+	 */
+	private static function addressed_code( $tags ) {
+
+		if ( 'SCRIPT' !== $tags->get_tag() ) {
+
+			return null;
+
+		}
+
+		$src = $tags->get_attribute( 'src' );
+
+		if ( ! is_string( $src ) || 0 !== stripos( $src, 'data:' ) ) {
+
+			return null;
+
+		}
+
+		$comma = strpos( $src, ',' );
+
+		if ( false === $comma ) {
+
+			return null;
+
+		}
+
+		// Media type and parameters come before the first comma; base64 is the last parameter.
+		$meta = explode( ';', strtolower( substr( $src, 5, $comma - 5 ) ) );
+
+		if ( ! in_array( trim( $meta[0] ), self::SCRIPT_TYPES, true ) ) {
+
+			return null;
+
+		}
+
+		$data = substr( $src, $comma + 1 );
+
+		// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode -- Reading back code from a data: address; bounded by HOLD_LIMIT.
+		$code = 'base64' === trim( (string) end( $meta ) ) ? base64_decode( $data, true ) : rawurldecode( $data );
+
+		return false === $code ? null : $code;
 
 	}
 
@@ -787,6 +1036,10 @@ class CSPInline {
 		}
 
 		if ( $allowed ) {
+
+			self::$trusted[ $type . ':' . CSPInlineRules::digest( trim( $code ) ) ] = true;
+
+			++self::$stamped;
 
 			return [ 'nonce' => self::$nonce ];
 
@@ -1272,17 +1525,21 @@ class CSPInline {
 
 		}
 
-		$id = (string) $tags->get_attribute( 'id' );
+		$id     = (string) $tags->get_attribute( 'id' );
+		$needle = CSPInlineRules::needle( $code );
 
-		return [
-			'type'    => $type,
-			'digest'  => $digest,
-			'origin'  => '',
-			'label'   => sanitize_text_field( '' !== $id ? $id : $type . ' ' . substr( $digest, 0, 12 ) ),
-			'source'  => $source,
-			'excerpt' => wp_check_invalid_utf8( mb_substr( trim( $code ), 0, 160, 'UTF-8' ), true ),
-			'path'    => $path,
-		];
+		return array_merge(
+			[
+				'type'    => $type,
+				'digest'  => $digest,
+				'origin'  => '',
+				'label'   => sanitize_text_field( '' !== $id ? $id : $type . ' ' . substr( $digest, 0, 12 ) ),
+				'source'  => $source,
+				'excerpt' => CSPInlineRules::excerpt( $code ),
+				'path'    => $path,
+			],
+			'' !== $needle ? [ 'needle' => $needle ] : []
+		);
 
 	}
 

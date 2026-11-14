@@ -174,6 +174,19 @@ class IPRules {
 
 		$db = new BruteForceDB();
 
+		if ( $db->range_rule_limit_reached( $ip ) ) {
+
+			wp_send_json_error(
+				[
+					/* translators: %d: Maximum number of IP range rules. */
+					'message' => esc_html( sprintf( __( 'You already have %d IP range rules, the most SecureFusion checks on each request. Remove ranges you no longer need first.', 'secuplug' ), BruteForceDB::MAX_RANGE_RULES ) ),
+				]
+			);
+
+			return;
+
+		}
+
 		if ( $rule_type === 'blocked' ) {
 
 			if ( $db->is_ip_whitelisted( $ip ) ) {
@@ -310,6 +323,25 @@ class IPRules {
 			?>
 
 			<div id="fynd-sf-rules-notice" class="fynd-sf-log-notice" style="display:none;"></div>
+
+			<?php
+			$range_count = $db->count_range_rules();
+
+			if ( $range_count > BruteForceDB::MAX_RANGE_RULES ) :
+				?>
+				<div class="notice notice-warning inline">
+					<p>
+						<?php
+						printf(
+							/* translators: 1: Number of IP range rules stored, 2: Maximum number checked on each request. */
+							esc_html__( 'There are %1$d IP range rules, but only %2$d are checked on each request: whitelisted ranges first, then the newest blocked ranges. The others are not enforced until you remove ranges you no longer need.', 'secuplug' ),
+							(int) $range_count,
+							(int) BruteForceDB::MAX_RANGE_RULES
+						);
+						?>
+					</p>
+				</div>
+			<?php endif; ?>
 
 			<!-- Add New Rule Card -->
 			<div class="fynd-sf-card fynd-sf-rules-form-card">

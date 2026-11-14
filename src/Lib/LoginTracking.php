@@ -25,6 +25,65 @@ if ( ! defined( 'ABSPATH' ) ) {
 trait LoginTracking {
 
 	/**
+	 * Register the login hooks.
+	 *
+	 * The lockout runs on the 'authenticate' filter, which wp_authenticate() applies for every
+	 * password login: the login form (wp_signon()), XML-RPC (wp_xmlrpc_server::login()) and any
+	 * plugin that calls wp_authenticate(). The 'wp_authenticate' action used before is fired by
+	 * wp_signon() only.
+	 *
+	 * @return void
+	 */
+	public function register_login_tracking() {
+
+		add_action( 'wp_login_failed', [ $this, 'track_login_failed' ], 10, 2 );
+		add_filter( 'authenticate', [ $this, 'check_login_lockout' ], Middleware::LOGIN_LOCKOUT_PRIORITY, 3 );
+		add_action( 'wp_login', [ $this, 'track_login_successful' ], 10, 2 );
+
+	}
+
+
+	/**
+	 * Refuse a password check from a locked-out address before WordPress verifies the password.
+	 *
+	 * Runs ahead of every core 'authenticate' callback. Core checks a password only when both
+	 * fields are filled (wp_authenticate_username_password() and its email and application
+	 * password siblings answer empty fields without hashing), so calls without credentials,
+	 * such as every view of wp-login.php, cost no query here. A locked-out address is answered
+	 * by wp_die(), which ends the request: no later callback can turn the refusal into a login
+	 * and no password hash is computed.
+	 *
+	 * @param \WP_User|\WP_Error|null $user     Result of earlier callbacks.
+	 * @param string                  $username Username or email address.
+	 * @param string                  $password Password.
+	 * @return \WP_User|\WP_Error|null
+	 */
+	public function check_login_lockout(
+		$user,
+		$username = '',
+		#[\SensitiveParameter]
+		$password = ''
+	) {
+
+		if ( empty( $username ) || empty( $password ) ) {
+
+			return $user;
+
+		}
+
+		if ( $this->track_limit_login_attempts() ) {
+
+			// Reached only if a wp_die() handler returns instead of ending the request.
+			return new \WP_Error( 'securefusion_locked_out', esc_html__( 'You have reached the login attempts limit. Your IP has been locked out.', 'secuplug' ) );
+
+		}
+
+		return $user;
+
+	}
+
+
+	/**
 	 * Track failed login attempts.
 	 *
 	 * Fired on 'wp_login_failed' action.
@@ -63,9 +122,10 @@ trait LoginTracking {
 	/**
 	 * Limit login attempts.
 	 *
-	 * Fired on the 'wp_authenticate' action.
+	 * Called from check_login_lockout() before a password is verified. Blocks the address
+	 * and ends the request once it reached the limit within the window.
 	 *
-	 * @return void
+	 * @return bool True when the address is locked out and wp_die() returned.
 	 */
 	public function track_limit_login_attempts() {
 
@@ -74,13 +134,13 @@ trait LoginTracking {
 
 		if ( ! $ip ) {
 
-			return;
+			return false;
 
 		}
 
 		if ( $this->brute_force_db->is_ip_whitelisted( $ip ) ) {
 
-			return;
+			return false;
 
 		}
 
@@ -90,7 +150,7 @@ trait LoginTracking {
 
 		if ( ! $ip_login_limit ) {
 
-			return;
+			return false;
 
 		}
 
@@ -106,6 +166,17 @@ trait LoginTracking {
 			$duration_seconds = $ip_time_limit * HOUR_IN_SECONDS;
 			$this->brute_force_db->block_ip( $ip, $duration_seconds );
 
+			if ( ! headers_sent() ) {
+
+				header( 'X-LiteSpeed-Cache-Control: no-cache' );
+
+				// The XML-RPC handler of wp_die() prints a fault but sets no status of its own.
+				status_header( 403 );
+
+			}
+
+			// wp_die() picks the answer for the request: the HTML page on the login form, an
+			// XML-RPC fault for XML-RPC, JSON for REST and AJAX; all with status 403 and no-cache.
 			wp_die(
 				esc_html__( 'You have reached the login attempts limit. Your IP has been locked out.', 'secuplug' ),
 				esc_html__( 'Too many failed login attempts', 'secuplug' ),
@@ -115,7 +186,11 @@ trait LoginTracking {
 				]
 			);
 
+			return true;
+
 		}
+
+		return false;
 
 	}
 

@@ -75,13 +75,14 @@ trait SecurityLogQueries {
 						0 AS is_whitelisted
 					FROM %i r
 					LEFT JOIN %i l ON r.ip = l.ip
-					WHERE r.rule_type = 'blocked'
+					WHERE r.rule_type = 'blocked' AND ( r.expiration <= 0 OR r.expiration >= %d )
 					GROUP BY r.ip
 					ORDER BY {$orderby_sql} {$order}
 					LIMIT %d OFFSET %d",
 					// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 					$this->ip_rules_table,
 					$this->table_name,
+					time(),
 					$per_page,
 					$offset
 				)
@@ -111,7 +112,7 @@ trait SecurityLogQueries {
 					l.log_type,
 					l.user_agent,
 					l.payload,
-					IF(r.rule_type = 'blocked', 1, 0) AS is_blocked,
+					IF(r.rule_type = 'blocked' AND ( r.expiration <= 0 OR r.expiration >= %d ), 1, 0) AS is_blocked,
 					IF(r.rule_type = 'whitelisted', 1, 0) AS is_whitelisted
 				FROM %i l
 				LEFT JOIN %i r ON l.ip = r.ip
@@ -119,6 +120,7 @@ trait SecurityLogQueries {
 				ORDER BY {$orderby_sql} {$order}
 				LIMIT %d OFFSET %d",
 				// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				time(),
 				$this->table_name,
 				$this->ip_rules_table,
 				$type_filter,
@@ -146,9 +148,10 @@ trait SecurityLogQueries {
 			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom security tables have no WordPress CRUD API. Fresh security decisions, live reports or schema checks must not use stale cached results.
 			$count = $wpdb->get_var(
 				$wpdb->prepare(
-					'SELECT COUNT(*) FROM %i WHERE rule_type = %s',
+					'SELECT COUNT(*) FROM %i WHERE rule_type = %s AND ( expiration <= 0 OR expiration >= %d )',
 					$this->ip_rules_table,
-					'blocked'
+					'blocked',
+					time()
 				)
 			);
 
@@ -207,11 +210,12 @@ trait SecurityLogQueries {
 					0 AS is_whitelisted
 				FROM %i r
 				LEFT JOIN %i l ON r.ip = l.ip
-				WHERE r.rule_type = 'blocked'
+				WHERE r.rule_type = 'blocked' AND ( r.expiration <= 0 OR r.expiration >= %d )
 				GROUP BY r.ip
 				ORDER BY last_attempt DESC",
 					$this->ip_rules_table,
-					$this->table_name
+					$this->table_name,
+					time()
 				)
 			);
 
@@ -229,12 +233,13 @@ trait SecurityLogQueries {
 				l.log_type,
 				l.user_agent,
 				l.payload,
-				IF(r.rule_type = 'blocked', 1, 0) AS is_blocked,
+				IF(r.rule_type = 'blocked' AND ( r.expiration <= 0 OR r.expiration >= %d ), 1, 0) AS is_blocked,
 				IF(r.rule_type = 'whitelisted', 1, 0) AS is_whitelisted
 			FROM %i l
 			LEFT JOIN %i r ON l.ip = r.ip
 			WHERE (%s = '' OR l.log_type = %s)
 			ORDER BY l.last_attempt DESC",
+				time(),
 				$this->table_name,
 				$this->ip_rules_table,
 				$type_filter,

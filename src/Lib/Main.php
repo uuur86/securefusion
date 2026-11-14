@@ -224,10 +224,9 @@ class Main {
 		// MIDDLEWARE.
 		add_action( 'plugins_loaded', array( $this->middleware, 'init' ) );
 		add_action( 'init', array( $this->middleware, 'filter_bad_requests' ), 10 );
-		add_action( 'wp_login_failed', array( $this->middleware, 'track_login_failed' ), 10, 2 );
-		add_action( 'wp_authenticate', array( $this->middleware, 'track_limit_login_attempts' ), 10, 0 );
-		add_action( 'wp_login', array( $this->middleware, 'track_login_successful' ), 10, 2 );
 		add_action( 'init', array( $this->middleware, 'headers' ), 9 );
+
+		$this->middleware->register_login_tracking();
 
 		// SECURITY LOG — AJAX handlers.
 		$security_log = new Sources\SecurityLog();
@@ -295,6 +294,75 @@ class Main {
 			$brute_force_db->cleanup_old_ips( $days, $attempts );
 
 		}
+
+		$this->cleanup_expired_ip_rules();
+
+	}
+
+
+	/**
+	 * Delete expired IP blocks, on every site of a network.
+	 *
+	 * The cleanup cron runs on the main site only, while every site keeps its own rules table.
+	 * Bounded by half of max_execution_time (15 seconds when unlimited), by 100 sites per run
+	 * with the position kept in a network option, and by the batch limits of
+	 * BruteForceDB::cleanup_expired_ip_rules().
+	 *
+	 * @return void
+	 */
+	private function cleanup_expired_ip_rules() {
+
+		$max_time = (int) ini_get( 'max_execution_time' );
+		$deadline = microtime( true ) + ( $max_time > 0 ? $max_time : 30 ) / 2;
+
+		if ( ! is_multisite() ) {
+
+			( new BruteForceDB() )->cleanup_expired_ip_rules( $deadline );
+
+			return;
+
+		}
+
+		$offset = absint( get_site_option( 'securefusion_rule_cleanup_offset', 0 ) );
+		$sites  = get_sites(
+			[
+				'fields'     => 'ids',
+				'number'     => 100,
+				'offset'     => $offset,
+				'network_id' => get_current_network_id(),
+				'orderby'    => 'id',
+				'order'      => 'ASC',
+			]
+		);
+
+		$done = 0;
+
+		foreach ( $sites as $site_id ) {
+
+			if ( microtime( true ) >= $deadline ) {
+
+				break;
+
+			}
+
+			switch_to_blog( $site_id );
+
+			// Sites that never finished installing have no rules table to clean.
+			if ( get_option( 'securefusion_db_verified' ) ) {
+
+				( new BruteForceDB() )->cleanup_expired_ip_rules( $deadline );
+
+			}
+
+			restore_current_blog();
+
+			++$done;
+
+		}
+
+		$finished = $done === count( $sites ) && count( $sites ) < 100;
+
+		update_site_option( 'securefusion_rule_cleanup_offset', $finished ? 0 : $offset + $done );
 
 	}
 
@@ -395,6 +463,12 @@ class Main {
 
 		$db->migrate_existing_rows_to_failed_login();
 
+		if ( ! $wpdb->last_error ) {
+
+			$db->flag_range_rules();
+
+		}
+
 		if ( $wpdb->last_error ) {
 
 			update_option( 'securefusion_db_error', 1, false );
@@ -405,7 +479,7 @@ class Main {
 		}
 
 		update_option( 'securefusion_db_version', SECUREFUSION_VERSION );
-		update_option( 'securefusion_db_verified', '1', false );
+		update_option( 'securefusion_db_verified', BruteForceDB::SCHEMA_REVISION, false );
 		delete_option( 'securefusion_db_error' );
 		delete_transient( 'securefusion_db_retry' );
 
@@ -471,7 +545,10 @@ class Main {
 
 		$installed_version = get_option( 'securefusion_db_version' );
 
-		if ( ( $installed_version !== SECUREFUSION_VERSION || '1' !== get_option( 'securefusion_db_verified' ) ) && ! get_transient( 'securefusion_db_retry' ) ) {
+		// A new schema revision reruns the install once, also on sites already at this version.
+		$verified = BruteForceDB::SCHEMA_REVISION === get_option( 'securefusion_db_verified' );
+
+		if ( ( $installed_version !== SECUREFUSION_VERSION || ! $verified ) && ! get_transient( 'securefusion_db_retry' ) ) {
 
 			if ( Settings::is_network_mode() ) {
 

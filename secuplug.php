@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: SecureFusion
- * Plugin URI: https://fyndsoft.com/portfolio/securefusion
+ * Plugin URI: https://fyndsoft.com/digital-products/securefusion/
  * Description: Firewall, login protection, Content Security Policy, security headers, XML-RPC and REST API hardening, HTTPS enforcement and a security log, built to stay light on every request.
  * Version: 3.0.0
  * Author: codeplusdev
@@ -54,7 +54,6 @@ if ( ! defined( 'SECUREFUSION_HIDE_LOGIN_DISABLE' ) ) {
 }
 
 require_once SECUREFUSION_PATH . 'vendor/autoload.php';
-require_once SECUREFUSION_PATH . 'xmlrpc_server.php';
 
 use SecureFusion\Lib\Main;
 

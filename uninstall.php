@@ -61,6 +61,8 @@ function securefusion_uninstall_site_data() {
 	delete_option( 'securefusion_settings_layer' );
 	delete_option( 'securefusion_settings_backup_premultisite' );
 	delete_option( 'securefusion_cloudflare_seen' );
+	delete_option( 'securefusion_csp_changed' );
+	delete_option( 'securefusion_csp_test_since' );
 
 	// Dismissed notifications, stored per user and site.
 	delete_metadata( 'user', 0, $wpdb->get_blog_prefix() . 'securefusion_notices', '', true );
@@ -160,6 +162,7 @@ function securefusion_uninstall_network_data() {
 	$wasp->remove_settings();
 
 	delete_site_option( 'securefusion_db_version' );
+	delete_site_option( 'securefusion_rule_cleanup_offset' );
 
 	// CSP cache driver: its block in wp-config.php and the self-test result.
 	\SecureFusion\Lib\CSPCacheSetup::remove();

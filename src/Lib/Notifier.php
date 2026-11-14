@@ -16,9 +16,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Tells an administrator what the plugin just did or needs, where they are, with the fix one click away.
  *
- * Costs nothing for visitors: the script is only printed for users who may change the settings.
- * Blocked content is reported by the browser itself, so no request is made until a button is pressed.
- * Server notices are asked for at most once per interval and browser.
+ * Costs nothing for visitors: the script, its styles and its settings are only printed for users who
+ * pass allowed(), and the request handler answers nobody else. Blocked content is reported by the
+ * browser itself and gathered into one box per kind and page; no request is made and nothing changes
+ * until a button is pressed. Server notices are asked for at most once per interval and browser.
+ *
+ * Other modules can add notices with the `securefusion_notices` filter and answer their own action
+ * operations with the `securefusion_notice_operation` filter.
  */
 class Notifier {
 
@@ -45,6 +49,37 @@ class Notifier {
 	const MAX_DISMISSED = 40;
 
 	/**
+	 * Most hosts allowed with one click.
+	 */
+	const MAX_HOSTS = 20;
+
+	/**
+	 * Most inline code blocks approved with one click.
+	 */
+	const MAX_CODES = 10;
+
+	/**
+	 * Longest blocked address accepted from the browser.
+	 */
+	const MAX_URL = 2048;
+
+	/**
+	 * Most server notices sent to the browser at once, and most actions per notice.
+	 */
+	const MAX_NOTICES = 10;
+	const MAX_ACTIONS = 3;
+
+	/**
+	 * Time the policy last gained an exception from a notification.
+	 */
+	const CHANGED_OPTION = 'securefusion_csp_changed';
+
+	/**
+	 * Time the policy was first seen in test mode.
+	 */
+	const TEST_OPTION = 'securefusion_csp_test_since';
+
+	/**
 	 * Register the script and its request handler.
 	 *
 	 * @return void
@@ -53,7 +88,20 @@ class Notifier {
 
 		add_action( 'wp_enqueue_scripts', [ __CLASS__, 'enqueue' ], 0 );
 		add_action( 'admin_enqueue_scripts', [ __CLASS__, 'enqueue' ], 0 );
+
+		// Logged-in only: there is no wp_ajax_nopriv_ handler, so visitors cannot reach any operation.
 		add_action( 'wp_ajax_' . self::ACTION, [ __CLASS__, 'ajax' ] );
+
+	}
+
+	/**
+	 * Whether the current user may see notifications and act on them.
+	 *
+	 * @return bool
+	 */
+	public static function allowed() {
+
+		return is_user_logged_in() && current_user_can( Settings::site_capability() );
 
 	}
 
@@ -111,7 +159,7 @@ class Notifier {
 	 */
 	public static function enqueue() {
 
-		if ( ! is_user_logged_in() || is_network_admin() || ! current_user_can( Settings::site_capability() ) ) {
+		if ( is_network_admin() || ! self::allowed() ) {
 
 			return;
 
@@ -129,7 +177,8 @@ class Notifier {
 
 		foreach ( self::CATEGORIES as $category ) {
 
-			if ( self::wants( $settings, $category ) ) {
+			// A summary is never urgent: it waits for the dashboard instead of interrupting a visit to the site.
+			if ( self::wants( $settings, $category ) && ( 'activity' !== $category || is_admin() ) ) {
 
 				$categories[] = $category;
 
@@ -140,6 +189,13 @@ class Notifier {
 		if ( ! $categories ) {
 
 			return;
+
+		}
+
+		// This page now carries a request token for this user: no shared cache may hand it to anyone else.
+		if ( ! is_admin() ) {
+
+			CSPCache::exclude();
 
 		}
 
@@ -162,26 +218,32 @@ class Notifier {
 				'strict'     => 'strict' === CSPPolicy::level( $settings ),
 				'review'     => self::settings_url( 'security_policies' ),
 				'interval'   => self::INTERVAL,
+				'maxHosts'   => self::MAX_HOSTS,
+				'maxCodes'   => self::MAX_CODES,
 				'text'       => [
-					'region'      => __( 'SecureFusion notifications', 'secuplug' ),
-					'blocked'     => __( 'Blocked by your security policy', 'secuplug' ),
-					'wouldBlock'  => __( 'Would be blocked (test mode)', 'secuplug' ),
-					'hint'        => __( 'Allow it only if you know this host and your site needs it.', 'secuplug' ),
-					'inline'      => __( 'Code written directly into this page is not approved. Review it under Exceptions.', 'secuplug' ),
-					'inlineType'  => __( 'Inline code', 'secuplug' ),
-					'eval'        => __( 'A script on this page builds code while it runs. Allow it only if something on the page stopped working.', 'secuplug' ),
-					'evalType'    => __( 'Code built at runtime (eval)', 'secuplug' ),
-					'handler'     => __( 'This page uses attributes such as onclick or onload. Allow them only if something on the page stopped working.', 'secuplug' ),
-					'handlerType' => __( 'Inline event handler', 'secuplug' ),
-					'allow'       => __( 'Allow', 'secuplug' ),
-					'ignore'      => __( 'Do not ask again', 'secuplug' ),
-					'review'      => __( 'Review', 'secuplug' ),
-					'reload'      => __( 'Reload page', 'secuplug' ),
-					'dismiss'     => __( 'Dismiss', 'secuplug' ),
-					'mute'        => __( 'Turn off notifications like this', 'secuplug' ),
-					'working'     => __( 'Working…', 'secuplug' ),
-					'error'       => __( 'The request failed. Nothing was changed.', 'secuplug' ),
-					'types'       => [
+					'region'       => __( 'SecureFusion notifications', 'secuplug' ),
+					'blocked'      => __( 'Blocked by your security policy', 'secuplug' ),
+					'wouldBlock'   => __( 'Would be blocked (test mode)', 'secuplug' ),
+					'hint'         => __( 'Allow only hosts you know and your site needs.', 'secuplug' ),
+					'inline'       => __( 'Code written directly into this page is not approved yet. Check how it starts and allow it only if you recognize it.', 'secuplug' ),
+					'inlineReview' => __( 'Code written directly into this page is not approved yet. The review lists it with where it came from.', 'secuplug' ),
+					'inlineType'   => __( 'Inline code', 'secuplug' ),
+					'allowCode'    => __( 'Allow this code', 'secuplug' ),
+					/* translators: %s: number of further items. */
+					'more'         => __( 'and %s more', 'secuplug' ),
+					'eval'         => __( 'A script on this page builds code while it runs. Allow it only if something on the page stopped working.', 'secuplug' ),
+					'evalType'     => __( 'Code built at runtime (eval)', 'secuplug' ),
+					'handler'      => __( 'This page uses attributes such as onclick or onload. Allow them only if something on the page stopped working.', 'secuplug' ),
+					'handlerType'  => __( 'Inline event handler', 'secuplug' ),
+					'allow'        => __( 'Allow', 'secuplug' ),
+					'ignore'       => __( 'Do not ask again', 'secuplug' ),
+					'review'       => __( 'Review', 'secuplug' ),
+					'reload'       => __( 'Reload page', 'secuplug' ),
+					'dismiss'      => __( 'Dismiss', 'secuplug' ),
+					'mute'         => __( 'Turn off notifications like this', 'secuplug' ),
+					'working'      => __( 'Working…', 'secuplug' ),
+					'error'        => __( 'The request failed. Nothing was changed.', 'secuplug' ),
+					'types'        => [
 						'script'      => __( 'Script', 'secuplug' ),
 						'style'       => __( 'Stylesheet', 'secuplug' ),
 						'img'         => __( 'Image', 'secuplug' ),
@@ -224,6 +286,71 @@ class Notifier {
 	}
 
 	/**
+	 * Read the raw "items" field, a JSON list sent by the script.
+	 *
+	 * @return string
+	 */
+	private static function raw_items() {
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- ajax() verifies the nonce; decode_items() bounds and validates every field.
+		return isset( $_POST['items'] ) && is_string( $_POST['items'] ) ? wp_unslash( $_POST['items'] ) : '';
+
+	}
+
+	/**
+	 * Decode a JSON list of flat objects whose fields are all strings.
+	 *
+	 * The whole list is refused when it is too long, too large, nested or holds any other value.
+	 *
+	 * @param string   $raw    JSON text.
+	 * @param string[] $fields Required field names.
+	 * @param int      $limit  Most items.
+	 * @param int      $length Most bytes of JSON text.
+	 * @return array<int,array<string,string>> Items, or none.
+	 */
+	public static function decode_items( $raw, $fields, $limit, $length ) {
+
+		if ( ! is_string( $raw ) || '' === $raw || strlen( $raw ) > $length ) {
+
+			return [];
+
+		}
+
+		$items = json_decode( $raw, true, 3 );
+
+		if ( ! is_array( $items ) || count( $items ) > $limit ) {
+
+			return [];
+
+		}
+
+		$result = [];
+
+		foreach ( $items as $item ) {
+
+			$row = [];
+
+			foreach ( $fields as $field ) {
+
+				if ( ! is_array( $item ) || ! is_string( $item[ $field ] ?? null ) ) {
+
+					return [];
+
+				}
+
+				$row[ $field ] = $item[ $field ];
+
+			}
+
+			$result[] = $row;
+
+		}
+
+		return $result;
+
+	}
+
+	/**
 	 * Answer the notification script.
 	 *
 	 * @return void
@@ -232,7 +359,7 @@ class Notifier {
 
 		check_ajax_referer( self::ACTION, 'nonce' );
 
-		if ( ! current_user_can( Settings::site_capability() ) ) {
+		if ( ! self::allowed() ) {
 
 			wp_send_json_error( [ 'message' => __( 'Permission denied.', 'secuplug' ) ], 403 );
 
@@ -286,6 +413,30 @@ class Notifier {
 
 		}
 
+		if ( 'recheck_cache' === $operation && CSPCacheSetup::can_manage() ) {
+
+			$status = CSPCacheSetup::verify();
+
+			wp_send_json_success( [ 'message' => ! empty( $status['ok'] ) ? __( 'The cache driver passed its test and is in use again.', 'secuplug' ) : __( 'The cache driver still fails its test. The Page cache box in the settings says why.', 'secuplug' ) ] );
+
+			return;
+
+		}
+
+		$message = '';
+
+		if ( 'allow_hosts' === $operation ) {
+
+			$message = self::allow_hosts( self::decode_items( self::raw_items(), [ 'type', 'url' ], self::MAX_HOSTS, self::MAX_HOSTS * ( self::MAX_URL + 64 ) ) );
+
+		}
+
+		if ( 'allow_inline' === $operation ) {
+
+			$message = self::allow_inline( self::decode_items( self::raw_items(), [ 'type', 'code' ], self::MAX_CODES, self::MAX_CODES * ( CSPInlineRules::MAX_CODE + 64 ) ) );
+
+		}
+
 		$switches = [
 			'allow_eval'     => [ 'csp_allow_eval', '1', __( 'Code built at runtime is now allowed on every page.', 'secuplug' ) ],
 			'allow_handlers' => [ 'csp_block_event_handlers', '0', __( 'Inline event handlers are now allowed.', 'secuplug' ) ],
@@ -295,9 +446,17 @@ class Notifier {
 
 			Settings::update_site( [ $switches[ $operation ][0] => $switches[ $operation ][1] ] );
 
+			self::changed();
+
+			$message = $switches[ $operation ][2];
+
+		}
+
+		if ( '' !== $message ) {
+
 			wp_send_json_success(
 				[
-					'message' => $switches[ $operation ][2],
+					'message' => $message,
 					'reload'  => true,
 				]
 			);
@@ -306,16 +465,30 @@ class Notifier {
 
 		}
 
-		if ( 'allow' === $operation ) {
+		$builtin = [ 'list', 'dismiss', 'mute', 'enforce', 'recheck_cache', 'allow_hosts', 'allow_inline', 'allow_eval', 'allow_handlers' ];
 
-			$message = self::allow( sanitize_key( self::input( 'type' ) ), sanitize_url( self::input( 'url' ), [ 'http', 'https', 'ws', 'wss' ] ) );
+		if ( '' !== $operation && ! in_array( $operation, $builtin, true ) ) {
 
-			if ( '' !== $message ) {
+			/**
+			 * Answers an action operation of a notice added with the `securefusion_notices` filter.
+			 *
+			 * Runs only after the nonce and the capability (Notifier::allowed()) were checked, and only
+			 * for operations SecureFusion does not handle itself. Check the operation name, do the work,
+			 * and read further request fields yourself. Return
+			 * [ 'message' => string, 'reload' => bool ] to answer; anything else means the operation
+			 * is unknown. The message is shown as plain text.
+			 *
+			 * @param array|null $answer    Null.
+			 * @param string     $operation Operation name, already passed through sanitize_key().
+			 */
+			$answer = apply_filters( 'securefusion_notice_operation', null, $operation );
+
+			if ( is_array( $answer ) && is_string( $answer['message'] ?? null ) ) {
 
 				wp_send_json_success(
 					[
-						'message' => $message,
-						'reload'  => true,
+						'message' => wp_strip_all_tags( $answer['message'] ),
+						'reload'  => ! empty( $answer['reload'] ),
 					]
 				);
 
@@ -330,18 +503,22 @@ class Notifier {
 	}
 
 	/**
-	 * Allow the host of a blocked address, or the whole service it belongs to.
+	 * Origin of a blocked address, when it can be a policy host source.
 	 *
-	 * @param string $type Resource type: script or a key of CSPPolicy::LIMITS.
-	 * @param string $url  Blocked address without query.
-	 * @return string Confirmation, or empty when the request is not usable.
+	 * @param string $url Blocked address.
+	 * @return string Origin, or empty.
 	 */
-	public static function allow( $type, $url ) {
+	private static function origin( $url ) {
+
+		if ( '' === $url || strlen( $url ) > self::MAX_URL ) {
+
+			return '';
+
+		}
 
 		$parts = wp_parse_url( $url );
-		$types = array_merge( [ 'script' ], array_keys( CSPPolicy::LIMITS ) );
 
-		if ( ! in_array( $type, $types, true ) || ! is_array( $parts ) || empty( $parts['scheme'] ) || empty( $parts['host'] ) ) {
+		if ( ! is_array( $parts ) || empty( $parts['scheme'] ) || empty( $parts['host'] ) || ! in_array( strtolower( $parts['scheme'] ), [ 'http', 'https', 'ws', 'wss' ], true ) ) {
 
 			return '';
 
@@ -349,37 +526,183 @@ class Notifier {
 
 		$origin = strtolower( $parts['scheme'] . '://' . $parts['host'] ) . ( isset( $parts['port'] ) ? ':' . (int) $parts['port'] : '' );
 
-		if ( ! CSP::validate_host_source( $origin ) ) {
+		return CSP::validate_host_source( $origin ) ? $origin : '';
+
+	}
+
+	/**
+	 * Allow the hosts of blocked addresses, or the services they belong to, with one settings write.
+	 *
+	 * Only types the policy already limits are accepted: the lists in CSPPolicy::LISTED start to limit
+	 * their type with their first host, so allowing one there would block everything else of that type.
+	 * One unusable item refuses the whole request.
+	 *
+	 * @param array<int,array{type:string,url:string}> $items At most MAX_HOSTS blocked addresses.
+	 * @return string Confirmation, or empty when the request is not usable.
+	 */
+	public static function allow_hosts( $items ) {
+
+		if ( ! is_array( $items ) || ! $items || count( $items ) > self::MAX_HOSTS ) {
 
 			return '';
 
 		}
 
 		$settings = Settings::all();
-		$provider = CSPIntegrations::provider_for( $url, $type );
+		$limited  = self::limited_types( $settings );
+		$catalog  = CSPIntegrations::catalog();
+		$changes  = [];
+		$services = [];
+		$hosts    = [];
 
-		if ( '' !== $provider ) {
+		foreach ( $items as $item ) {
 
-			Settings::update_site( [ 'csp_service_' . $provider => '1' ] );
+			$type   = is_array( $item ) && is_string( $item['type'] ?? null ) ? $item['type'] : '';
+			$url    = is_array( $item ) && is_string( $item['url'] ?? null ) ? $item['url'] : '';
+			$origin = in_array( $type, $limited, true ) ? self::origin( $url ) : '';
 
-			/* translators: %s: service name, for example "Google Analytics". */
-			return sprintf( __( '%s is now allowed under Services.', 'secuplug' ), CSPIntegrations::catalog()[ $provider ]['label'] ?? $provider );
+			if ( '' === $origin ) {
+
+				return '';
+
+			}
+
+			$provider = CSPIntegrations::provider_for( $url, $type );
+
+			if ( '' !== $provider ) {
+
+				$changes[ 'csp_service_' . $provider ] = '1';
+				$services[ $provider ]                 = (string) ( $catalog[ $provider ]['label'] ?? $provider );
+
+				continue;
+
+			}
+
+			$key  = 'csp_allowed_' . $type . '_sources';
+			$list = isset( $changes[ $key ] ) ? CSP::host_list( $changes[ $key ] ) : CSP::host_list( $settings[ $key ] ?? '' );
+
+			if ( ! in_array( $origin, $list, true ) ) {
+
+				$list[]          = $origin;
+				$changes[ $key ] = implode( PHP_EOL, $list );
+
+			}
+
+			$hosts[ $origin ] = $origin;
 
 		}
 
-		$key   = 'csp_allowed_' . $type . '_sources';
-		$hosts = CSP::host_list( $settings[ $key ] ?? '' );
+		if ( $changes ) {
 
-		if ( ! in_array( $origin, $hosts, true ) ) {
+			Settings::update_site( $changes );
 
-			$hosts[] = $origin;
-
-			Settings::update_site( [ $key => implode( PHP_EOL, $hosts ) ] );
+			self::changed();
 
 		}
 
-		/* translators: %s: host, for example "https://cdn.example.com". */
-		return sprintf( __( '%s is now allowed.', 'secuplug' ), $origin );
+		$parts = [];
+
+		if ( $services ) {
+
+			/* translators: %s: comma-separated service names, for example "Google Analytics, Stripe". */
+			$parts[] = sprintf( _n( '%s is now allowed under Services.', '%s are now allowed under Services.', count( $services ), 'secuplug' ), implode( ', ', $services ) );
+
+		}
+
+		if ( $hosts ) {
+
+			/* translators: %s: comma-separated hosts, for example "https://cdn.example.com". */
+			$parts[] = sprintf( _n( '%s is now allowed.', '%s are now allowed.', count( $hosts ), 'secuplug' ), implode( ', ', $hosts ) );
+
+		}
+
+		return implode( ' ', $parts );
+
+	}
+
+	/**
+	 * Approve inline code the owner chose in a notification. Only while inline code is verified.
+	 *
+	 * @param array<int,array{type:string,code:string}> $items At most MAX_CODES code blocks.
+	 * @return string Confirmation, or empty when nothing was approved.
+	 */
+	public static function allow_inline( $items ) {
+
+		if ( ! is_array( $items ) || ! $items || count( $items ) > self::MAX_CODES || 'strict' !== CSPPolicy::level( Settings::all() ) ) {
+
+			return '';
+
+		}
+
+		$count = 0;
+
+		foreach ( $items as $item ) {
+
+			if ( is_array( $item ) && is_string( $item['type'] ?? null ) && is_string( $item['code'] ?? null ) && CSPInlineRules::approve_code( $item['type'], $item['code'] ) ) {
+
+				++$count;
+
+			}
+
+		}
+
+		if ( $count < 1 ) {
+
+			return '';
+
+		}
+
+		self::changed();
+
+		/* translators: %s: number of approved code blocks. */
+		return sprintf( _n( '%s code block is now approved on every page. You can take it back under Exceptions.', '%s code blocks are now approved on every page. You can take them back under Exceptions.', $count, 'secuplug' ), number_format_i18n( $count ) );
+
+	}
+
+	/**
+	 * Remember that the policy just gained an exception, which restarts the quiet week.
+	 *
+	 * @return void
+	 */
+	public static function changed() {
+
+		update_option( self::CHANGED_OPTION, time(), false );
+
+	}
+
+	/**
+	 * Days the policy has run in test mode without needing a new exception, or -1 when it is not testing.
+	 *
+	 * @param array $settings Resolved settings.
+	 * @return int
+	 */
+	private static function quiet_days( $settings ) {
+
+		if ( 'off' === CSPPolicy::level( $settings ) || 'enforce' === CSPPolicy::mode( $settings ) ) {
+
+			if ( false !== get_option( self::TEST_OPTION ) ) {
+
+				delete_option( self::TEST_OPTION );
+
+			}
+
+			return -1;
+
+		}
+
+		$since = (int) get_option( self::TEST_OPTION, 0 );
+
+		if ( $since < 1 ) {
+
+			$since = time();
+
+			update_option( self::TEST_OPTION, $since, false );
+
+		}
+
+		$since = max( $since, (int) get_option( self::CHANGED_OPTION, 0 ) );
+
+		return (int) floor( max( 0, time() - $since ) / DAY_IN_SECONDS );
 
 	}
 
@@ -426,10 +749,56 @@ class Notifier {
 	}
 
 	/**
+	 * Keep the actions of a notice the script can safely offer.
+	 *
+	 * @param mixed $actions Actions from a notice.
+	 * @return array<int,array<string,mixed>> At most MAX_ACTIONS, each with a label and a url or an operation.
+	 */
+	private static function actions( $actions ) {
+
+		$result = [];
+
+		foreach ( is_array( $actions ) ? array_slice( $actions, 0, self::MAX_ACTIONS ) : [] as $action ) {
+
+			if ( ! is_array( $action ) || ! is_string( $action['label'] ?? null ) || '' === $action['label'] ) {
+
+				continue;
+
+			}
+
+			$url       = is_string( $action['url'] ?? null ) ? esc_url_raw( $action['url'], [ 'http', 'https' ] ) : '';
+			$operation = is_string( $action['operation'] ?? null ) ? sanitize_key( $action['operation'] ) : '';
+			$clean     = [
+				'label'   => $action['label'],
+				'primary' => ! empty( $action['primary'] ),
+			];
+
+			if ( '' !== $url ) {
+
+				$clean['url'] = $url;
+
+			} elseif ( '' !== $operation ) {
+
+				$clean['operation'] = $operation;
+
+			} else {
+
+				continue;
+
+			}
+
+			$result[] = $clean;
+
+		}
+
+		return $result;
+
+	}
+
+	/**
 	 * Collect what the current user should be told now.
 	 *
-	 * Each notice: id, category, title, text, repeat (seconds before a dismissed notice may return,
-	 * 0 for never) and actions (label plus either an operation or a url).
+	 * Called from ajax() after the nonce and capability checks.
 	 *
 	 * @return array<int,array<string,mixed>>
 	 */
@@ -448,7 +817,19 @@ class Notifier {
 		/**
 		 * Filters the notices offered to an administrator.
 		 *
-		 * @param array $notices  Notices, see Notifier::pending().
+		 * Each notice is an array with:
+		 * - id       (string) Unique key, used to remember a dismissal.
+		 * - category (string) One of Notifier::CATEGORIES; follows that category's switch. Default status.
+		 * - title    (string) Short title, shown as plain text.
+		 * - text     (string) One or two sentences, shown as plain text.
+		 * - repeat   (int)    Seconds before a dismissed notice may return, 0 for never.
+		 * - actions  (array)  Up to three buttons: label (string), primary (bool), and either url
+		 *                     (http or https) or operation (a key answered through the
+		 *                     `securefusion_notice_operation` filter).
+		 *
+		 * At most ten notices are sent at once. Only users who pass Notifier::allowed() ever see them.
+		 *
+		 * @param array $notices  Notices.
 		 * @param array $settings Resolved settings.
 		 */
 		$notices = (array) apply_filters( 'securefusion_notices', $notices, $settings );
@@ -457,8 +838,20 @@ class Notifier {
 
 		foreach ( $notices as $notice ) {
 
-			$id       = sanitize_key( $notice['id'] ?? '' );
-			$category = $notice['category'] ?? 'status';
+			if ( count( $result ) >= self::MAX_NOTICES ) {
+
+				break;
+
+			}
+
+			if ( ! is_array( $notice ) ) {
+
+				continue;
+
+			}
+
+			$id       = sanitize_key( is_string( $notice['id'] ?? null ) ? $notice['id'] : '' );
+			$category = in_array( $notice['category'] ?? '', self::CATEGORIES, true ) ? $notice['category'] : 'status';
 			$closed   = $state['dismissed'][ $id ] ?? 0;
 			$repeat   = (int) ( $notice['repeat'] ?? 0 );
 
@@ -471,14 +864,15 @@ class Notifier {
 			$result[] = [
 				'id'       => $id,
 				'category' => $category,
-				'title'    => (string) ( $notice['title'] ?? '' ),
-				'text'     => (string) ( $notice['text'] ?? '' ),
-				'actions'  => array_values( (array) ( $notice['actions'] ?? [] ) ),
+				'title'    => is_string( $notice['title'] ?? null ) ? $notice['title'] : '',
+				'text'     => is_string( $notice['text'] ?? null ) ? $notice['text'] : '',
+				'actions'  => self::actions( $notice['actions'] ?? [] ),
 			];
 
 		}
 
-		$summary = self::wants( $settings, 'activity' ) ? self::activity_notice( $state ) : null;
+		// Only a page that shows the summary (the dashboard) may use it up; see enqueue().
+		$summary = self::wants( $settings, 'activity' ) && '1' === self::input( 'activity' ) ? self::activity_notice( $state ) : null;
 
 		if ( $summary ) {
 
@@ -504,21 +898,27 @@ class Notifier {
 			'url'   => self::settings_url( 'security_policies' ),
 		];
 
-		if ( 'off' !== CSPPolicy::level( $settings ) && 'enforce' !== CSPPolicy::mode( $settings ) ) {
+		$quiet = self::quiet_days( $settings );
+
+		// Asked only once testing has shown something: a week without a new exception.
+		if ( $quiet >= 7 ) {
 
 			$notices[] = [
-				'id'       => 'csp_test',
+				'id'       => 'csp_ready',
 				'category' => 'status',
-				'repeat'   => WEEK_IN_SECONDS,
-				'title'    => __( 'Your security policy is only being tested', 'secuplug' ),
-				'text'     => __( 'Nothing is blocked yet, so visitors are not protected by it. Browse your pages: a notification appears for anything that would be blocked. When everything works, enforce the policy.', 'secuplug' ),
+				'repeat'   => 2 * WEEK_IN_SECONDS,
+				'title'    => __( 'Your security policy is ready to protect visitors', 'secuplug' ),
+				'text'     => sprintf(
+					/* translators: %s: number of days. */
+					_n( 'It has been tested for %s day without needing a new exception, but it still blocks nothing. Turn it on now; anything blocked later shows up here with a fix.', 'It has been tested for %s days without needing a new exception, but it still blocks nothing. Turn it on now; anything blocked later shows up here with a fix.', $quiet, 'secuplug' ),
+					number_format_i18n( $quiet )
+				),
 				'actions'  => [
 					[
-						'label'     => __( 'Enforce now', 'secuplug' ),
+						'label'     => __( 'Turn on protection', 'secuplug' ),
 						'operation' => 'enforce',
 						'primary'   => true,
 					],
-					$review,
 				],
 			];
 
@@ -546,8 +946,15 @@ class Notifier {
 				'category' => 'status',
 				'repeat'   => DAY_IN_SECONDS,
 				'title'    => __( 'The cache driver is not in use', 'secuplug' ),
-				'text'     => __( 'It did not pass its test, so it is not used. The Page cache box in the settings says why.', 'secuplug' ),
-				'actions'  => [ $review ],
+				'text'     => __( 'It did not pass its test, so it is not used. Test it again after changing your cache settings.', 'secuplug' ),
+				'actions'  => [
+					[
+						'label'     => __( 'Test again', 'secuplug' ),
+						'operation' => 'recheck_cache',
+						'primary'   => true,
+					],
+					$review,
+				],
 			];
 
 		}
@@ -570,7 +977,7 @@ class Notifier {
 	}
 
 	/**
-	 * Summarize what was stopped since the last summary, at most once a day.
+	 * Summarize what was stopped since the last summary, at most once a week.
 	 *
 	 * @param array $state Current user's state.
 	 * @return array<string,mixed>|null
@@ -579,7 +986,7 @@ class Notifier {
 
 		$now = time();
 
-		if ( $now - $state['seen'] < DAY_IN_SECONDS ) {
+		if ( $now - $state['seen'] < WEEK_IN_SECONDS ) {
 
 			return null;
 

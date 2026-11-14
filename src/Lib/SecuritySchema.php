@@ -77,10 +77,12 @@ trait SecuritySchema {
 				],
 			],
 			$this->ip_rules_table => [
-				[ 'id', 'ip', 'rule_type', 'created_at', 'expiration' ],
+				[ 'id', 'ip', 'rule_type', 'created_at', 'expiration', 'is_range' ],
 				[
-					'PRIMARY' => [ 'id' ],
-					'ip'      => [ 'ip' ],
+					'PRIMARY'         => [ 'id' ],
+					'ip'              => [ 'ip' ],
+					'range_rules'     => [ 'is_range', 'rule_type', 'id' ],
+					'rule_expiration' => [ 'rule_type', 'expiration' ],
 				],
 			],
 		];
@@ -173,8 +175,11 @@ trait SecuritySchema {
             rule_type varchar(50) NOT NULL,
             created_at int DEFAULT '0' NOT NULL,
             expiration int DEFAULT '0' NOT NULL,
+            is_range tinyint(1) DEFAULT '0' NOT NULL,
             PRIMARY KEY  (id),
-            UNIQUE KEY  ip (ip)
+            UNIQUE KEY  ip (ip),
+            KEY  range_rules (is_range,rule_type,id),
+            KEY  rule_expiration (rule_type,expiration)
         ) {$charset_collate};";
 
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
@@ -281,6 +286,32 @@ trait SecuritySchema {
 		);
 
 		return $last_id;
+
+	}
+
+
+	/**
+	 * Flag range rules stored before the `is_range` column existed.
+	 *
+	 * Runs once per schema revision from Main::install_database(), in the same request that
+	 * added the column, so the range lookup never misses older ranges. One statement over the
+	 * rules table, as migrate_existing_rows_to_failed_login() does over the log table; it only
+	 * changes rows that are still unflagged, so a repeated run touches nothing.
+	 *
+	 * @return void
+	 */
+	public function flag_range_rules() {
+
+		$wpdb = $this->wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Custom security tables have no WordPress CRUD API; this migration needs fresh data.
+		$wpdb->query(
+			$wpdb->prepare(
+				'UPDATE %i SET is_range = 1 WHERE is_range = 0 AND ip LIKE %s',
+				$this->ip_rules_table,
+				'%' . $wpdb->esc_like( '/' ) . '%'
+			)
+		);
 
 	}
 

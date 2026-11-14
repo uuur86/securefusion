@@ -562,8 +562,8 @@ trait WPCommon {
 	public function render_header( $title, $description, $custom_actions = [] ) {
 
 		$plugin_url    = \plugins_url( '/', SECUREFUSION_BASENAME );
-		$changelog_url = 'https://fyndsoft.com/portfolio/securefusion/#changelog';
-		$products_url  = 'https://fyndsoft.com/portfolio/';
+		$changelog_url = 'https://fyndsoft.com/digital-products/securefusion/#fynd-product-changelog-title';
+		$products_url  = 'https://fyndsoft.com/digital-products/';
 		$services_url  = 'https://fyndsoft.com/services/';
 		?>
 		<header class="fynd-sf-log-header">

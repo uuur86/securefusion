@@ -54,6 +54,13 @@ class CSPPolicy {
 	const LISTED = [ 'media', 'img', 'font', 'connect', 'frame', 'form_action' ];
 
 	/**
+	 * Switches that versions up to 2.0.3 stored, together with their whole configuration. A layer
+	 * holding one of them was saved by such a version; http_headers is a current setting and proves
+	 * nothing alone.
+	 */
+	const LEGACY_KEYS = [ 'enable_csp_report_only', 'enable_csp_script', 'enable_csp_style' ];
+
+	/**
 	 * Resolve the configured protection level.
 	 *
 	 * @param array $settings Resolved settings.
@@ -86,7 +93,7 @@ class CSPPolicy {
 	}
 
 	/**
-	 * Read the On/Off switch each list had in older versions.
+	 * Read the On/Off switch each list had in versions up to 2.0.3.
 	 *
 	 * A list is now a limit as soon as it holds a host. A list whose switch was off never limited
 	 * anything, so it is emptied; otherwise the hosts that shipped as defaults would start
@@ -136,7 +143,11 @@ class CSPPolicy {
 	}
 
 	/**
-	 * Translate settings saved by older versions into the protection level.
+	 * Translate settings saved by versions up to 2.0.3 into the protection level.
+	 *
+	 * Runs on every read and write of a layer, and a network sub-site layer holds only the keys that
+	 * site changed. A layer made of current settings alone passes through unchanged. The keys read
+	 * here are removed once a level is set, so a stored layer is translated once.
 	 *
 	 * @param array|mixed $values Stored values from one settings layer.
 	 * @return array|mixed
@@ -154,108 +165,63 @@ class CSPPolicy {
 
 		if ( isset( $values['csp_level'] ) ) {
 
-			// The settings form only offers Off and On; development builds stored other names.
-			if ( 'off' !== $values['csp_level'] ) {
+			return $values;
 
-				$values['csp_level'] = 'basic';
+		}
 
-			}
+		// Versions up to 2.0.3 stored their whole configuration: the CSP switches, or before them
+		// change_admin_id. Today http_headers leaves the policy alone, so on its own it is a site's
+		// current choice.
+		$switches = (bool) array_intersect_key( $values, array_flip( self::LEGACY_KEYS ) );
+
+		if ( ! $switches && ! array_key_exists( 'change_admin_id', $values ) ) {
 
 			return $values;
 
 		}
 
-		$level = self::legacy_level( $values );
+		// Those versions sent their policy only together with the browser headers.
+		$sent = ! array_key_exists( 'http_headers', $values ) || ! empty( $values['http_headers'] );
 
-		if ( '' === $level ) {
+		// A version before the CSP switches, with the headers on, holds no CSP decision.
+		if ( $sent && ! $switches ) {
 
 			return $values;
 
 		}
 
-		$values['csp_level'] = 'off' === $level ? 'off' : 'basic';
+		$tested = ! empty( $values['enable_csp_report_only'] );
+		$limits = $sent && ( ! empty( $values['enable_csp_script'] ) || ! empty( $values['enable_csp_style'] ) );
 
-		// Scripts were not limited on this site before, so the policy starts as a test.
-		if ( 'basic' === $level ) {
+		$values['csp_level'] = $sent ? 'basic' : 'off';
 
+		if ( $sent && ! $limits ) {
+
+			// Scripts and styles were not limited on this site before, so the policy starts as a test.
 			$values['csp_mode'] = 'report';
-
-			return $values;
-
-		}
-
-		if ( isset( $values['csp_mode'] ) ) {
-
-			$values['csp_mode'] = self::mode( $values );
 
 		} else {
 
-			$tested             = ! empty( $values['csp_easy_mode'] ) || ! empty( $values['enable_csp_report_only'] );
 			$values['csp_mode'] = $tested ? 'report' : 'enforce';
 
+			// This site already ran its own script or style rules. Keep what its pages may rely on.
+			if ( $limits ) {
+
+				$values['csp_allow_inline'] = '1';
+
+			}
+
+			$values += [ 'csp_allow_eval' => '1' ];
+
 		}
 
-		// This site already ran its own rules. Keep what its pages may rely on.
-		if ( 'enhanced' === $level ) {
+		foreach ( array_merge( self::LEGACY_KEYS, [ 'change_admin_id' ] ) as $key ) {
 
-			$values['csp_allow_inline'] = '1';
-
-		}
-
-		if ( ! isset( $values['csp_allow_eval'] ) ) {
-
-			$values['csp_allow_eval'] = '1';
+			unset( $values[ $key ] );
 
 		}
 
 		return $values;
-
-	}
-
-	/**
-	 * Map a pre-level configuration to the closest level.
-	 *
-	 * @param array $values Stored values from one settings layer.
-	 * @return string Level, or empty when this layer holds no CSP decision.
-	 */
-	private static function legacy_level( $values ) {
-
-		$disabled = isset( $values['http_headers'] ) && '0' === (string) $values['http_headers'];
-		$keys     = [ 'csp_profile', 'csp_mode', 'csp_easy_mode', 'enable_csp_report_only', 'csp_inline_enabled', 'enable_csp_script', 'enable_csp_style' ];
-
-		if ( ! array_intersect_key( $values, array_flip( $keys ) ) ) {
-
-			return $disabled ? 'off' : '';
-
-		}
-
-		if ( $disabled ) {
-
-			return 'off';
-
-		}
-
-		if ( 'auto' === ( $values['csp_profile'] ?? '' ) ) {
-
-			return 'basic';
-
-		}
-
-		$inline = (string) ( $values['csp_inline_enabled'] ?? '0' );
-
-		if ( '1' === $inline ) {
-
-			return 'strict';
-
-		}
-
-		$custom = 'unsafe' === $inline
-			|| ! empty( $values['csp_easy_mode'] )
-			|| 'report_all' === ( $values['csp_mode'] ?? '' )
-			|| '1' === (string) ( $values['enable_csp_script'] ?? '0' )
-			|| '1' === (string) ( $values['enable_csp_style'] ?? '0' );
-
-		return $custom ? 'enhanced' : 'basic';
 
 	}
 
